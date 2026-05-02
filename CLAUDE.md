@@ -36,8 +36,9 @@ S = {
     scenes: [{
       name: string,        // optional user-given name (display uses sceneLabel which adds "Scene One" numbering)
       description: string,
+      setting: string,     // scene-level setting description (e.g. "A dimly lit parlor. Evening.")
       lines: [{
-        type: 'setting' | 'direction' | 'dialogue' | 'action',  // internal keys; display names: Setting, Cue, Dialogue, Stage Direction
+        type: 'direction' | 'dialogue' | 'action',  // internal keys; display names: Cue, Dialogue, Stage Direction (legacy 'setting' lines still rendered)
         value: string,
         character?: { name, description },      // for dialogue & action (stage direction)
         dialogueAction?: string,                 // for dialogue (parenthetical)
@@ -261,3 +262,11 @@ S = {
 - **UI density cleanup — editor lines** — Drag handles hidden by default, revealed on hover (`.drag-handle{opacity:0}` + `:hover` rule). Act/scene Edit/Delete buttons hidden until hover (`.row-btns{opacity:0}` + `:hover` rule). Tightened spacing: act block margin 32→24px, scene gap 12→8px, line padding 2→1px, header padding reduced. Smaller button text (11→10px). Mobile overrides keep controls always visible.
 - **UI density cleanup — input bar** — Pill shortcut labels (`.sc`) hidden by default, revealed on pill hover. Slimmer pills (12→11px text, 5→4px padding, 1.5→1px border). Reduced input bar padding, footer padding, submit button size. Type pills gap tightened.
 - **Dead code removal** — Removed: `renderSummaries()`, `updateScriptTitle()`, `updateScriptAuthor()` (old summaries panel functions), `#summaries-panel` div and CSS, `#guide-panel` div (100+ lines of embedded guide HTML), `.sum-field-row`/`.sum-input`/`.sum-save-btn` CSS rules, mobile override for `#summaries-panel` and `#guide-panel`.
+
+### Session 13 — 2026-05-02
+- **Promoted Setting from line type to scene attribute** — Setting is no longer a pill/line type. Instead, each scene has a `setting` string field editable via the scene create/edit modals. The Setting pill was removed from the input bar (now 3 pills: Cue, Dialogue, Stage Direction). Default `cType` changed from `'setting'` to `'direction'`. Auto-advance no longer starts from setting.
+- **Scene setting display** — New `.scene-setting` div renders below the scene header in the editor, italic with a subtle background. Clickable to open the scene edit modal. Also displayed in View tab, PDF export, and Outline cards.
+- **Migration for backward compatibility** — `migrateSettingLines()` runs on `loadFromData` and `resumeFromLS`: if a scene has no `setting` field and its first line is `type:'setting'`, the line value is promoted to `scene.setting` and the line is removed. Legacy `type:'setting'` lines are still rendered and editable via inline editing for any remaining cases.
+- **Import/export updates** — Fountain export emits `scene.setting` as a Fountain scene heading before any lines. Fountain import stores the first scene heading in `scene.setting` (subsequent ones become legacy lines). FDX export emits `scene.setting` as a `Scene Heading` paragraph. FDX import stores `Scene Heading` paragraphs in `scene.setting` instead of as lines.
+- **Removed Setting from UI** — Setting pill, Setting color swatch in Settings, Setting hotkey in keyboard shortcuts, Setting chip in find/replace filters all removed. `pillHotkeys` reduced to 3 keys (default: 1=Dialogue, 2=Stage Dir., 3=Cue). `ltColors`/`ltEnabled`/`applyLTColors` no longer include setting. `findFilters` no longer includes setting.
+- **Sample script migrated** — All three scenes in the sample script now use `scene.setting` instead of setting lines.

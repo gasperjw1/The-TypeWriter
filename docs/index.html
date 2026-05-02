@@ -149,6 +149,8 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 .scene-hdr{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg2);border-bottom:1px solid var(--bd3);border-radius:var(--rl) var(--rl) 0 0;}
 .scene-name-disp{font-size:var(--script-font-size);font-weight:500;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
 .scene-subdesc{font-size:11px;color:var(--tx2);}
+.scene-setting{font-style:italic;color:var(--tx2);font-size:var(--script-font-size);font-family:'Courier New',monospace;padding:6px 12px 2px;border-bottom:1px solid var(--bd3);background:var(--bg2);cursor:pointer;}
+.scene-setting:hover{background:var(--bg3);}
 .lines-wrap{padding:4px 0;}
 .scene-empty{padding:6px 12px;font-size:11px;color:var(--tx3);}
 .line-item{position:relative;padding:1px 12px;cursor:pointer;transition:background .1s;}
@@ -787,7 +789,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   <button class="fr-btn" onclick="doReplaceAll()">Replace All</button>
   <div class="fr-filters">
     <span>In:</span>
-    <button class="fr-chip on" data-ft="setting" onclick="toggleFindFilter(this)">Setting</button>
     <button class="fr-chip on" data-ft="direction" onclick="toggleFindFilter(this)">Cue</button>
     <button class="fr-chip on" data-ft="dialogue" onclick="toggleFindFilter(this)">Dialogue</button>
     <button class="fr-chip on" data-ft="action" onclick="toggleFindFilter(this)">Stage Dir.</button>
@@ -891,12 +892,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="setting-desc">Customize or disable the accent color and background tint for each line type in the editor.</div>
         <div id="lt-settings">
           <div class="lt-row">
-            <div class="lt-swatch" id="lts-setting" style="background:#1D9E75;"></div>
-            <div class="lt-name">Setting</div>
-            <input type="color" class="lt-color-input" id="ltc-setting" value="#1D9E75" onchange="setLTColor('setting',this.value)"/>
-            <button class="stoggle" id="ltt-setting" onclick="toggleLT('setting')"></button>
-          </div>
-          <div class="lt-row">
             <div class="lt-swatch" id="lts-direction" style="background:#EF9F27;"></div>
             <div class="lt-name">Cue</div>
             <input type="color" class="lt-color-input" id="ltc-direction" value="#EF9F27" onchange="setLTColor('direction',this.value)"/>
@@ -935,11 +930,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="type-alert"></div>
       <div id="type-pills">
         <div class="tpill-wrap">
-          <span class="tpill active" data-t="setting" data-n="3" onclick="selPill(this,'setting')">Setting<span class="sc">` 3</span></span>
-          <div class="pill-tip"><strong>Setting</strong> &nbsp;·&nbsp; Shortcut: <code>` 3</code><br>Establishes the location and time of a scene.<br><em>e.g. A dimly lit parlor. Evening.</em><br>Typically the first line of every scene.</div>
-        </div>
-        <div class="tpill-wrap">
-          <span class="tpill" data-t="direction" data-n="4" onclick="selPill(this,'direction')">Cue<span class="sc">` 4</span></span>
+          <span class="tpill active" data-t="direction" data-n="3" onclick="selPill(this,'direction')">Cue<span class="sc">` 3</span></span>
           <div class="pill-tip"><strong>Cue</strong> &nbsp;·&nbsp; Shortcut: <code>` 4</code><br>Marks character entrances and exits<br>using cue chips. Also includes a text<br>field for accompanying stage directions.</div>
         </div>
         <div class="tpill-wrap">
@@ -1030,7 +1021,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
 <script>
 let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};
-let activeTab='edit',cType='setting',pendingPill=null,pendingPillKey=null;
+let activeTab='edit',cType='direction',pendingPill=null,pendingPillKey=null;
 let insertAfter=null,undoStack=[],undoCursor=-1,dragSrc=null;
 let hasFilename=false,lastSavedJSON='';
 let fileHandle=null;
@@ -1043,9 +1034,9 @@ let modalCues={enters:[],exits:[]};
 let autosaveEnabled=true;
 let themeMode='system';
 function typeLabel(t){return{setting:'Setting',direction:'Cue',action:'Stage Direction',dialogue:'Dialogue'}[t]||t;}
-let ltColors={setting:'#1D9E75',direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
-let ltEnabled={setting:false,direction:false,action:false,dialogue:true};
-let pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
+let ltColors={direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
+let ltEnabled={direction:false,action:false,dialogue:true};
+let pillHotkeys={dialogue:'1',action:'2',direction:'3'};
 let charPanelExpanded={};
 let showRevMarks=true;
 const REV_COLORS=[
@@ -1136,7 +1127,7 @@ function isCont(scene,li){
   for(let i=li-1;i>=0;i--){const prev=scene.lines[i];if(prev.type==='dialogue')return prev.character&&prev.character.name===cur.character.name;if(prev.type==='action'||prev.type==='setting'||prev.type==='direction')return false;}
   return false;
 }
-function nextPillAfter(t){if(t==='setting')return'direction';if(t==='direction')return'dialogue';return'dialogue';}
+function nextPillAfter(t){if(t==='direction')return'dialogue';return'dialogue';}
 
 function setFontSize(v){document.documentElement.style.setProperty('--script-font-size',v+'px');$('font-preview').style.fontSize=v+'px';$('font-size-sel').value=v;lsSaveSettings();}
 function setIndicator(mode){indicatorMode=mode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));$('opt-'+mode).classList.add('selected');const c=indicatorColors[mode];if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',c);else document.documentElement.style.setProperty('--highlight-color',c);lsSaveSettings();render();}
@@ -1145,10 +1136,12 @@ function setIndicatorColor(mode,val){indicatorColors[mode]=val;if(mode===indicat
 function hexToRgba(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}
 function applyLTColors(){
   const r=document.documentElement;const isDark=themeMode==='dark'||(themeMode==='system'&&window.matchMedia('(prefers-color-scheme:dark)').matches);
-  ['setting','direction','action','dialogue'].forEach(t=>{
+  ['direction','action','dialogue'].forEach(t=>{
     if(ltEnabled[t]){r.style.setProperty('--lt-'+t,ltColors[t]);r.style.setProperty('--lt-'+t+'-bg',hexToRgba(ltColors[t],isDark?0.08:0.05));}
     else{r.style.setProperty('--lt-'+t,'transparent');r.style.setProperty('--lt-'+t+'-bg','transparent');}
   });
+  /* Setting type no longer has a color — always transparent */
+  r.style.setProperty('--lt-setting','transparent');r.style.setProperty('--lt-setting-bg','transparent');
 }
 function setLTColor(type,val){
   ltColors[type]=val;
@@ -1233,14 +1226,23 @@ function loadFile(e){
   reader.onload=ev=>{try{loadFromData(JSON.parse(ev.target.result));}catch(err){alert('Could not parse file.');}};
   reader.readAsText(file);e.target.value='';
 }
+function migrateSettingLines(){
+  /* Migrate old setting lines into scene.setting for scripts saved before this change */
+  S.acts.forEach(a=>a.scenes.forEach(sc=>{
+    if(typeof sc.setting==='undefined')sc.setting='';
+    if(!sc.setting&&sc.lines.length&&sc.lines[0].type==='setting'){
+      sc.setting=sc.lines[0].value;sc.lines.shift();
+    }
+  }));
+}
 function loadFromData(data){
   S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
-  resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
+  migrateSettingLines();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
   try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
-  resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
+  migrateSettingLines();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Garden Party',
@@ -1253,8 +1255,7 @@ const SAMPLE_SCRIPT={
   ],
   acts:[
     {name:'Arrivals',description:'A garden party brings old tensions to the surface.',scenes:[
-      {name:'Preparations',description:'Helen sets the stage for a perfect afternoon.',lines:[
-        {type:'setting',value:'The back garden of a large country house. Late afternoon, summer. A long table is set for tea under a canopy of fairy lights. Bunting hangs between the trees. Everything is immaculate.'},
+      {name:'Preparations',description:'Helen sets the stage for a perfect afternoon.',setting:'The back garden of a large country house. Late afternoon, summer. A long table is set for tea under a canopy of fairy lights. Bunting hangs between the trees. Everything is immaculate.',lines:[
         {type:'direction',value:'HELEN arranges flowers in a vase at the centre of the table, stepping back to check the effect.',cues:{enters:['HELEN'],exits:[]}},
         {type:'action',value:'HELEN adjusts a napkin, then adjusts it again. She checks her watch.'},
         {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Four o\'clock. They\'ll be here any minute.'},
@@ -1267,8 +1268,7 @@ const SAMPLE_SCRIPT={
         {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'I know exactly what you mean. And he\'ll see through it in about thirty seconds, same as always.'},
         {type:'action',value:'HELEN turns away and fusses with the flowers again. A silence sits between them.'}
       ]},
-      {name:'The Return',description:'James arrives and old patterns resurface.',lines:[
-        {type:'setting',value:'The same garden, moments later. The light has shifted slightly. A bird sings offstage.'},
+      {name:'The Return',description:'James arrives and old patterns resurface.',setting:'The same garden, moments later. The light has shifted slightly. A bird sings offstage.',lines:[
         {type:'direction',value:'JAMES enters from the side gate, carrying a small bag. He stops when he sees the garden.',cues:{enters:['JAMES'],exits:[]}},
         {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'You\'ve outdone yourself.',dialogueAction:'looking around'},
         {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'James!'},
@@ -1283,8 +1283,7 @@ const SAMPLE_SCRIPT={
       ]}
     ]},
     {name:'Revelations',description:'The party takes an unexpected turn.',scenes:[
-      {name:'An Old Friend',description:'Claire arrives and shifts the balance.',lines:[
-        {type:'setting',value:'The garden. The tea things are partly used. Late golden light.'},
+      {name:'An Old Friend',description:'Claire arrives and shifts the balance.',setting:'The garden. The tea things are partly used. Late golden light.',lines:[
         {type:'direction',value:'CLAIRE enters through the garden gate, a bottle of wine in hand.',cues:{enters:['CLAIRE'],exits:[]}},
         {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'I brought something stronger than tea.',dialogueAction:'holding up the bottle'},
         {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'Claire.'},
@@ -1318,7 +1317,7 @@ $('setup-input').addEventListener('keydown',e=>{if(e.key==='Enter')startScript()
 
 /* ── Find / Replace ── */
 let findQuery='',findMatches=[],findIdx=-1;
-let findFilters={setting:true,direction:true,dialogue:true,action:true};
+let findFilters={direction:true,dialogue:true,action:true};
 function toggleFindFilter(el){
   const ft=el.dataset.ft;
   findFilters[ft]=!findFilters[ft];
@@ -1389,7 +1388,7 @@ function openFindBar(){
 function closeFindBar(){
   $('find-bar').classList.remove('open');
   findQuery='';findMatches=[];findIdx=-1;
-  findFilters={setting:true,direction:true,dialogue:true,action:true};
+  findFilters={direction:true,dialogue:true,action:true};
   document.querySelectorAll('.fr-chip').forEach(c=>c.classList.add('on'));
   $('find-input').value='';$('replace-input').value='';$('find-count').textContent='';
   render();
@@ -1447,8 +1446,7 @@ function selPill(el,t){if(t===cType&&!pendingPill)return;if(hasInput()&&pendingP
 function activatePillByType(t){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));const el=document.querySelector(`.tpill[data-t="${t}"]`);if(el)el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function updateInputMode(){
   $('simple-ta').style.display='none';$('dlg-box').style.display='none';$('direction-box').style.display='none';
-  if(cType==='setting'){$('simple-ta').style.display='block';$('simple-ta').placeholder='e.g. A dimly lit parlor. Evening.';setTimeout(()=>$('simple-ta').focus(),30);}
-  else if(cType==='action'){$('simple-ta').style.display='block';$('simple-ta').placeholder='Describe the action...';setTimeout(()=>$('simple-ta').focus(),30);}
+  if(cType==='action'){$('simple-ta').style.display='block';$('simple-ta').placeholder='Describe the action...';setTimeout(()=>$('simple-ta').focus(),30);}
   else if(cType==='dialogue'){$('dlg-box').style.display='flex';setTimeout(()=>$('dlg-char-ta').focus(),30);}
   else if(cType==='direction'){$('direction-box').style.display='flex';updateDirCues();setTimeout(()=>$('dir-desc-ta').focus(),30);}
 }
@@ -1494,8 +1492,7 @@ function toggleCue(type,name){if(type==='exit'){const i=pendingCues.exits.indexO
 function submitLine(){
   const t=cType,scene=insertAfter?insertAfter.scene:currentScene();if(!scene){alert('Add an Act and Scene first.');return;}
   let line=null;
-  if(t==='setting'){const v=$('simple-ta').value.trim();if(!v)return;line={type:'setting',value:v};}
-  else if(t==='action'){const v=$('simple-ta').value.trim();if(!v)return;line={type:'action',value:v};}
+  if(t==='action'){const v=$('simple-ta').value.trim();if(!v)return;line={type:'action',value:v};}
   else if(t==='direction'){const v=$('dir-desc-ta').value.trim();if(!v)return;line={type:'direction',value:v};if(pendingCues.enters.length||pendingCues.exits.length)line.cues={enters:[...pendingCues.enters],exits:[...pendingCues.exits]};}
   else if(t==='dialogue'){const cn=$('dlg-char-ta').value.trim(),da=$('dlg-act-ta').value.trim();const vRaw=$('dlg-text-ta').value.trim();if(!cn||!vRaw)return;const ex=findChar(cn);if(!ex){openNewCharModal(cn,da,vRaw);return;}/* inject newlines around parentheticals only after char is confirmed */const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};if(da)line.dialogueAction=da;}
   if(!line)return;
@@ -1631,6 +1628,7 @@ function renderScene(act,ai,sc,si){
   }).join('');
   return`<div class="scene-block" draggable="true" ondragstart="DS(event,'scene',${ai},${si})" ondragover="DO(event,'scene',${ai},${si})" ondrop="DP(event,'scene',${ai},${si})" ondragend="DE()">
 <div class="scene-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'scene',${ai},${si})">⠿</span><div style="flex:1;min-width:0"><div class="scene-name-disp">${esc(sceneLabel(ai,si))}${charSum}</div>${sc.description?`<div class="scene-subdesc">${esc(sc.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditScene(${ai},${si}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delScene(${ai},${si}))">${dl}</button></div></div>
+${sc.setting?`<div class="scene-setting" onclick="openEditScene(${ai},${si})">${esc(sc.setting)}</div>`:''}
 <div class="lines-wrap">${lines||`<div class="scene-empty">No lines yet</div>`}</div></div>`;
 }
 
@@ -1638,7 +1636,7 @@ function renderView(){
   const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
   let h=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${esc(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${esc(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${esc(l.dialogueAction)})</div>`:''}<div class="vt">${esc(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${esc(l.value)})</div>`;});});});
+  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${esc(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${esc(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${esc(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${esc(l.dialogueAction)})</div>`:''}<div class="vt">${esc(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${esc(l.value)})</div>`;});});});
   p.innerHTML=h;
 }
 
@@ -1667,6 +1665,7 @@ function renderOutline(){
       const dlgCount=sc.lines.filter(l=>l.type==='dialogue').length;
       h+=`<div class="outline-card" draggable="true" data-ai="${ai}" data-si="${si}" onclick="outlineCardClick(${ai},${si})" ondragstart="outlineDragStart(event,${ai},${si})" ondragover="outlineDragOver(event,${ai},${si})" ondragleave="outlineDragLeave(event)" ondrop="outlineDrop(event,${ai},${si})" ondragend="outlineDragEnd(event)" ontouchstart="outlineTouchStart(event)">`;
       h+=`<div class="outline-card-title">${esc(label)}</div>`;
+      if(sc.setting)h+=`<div class="outline-card-desc" style="font-style:italic;">${esc(sc.setting)}</div>`;
       if(sc.description)h+=`<div class="outline-card-desc">${esc(sc.description)}</div>`;
       h+=`<div class="outline-card-stats">`;
       h+=`<span class="outline-card-stat"><strong>${lineCount}</strong>&nbsp;line${lineCount!==1?'s':''}</span>`;
@@ -1996,12 +1995,12 @@ function closeModal(){$('mlayer').classList.remove('open');$('mcontent').innerHT
 
 function openActModal(isFirst){const num=numWord(S.acts.length+1);openModal(`<h3>${isFirst?'Act '+num:'New act — Act '+num}</h3><div class="mf"><label>Act name <em>(optional)</em></label><input class="minput" id="ma-n" placeholder="e.g. The Beginning"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ma-d"/></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmAct(${isFirst})">Next →</button></div>`,null);setTimeout(()=>{const el=$('ma-n');if(el)el.focus();},50);}
 function confirmAct(isFirst){const n=$('ma-n').value.trim();const d=$('ma-d').value.trim();pushUndo();S.acts.push({name:n,description:d,scenes:[]});closeModal();openSceneModal(S.acts.length-1,isFirst);}
-function openSceneModal(aiArg,isFirst){const ai=aiArg!==undefined?aiArg:S.acts.length-1;const act=S.acts[ai];if(!act)return;const num=numWord(act.scenes.length+1);openModal(`<h3>${isFirst?'Scene '+num+' in '+esc(actLabel(ai)):'New scene — Scene '+num+' in '+esc(actLabel(ai))}</h3><div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="ms-n" placeholder="e.g. Opening" data-ai="${ai}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ms-d"/></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmScene()">Start writing</button></div>`,null);setTimeout(()=>{const el=$('ms-n');if(el)el.focus();},50);}
-function confirmScene(){const el=$('ms-n');if(!el)return;const ai=parseInt(el.dataset.ai);const n=el.value.trim();const d=$('ms-d').value.trim();pushUndo();S.acts[ai].scenes.push({name:n,description:d,lines:[]});closeModal();autoSave();activatePillByType('setting');render();}
+function openSceneModal(aiArg,isFirst){const ai=aiArg!==undefined?aiArg:S.acts.length-1;const act=S.acts[ai];if(!act)return;const num=numWord(act.scenes.length+1);openModal(`<h3>${isFirst?'Scene '+num+' in '+esc(actLabel(ai)):'New scene — Scene '+num+' in '+esc(actLabel(ai))}</h3><div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="ms-n" placeholder="e.g. Opening" data-ai="${ai}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ms-d"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="ms-setting" rows="2" placeholder="e.g. A dimly lit parlor. Evening." style="resize:vertical;font-family:'Courier New',monospace;"></textarea></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmScene()">Start writing</button></div>`,null);setTimeout(()=>{const el=$('ms-n');if(el)el.focus();},50);}
+function confirmScene(){const el=$('ms-n');if(!el)return;const ai=parseInt(el.dataset.ai);const n=el.value.trim();const d=$('ms-d').value.trim();const st=($('ms-setting')?$('ms-setting').value.trim():'');pushUndo();S.acts[ai].scenes.push({name:n,description:d,setting:st,lines:[]});closeModal();autoSave();render();}
 function openEditAct(ai){const a=S.acts[ai];openModal(`<h3>Edit ${esc(actLabel(ai))}</h3><div class="mf"><label>Act name <em>(optional)</em></label><input class="minput" id="ea-n" value="${esc(a.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ea-d" value="${esc(a.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveActEdit(${ai})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('ea-n');if(el)el.focus();},50);}
 function saveActEdit(ai){const n=$('ea-n').value.trim();const d=$('ea-d').value.trim();pushUndo();S.acts[ai].name=n;S.acts[ai].description=d;closeModal();autoSave();render();}
-function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];const lockField=S.scenesLocked?`<div class="mf"><label>Locked scene number</label><input class="minput" id="es-ln" value="${esc(sc.lockedNum||numWord(si+1))}"/></div>`:'';openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3>${lockField}<div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$(S.scenesLocked?'es-ln':'es-n');if(el)el.focus();},50);}
-function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').value.trim();pushUndo();S.acts[ai].scenes[si].name=n;S.acts[ai].scenes[si].description=d;if(S.scenesLocked){const lnEl=$('es-ln');if(lnEl){const ln=lnEl.value.trim();if(ln)S.acts[ai].scenes[si].lockedNum=ln;}}closeModal();autoSave();render();}
+function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];const lockField=S.scenesLocked?`<div class="mf"><label>Locked scene number</label><input class="minput" id="es-ln" value="${esc(sc.lockedNum||numWord(si+1))}"/></div>`:'';openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3>${lockField}<div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="es-setting" rows="2" style="resize:vertical;font-family:'Courier New',monospace;">${esc(sc.setting||'')}</textarea></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$(S.scenesLocked?'es-ln':'es-n');if(el)el.focus();},50);}
+function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').value.trim();const st=$('es-setting')?$('es-setting').value.trim():'';pushUndo();S.acts[ai].scenes[si].name=n;S.acts[ai].scenes[si].description=d;S.acts[ai].scenes[si].setting=st;if(S.scenesLocked){const lnEl=$('es-ln');if(lnEl){const ln=lnEl.value.trim();if(ln)S.acts[ai].scenes[si].lockedNum=ln;}}closeModal();autoSave();render();}
 
 /* Edit line — direction gets full cue editor in modal */
 function openEditLine(ai,si,li){
@@ -2283,6 +2282,7 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
     if(a.description)html+=`<div class="s-act-desc">${esc2(a.description)}</div>`;
     a.scenes.forEach((sc,si)=>{
       html+=`<div class="s-scene">${esc2(sceneLabel(ai,si))}</div>`;
+      if(sc.setting)html+=`<div class="s-setting">${esc2(sc.setting)}</div>`;
       if(sc.description)html+=`<div class="s-setting"><em>${esc2(sc.description)}</em></div>`;
       sc.lines.forEach((l,li)=>{
         const cont=isCont(sc,li);
@@ -2379,9 +2379,16 @@ function buildFountain(){
       if(sc.description)out+='[['+sc.description+']]\n';
       out+='\n';
 
+      /* Scene setting as Fountain scene heading */
+      if(sc.setting){
+        const v=sc.setting.trim();
+        const isSlug=/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(v);
+        out+=(isSlug?v.toUpperCase():'.'+v)+'\n\n';
+      }
+
       sc.lines.forEach((line,li)=>{
         if(line.type==='setting'){
-          /* Scene heading — if it starts with INT/EXT, use as-is; otherwise force with . */
+          /* Legacy setting lines — still export for backward compat */
           const v=line.value.trim();
           const isSlug=/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(v);
           out+=(isSlug?v.toUpperCase():'.'+v)+'\n\n';
@@ -2468,7 +2475,7 @@ function parseFountain(text){
   /* Ensure at least one act and scene exist */
   function ensureActScene(){
     if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
-    if(!curScene){curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);}
+    if(!curScene){curScene={name:'',description:'',setting:'',lines:[]};curAct.scenes.push(curScene);}
   }
 
   /* Collect paragraphs (groups of lines separated by blank lines) */
@@ -2510,7 +2517,7 @@ function parseFountain(text){
         curAct={name:text,description:desc,scenes:[]};acts.push(curAct);curScene=null;
       }else{
         if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
-        curScene={name:text,description:desc,lines:[]};curAct.scenes.push(curScene);
+        curScene={name:text,description:desc,setting:'',lines:[]};curAct.scenes.push(curScene);
       }
       p++;continue;
     }
@@ -2523,7 +2530,9 @@ function parseFountain(text){
       if(isSlug||isForced){
         ensureActScene();
         const val=isForced?sl.slice(1).trim():sl.trim();
-        curScene.lines.push({type:'setting',value:val});
+        /* First scene heading goes into scene.setting; subsequent ones become lines for compat */
+        if(!curScene.setting){curScene.setting=val;}
+        else{curScene.lines.push({type:'setting',value:val});}
         p++;continue;
       }
     }
@@ -2717,7 +2726,7 @@ function parseFDX(xmlText){
 
   function ensureActScene(){
     if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
-    if(!curScene){curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);}
+    if(!curScene){curScene={name:'',description:'',setting:'',lines:[]};curAct.scenes.push(curScene);}
   }
 
   /* Flush any pending character that never got dialogue */
@@ -2775,11 +2784,11 @@ function parseFDX(xmlText){
         flushPendingChar();
         ensureActScene();
         /* In stage plays, scene headings describe the scene setting */
-        /* Create a new scene if we already have lines in the current one */
-        if(curScene&&curScene.lines.length>0){
-          curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);
+        /* Create a new scene if we already have lines or a setting in the current one */
+        if(curScene&&(curScene.lines.length>0||curScene.setting)){
+          curScene={name:'',description:'',setting:'',lines:[]};curAct.scenes.push(curScene);
         }
-        if(txt)curScene.lines.push({type:'setting',value:txt});
+        if(txt)curScene.setting=txt;
         break;
       }
       case 'Character':{
@@ -2869,9 +2878,16 @@ function buildFDXText(){
       xml+='    </Paragraph>\n';
     }
     act.scenes.forEach((sc,si)=>{
+      /* Scene setting as Scene Heading */
+      if(sc.setting){
+        xml+='    <Paragraph Type="Scene Heading">\n';
+        xml+='      <Text>'+xmlEsc(sc.setting)+'</Text>\n';
+        xml+='    </Paragraph>\n';
+      }
       sc.lines.forEach(line=>{
         switch(line.type){
           case 'setting':
+            /* Legacy setting lines */
             xml+='    <Paragraph Type="Scene Heading">\n';
             xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
@@ -3160,7 +3176,7 @@ function jumpToLine(ai,si,li){
 /* ── Pill hotkey customization ── */
 function renderHotkeySettings(){
   const c=$('hk-settings');if(!c)return;
-  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Stage Direction'},{key:'setting',label:'Setting'},{key:'direction',label:'Cue'}];
+  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Stage Direction'},{key:'direction',label:'Cue'}];
   c.innerHTML=types.map(t=>`<div class="hk-row"><div class="hk-name">${t.label}</div><div class="hk-key-wrap"><span class="hk-prefix">\` +</span><input class="hk-input" id="hk-${t.key}" value="${esc(pillHotkeys[t.key])}" readonly onfocus="startHkCapture('${t.key}')" onblur="stopHkCapture('${t.key}')"/></div></div>`).join('');
 }
 let hkCapturing=null;
@@ -3189,7 +3205,7 @@ document.addEventListener('keydown',function hkHandler(e){
   updatePillLabels();renderHotkeySettings();lsSaveSettings();
 },true);
 function resetHotkeys(){
-  pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
+  pillHotkeys={dialogue:'1',action:'2',direction:'3'};
   updatePillLabels();renderHotkeySettings();lsSaveSettings();
 }
 function updatePillLabels(){
@@ -3212,8 +3228,8 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.fontSize){document.documentElement.style.setProperty('--script-font-size',sets.fontSize);const sel=$('font-size-sel');if(sel)sel.value=parseInt(sets.fontSize);const prev=$('font-preview');if(prev)prev.style.fontSize=sets.fontSize;}
     if(typeof sets.rpCollapsed==='boolean')rpCollapsed=sets.rpCollapsed;
     if(sets.themeMode){themeMode=sets.themeMode;setTheme(themeMode);}
-    if(sets.ltColors){ltColors=sets.ltColors;['setting','direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
-    if(sets.ltEnabled){ltEnabled=sets.ltEnabled;['setting','direction','action','dialogue'].forEach(t=>{const btn=$('ltt-'+t);if(btn)btn.classList.toggle('on',ltEnabled[t]);});}
+    if(sets.ltColors){ltColors={...ltColors,...sets.ltColors};['direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
+    if(sets.ltEnabled){ltEnabled={...ltEnabled,...sets.ltEnabled};['direction','action','dialogue'].forEach(t=>{const btn=$('ltt-'+t);if(btn)btn.classList.toggle('on',ltEnabled[t]);});}
     if(sets.pillHotkeys){pillHotkeys=sets.pillHotkeys;updatePillLabels();}
   }
   applyLTColors();renderHotkeySettings();
