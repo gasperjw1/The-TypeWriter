@@ -12,6 +12,7 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The TypeWriter"/>
 <meta name="twitter:description" content="A free, open-source screenplay editor in your browser. No accounts, no installs."/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -474,6 +475,31 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .fr-chip{font-family:var(--sans);font-size:11px;padding:2px 8px;border:1px solid var(--bd2);border-radius:10px;background:transparent;color:var(--tx2);cursor:pointer;transition:all .15s;}
 .fr-chip:hover{border-color:var(--tx2);}
 .fr-chip.on{background:var(--tx1);color:var(--bg1);border-color:var(--tx1);}
+
+/* Character panel expansion */
+.char-chip{cursor:pointer;transition:background .1s;}
+.char-expand{display:none;padding:6px 8px;border-top:1px solid var(--bd3);margin-top:4px;}
+.char-expand.open{display:block;}
+.char-full-desc{font-size:11px;color:var(--tx2);line-height:1.5;margin-bottom:6px;font-style:italic;}
+.char-dlg-search{width:100%;font-family:var(--sans);font-size:11px;padding:4px 6px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);outline:none;margin-bottom:4px;}
+.char-dlg-search:focus{border-color:var(--bd1);background:var(--bg1);}
+.char-dlg-list{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.char-dlg-item{font-size:11px;color:var(--tx1);padding:3px 6px;border-radius:4px;cursor:pointer;line-height:1.4;border-left:2px solid var(--lt-dialogue);background:var(--lt-dialogue-bg);}
+.char-dlg-item:hover{background:var(--bg2);}
+.char-dlg-item .cdl-loc{font-size:10px;color:var(--tx3);display:block;}
+.char-dlg-empty{font-size:11px;color:var(--tx3);font-style:italic;padding:3px 6px;}
+.char-chip-toggle{font-size:10px;border:none;background:none;cursor:pointer;color:var(--tx3);padding:1px 4px;font-family:var(--sans);transition:transform .15s;}
+.char-chip-toggle.open{transform:rotate(90deg);}
+
+/* Hotkey settings */
+.hk-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--bd3);border-radius:var(--rm);background:var(--bg2);margin-bottom:6px;}
+.hk-name{font-size:13px;font-weight:500;color:var(--tx1);min-width:80px;}
+.hk-key-wrap{display:flex;align-items:center;gap:6px;flex:1;}
+.hk-prefix{font-size:12px;color:var(--tx2);}
+.hk-input{width:48px;text-align:center;font-family:'Courier New',monospace;font-size:14px;padding:4px 6px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg1);color:var(--tx1);outline:none;cursor:pointer;}
+.hk-input:focus{border-color:var(--tx1);box-shadow:0 0 0 2px rgba(55,138,221,0.2);}
+.hk-reset{font-size:11px;padding:3px 8px;border:1px solid var(--bd3);border-radius:var(--rm);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);}
+.hk-reset:hover{background:var(--bg2);color:var(--tx1);}
 </style>
 </head>
 <body>
@@ -500,6 +526,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-item" onclick="menuNew()">New script</div>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="exportPDF()">Export to PDF</div>
+        <div class="fdd-item" onclick="exportPDFWithMeta()">Export PDF + metadata</div>
+        <div class="fdd-sep"></div>
+        <div class="fdd-item" onclick="downloadMetadata()">Download metadata (.zip)</div>
       </div>
     </div>
   </div>
@@ -648,6 +677,13 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </div>
         </div>
       </div>
+      <div class="psec-title" style="margin-top:28px;">Keyboard shortcuts</div>
+      <div class="setting-row">
+        <div class="setting-label">Pill hotkeys</div>
+        <div class="setting-desc">Customize the key that activates each line-type pill. Press backtick (`) then the assigned key.</div>
+        <div id="hk-settings"></div>
+        <button class="hk-reset" style="margin-top:8px;" onclick="resetHotkeys()">Reset to defaults</button>
+      </div>
     </div>
 
     <div id="input-bar" style="display:none">
@@ -758,13 +794,15 @@ let autosaveEnabled=true;
 let themeMode='system';
 let ltColors={setting:'#1D9E75',direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
 let ltEnabled={setting:true,direction:true,action:true,dialogue:true};
+let pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
+let charPanelExpanded={};
 
 const LS_SCRIPT_KEY='tw_script';
 const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed,themeMode,ltColors,ltEnabled}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -894,6 +932,7 @@ function switchTab(t){
   $('right-panel-wrap').style.display=t==='settings'?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
   if(t==='summaries')renderSummaries();
+  if(t==='settings')renderHotkeySettings();
   $('file-dd').classList.remove('open');
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
@@ -1132,7 +1171,7 @@ document.addEventListener('keydown',e=>{
   if(editingLine)return;
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){submitLine();return;}
   if(e.key==='`'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();pendingPillKey=true;return;}
-  if(pendingPillKey&&['1','2','3','4'].includes(e.key)){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-n="${e.key}"]`);if(pill)selPill(pill,pill.dataset.t);return;}
+  if(pendingPillKey){const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}}
   pendingPillKey=false;
 });
 
@@ -1372,7 +1411,18 @@ function getFilteredChars(){
 function renderCharList(){
   const c=$('char-list-rp');if(!c)return;const filtered=getFilteredChars();
   if(!filtered.length){c.innerHTML=`<div style="font-size:11px;color:var(--tx3);">No characters found</div>`;return;}
-  c.innerHTML=filtered.map(ch=>`<div class="char-chip${ch.archived?' archived':''}"><div style="min-width:0"><div class="char-chip-name">${esc(ch.name)}${ch.archived?`<span class="char-chip-archived-badge">archived</span>`:''}</div>${ch.description?`<div class="char-chip-desc">${esc(ch.description)}</div>`:''}</div><div class="char-chip-btns"><button class="char-chip-btn" onclick="openEditChar('${escJs(ch.name)}')">Edit</button><button class="char-chip-btn" style="color:#A32D2D" onclick="tryDeleteChar('${escJs(ch.name)}')">Del</button></div></div>`).join('');
+  c.innerHTML=filtered.map(ch=>{
+    const isOpen=charPanelExpanded[ch.name];
+    const toggleCls='char-chip-toggle'+(isOpen?' open':'');
+    let expandHtml='';
+    if(isOpen){
+      const descHtml=ch.description?`<div class="char-full-desc">${esc(ch.description)}</div>`:'<div class="char-full-desc" style="color:var(--tx3);">No description</div>';
+      expandHtml=`<div class="char-expand open">${descHtml}<input class="char-dlg-search" id="cdl-search-${ch.name}" placeholder="Search dialogue..." oninput="filterCharDlg('${escJs(ch.name)}')"/><div class="char-dlg-list" id="cdl-list-${ch.name}"></div></div>`;
+    }
+    return`<div class="char-chip${ch.archived?' archived':''}" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;justify-content:space-between;" onclick="toggleCharExpand('${escJs(ch.name)}')"><div style="display:flex;align-items:center;gap:4px;min-width:0"><button class="${toggleCls}">▶</button><div style="min-width:0"><div class="char-chip-name">${esc(ch.name)}${ch.archived?`<span class="char-chip-archived-badge">archived</span>`:''}</div></div></div><div class="char-chip-btns" onclick="event.stopPropagation()"><button class="char-chip-btn" onclick="openEditChar('${escJs(ch.name)}')">Edit</button><button class="char-chip-btn" style="color:#A32D2D" onclick="tryDeleteChar('${escJs(ch.name)}')">Del</button></div></div>${expandHtml}</div>`;
+  }).join('');
+  /* populate open dialogue lists */
+  filtered.forEach(ch=>{if(charPanelExpanded[ch.name])renderCharDlgList(ch.name,'');});
 }
 
 function delAct(ai){if(editingLine&&editingLine.actIdx===ai)editingLine=null;pushUndo();S.acts.splice(ai,1);if(insertAfter&&insertAfter.actIdx===ai)insertAfter=null;autoSave();render();}
@@ -1733,6 +1783,118 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
   return html;
 }
 
+/* ── Metadata ZIP download ── */
+async function buildMetadataZip(){
+  const zip=new JSZip();
+  const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'_metadata');
+  folder.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
+  /* add a manifest with export info */
+  folder.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The TypeWriter'},null,2));
+  return zip.generateAsync({type:'blob'});
+}
+async function downloadMetadata(){
+  $('file-dd').classList.remove('open');
+  if(!S.title){alert('Open or create a script first.');return;}
+  try{
+    const blob=await buildMetadataZip();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=S.title.toLowerCase().replace(/ /g,'_')+'_metadata.zip';
+    a.click();URL.revokeObjectURL(a.href);
+  }catch(e){alert('Failed to create metadata ZIP: '+e.message);}
+}
+async function exportPDFWithMeta(){
+  $('file-dd').classList.remove('open');
+  if(!S.title){alert('Open or create a script first.');return;}
+  try{
+    const zip=new JSZip();
+    const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_'));
+    /* add the PDF as HTML (user prints from the window) */
+    folder.file(S.title.toLowerCase().replace(/ /g,'_')+'.html',buildPDFHTML());
+    /* add metadata */
+    const meta=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'/metadata');
+    meta.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
+    meta.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The TypeWriter'},null,2));
+    const blob=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=S.title.toLowerCase().replace(/ /g,'_')+'_export.zip';
+    a.click();URL.revokeObjectURL(a.href);
+  }catch(e){alert('Failed to create export ZIP: '+e.message);}
+}
+
+/* ── Character panel inline expansion ── */
+function toggleCharExpand(name){
+  charPanelExpanded[name]=!charPanelExpanded[name];
+  renderCharList();
+}
+function filterCharDlg(name){
+  const input=document.getElementById('cdl-search-'+name);
+  if(!input)return;
+  renderCharDlgList(name,input.value);
+}
+function renderCharDlgList(name,query){
+  const listEl=document.getElementById('cdl-list-'+name);
+  if(!listEl)return;
+  const q=(query||'').toLowerCase();
+  let lines=[];
+  S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>sc.lines.forEach((l,li)=>{
+    if(l.type==='dialogue'&&l.character&&l.character.name===name){
+      if(!q||l.value.toLowerCase().includes(q)||(l.dialogueAction||'').toLowerCase().includes(q)){
+        lines.push({ai,si,li,value:l.value,da:l.dialogueAction});
+      }
+    }
+  })));
+  if(!lines.length){listEl.innerHTML='<div class="char-dlg-empty">No dialogue lines'+(q?' matching "'+esc(q)+'"':'')+'</div>';return;}
+  listEl.innerHTML=lines.map(d=>{
+    const loc=sceneLabel(d.ai,d.si);
+    const preview=d.value.length>80?d.value.slice(0,80)+'...':d.value;
+    return`<div class="char-dlg-item" onclick="selLine(${d.ai},${d.si},${d.li});switchTab('edit')" title="${esc(d.value)}"><span class="cdl-loc">${esc(loc)}</span>${d.da?'<em style="color:var(--tx3);font-size:10px;">('+esc(d.da)+')</em> ':''}${esc(preview)}</div>`;
+  }).join('');
+}
+
+/* ── Pill hotkey customization ── */
+function renderHotkeySettings(){
+  const c=$('hk-settings');if(!c)return;
+  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Action'},{key:'setting',label:'Setting'},{key:'direction',label:'Direction'}];
+  c.innerHTML=types.map(t=>`<div class="hk-row"><div class="hk-name">${t.label}</div><div class="hk-key-wrap"><span class="hk-prefix">\` +</span><input class="hk-input" id="hk-${t.key}" value="${esc(pillHotkeys[t.key])}" readonly onfocus="startHkCapture('${t.key}')" onblur="stopHkCapture('${t.key}')"/></div></div>`).join('');
+}
+let hkCapturing=null;
+function startHkCapture(type){
+  hkCapturing=type;
+  const el=$('hk-'+type);if(el){el.value='...';el.style.borderColor='var(--tx1)';}
+}
+function stopHkCapture(type){
+  if(hkCapturing===type){
+    const el=$('hk-'+type);
+    if(el&&el.value==='...')el.value=pillHotkeys[type];
+    if(el)el.style.borderColor='';
+    hkCapturing=null;
+  }
+}
+document.addEventListener('keydown',function hkHandler(e){
+  if(!hkCapturing)return;
+  e.preventDefault();e.stopPropagation();
+  const key=e.key;
+  if(key==='Escape'||key==='Tab'){stopHkCapture(hkCapturing);return;}
+  /* check for conflicts with other pill hotkeys */
+  const conflict=Object.keys(pillHotkeys).find(t=>t!==hkCapturing&&pillHotkeys[t]===key);
+  if(conflict){/* swap */pillHotkeys[conflict]=pillHotkeys[hkCapturing];}
+  pillHotkeys[hkCapturing]=key;
+  hkCapturing=null;
+  updatePillLabels();renderHotkeySettings();lsSaveSettings();
+},true);
+function resetHotkeys(){
+  pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
+  updatePillLabels();renderHotkeySettings();lsSaveSettings();
+}
+function updatePillLabels(){
+  document.querySelectorAll('.tpill').forEach(p=>{
+    const t=p.dataset.t;if(!t||!pillHotkeys[t])return;
+    const sc=p.querySelector('.sc');if(sc)sc.textContent='\` '+pillHotkeys[t];
+  });
+}
+
 updateInputMode();switchTab('edit');updateSaveIndicator();
 
 (function initFromLS(){
@@ -1748,8 +1910,9 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.themeMode){themeMode=sets.themeMode;setTheme(themeMode);}
     if(sets.ltColors){ltColors=sets.ltColors;['setting','direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
     if(sets.ltEnabled){ltEnabled=sets.ltEnabled;['setting','direction','action','dialogue'].forEach(t=>{const btn=$('ltt-'+t);if(btn)btn.classList.toggle('on',ltEnabled[t]);});}
+    if(sets.pillHotkeys){pillHotkeys=sets.pillHotkeys;updatePillLabels();}
   }
-  applyLTColors();
+  applyLTColors();renderHotkeySettings();
 })();
 </script>
 </body>
