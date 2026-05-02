@@ -723,6 +723,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-item" onclick="exportFountain()">Export to Fountain (.fountain)</div>
         <div class="fdd-item" onclick="importFountain()">Import Fountain file</div>
         <input type="file" id="fountain-open-in" accept=".fountain,.txt,.spmd" style="display:none" onchange="loadFountainFile(event)"/>
+        <div class="fdd-item" onclick="importFDX()">Import Final Draft (.fdx)</div>
+        <input type="file" id="fdx-open-in" accept=".fdx,.xml" style="display:none" onchange="loadFDXFile(event)"/>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="downloadMetadata()">Download metadata (.zip)</div>
       </div>
@@ -2531,6 +2533,212 @@ function parseFountain(text){
 
   /* If no acts were created, wrap everything in a default act */
   if(!acts.length){acts=[{name:'',description:'',scenes:[{name:'',description:'',lines:[]}]}];}
+
+  /* Load into app */
+  pushUndo();
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;
+  resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
+  showEditor(title);render();
+}
+
+/* ── FDX (Final Draft) import ── */
+function importFDX(){
+  closeFDD();
+  $('fdx-open-in').click();
+}
+function loadFDXFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){parseFDX(ev.target.result);};
+  reader.readAsText(file);
+  e.target.value='';
+}
+function parseFDX(xmlText){
+  /* Parse Final Draft XML into our S data model */
+  const parser=new DOMParser();
+  const doc=parser.parseFromString(xmlText,'text/xml');
+  const parseErr=doc.querySelector('parsererror');
+  if(parseErr){alert('Invalid FDX file: XML parse error.');return;}
+
+  let title='Untitled',author='';
+  let acts=[],characters=[];
+  const charSet=new Set();
+
+  /* Helper: extract all text from a Paragraph element (may have multiple <Text> children) */
+  function paraText(paraEl){
+    return Array.from(paraEl.querySelectorAll(':scope > Text')).map(t=>t.textContent).join('').trim();
+  }
+
+  /* Helper: normalize character name to title case */
+  function normName(raw){
+    return raw.trim().split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+  }
+
+  /* Helper: ensure character exists */
+  function ensureChar(name){
+    if(!charSet.has(name)){charSet.add(name);characters.push({name,description:'',archived:false});}
+  }
+
+  /* --- Title page --- */
+  const titlePage=doc.querySelector('TitlePage');
+  if(titlePage){
+    const tpParas=titlePage.querySelectorAll('Paragraph');
+    tpParas.forEach(p=>{
+      const type=(p.getAttribute('Type')||'').toLowerCase();
+      const txt=paraText(p);
+      if(!txt)return;
+      /* Title page paragraphs don't always have Type — check text content */
+      if(type.includes('title')||(!title||title==='Untitled')&&!type)title=txt;
+      if(type.includes('author')||/^(written by|by)\s/i.test(txt)){
+        const m=txt.match(/^(?:written by|by)\s+(.+)$/i);
+        if(m)author=m[1].trim(); else if(type.includes('author'))author=txt;
+      }
+    });
+  }
+
+  /* --- Cast section — populate characters --- */
+  const castMembers=doc.querySelectorAll('Cast > Member');
+  castMembers.forEach(m=>{
+    const raw=m.getAttribute('Character');
+    if(raw){const n=normName(raw);ensureChar(n);}
+  });
+
+  /* --- Content paragraphs --- */
+  const content=doc.querySelector('FinalDraft > Content');
+  if(!content){alert('No content found in FDX file.');return;}
+  const paras=Array.from(content.children);
+
+  let curAct=null,curScene=null;
+  let pendingChar=null; /* holds character name waiting for Dialogue */
+
+  function ensureActScene(){
+    if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
+    if(!curScene){curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);}
+  }
+
+  /* Flush any pending character that never got dialogue */
+  function flushPendingChar(){
+    if(pendingChar){
+      ensureActScene();
+      curScene.lines.push({type:'action',value:pendingChar.raw});
+      pendingChar=null;
+    }
+  }
+
+  for(let i=0;i<paras.length;i++){
+    const p=paras[i];
+    if(p.nodeName!=='Paragraph')continue;
+    const type=p.getAttribute('Type')||'';
+    const txt=paraText(p);
+
+    /* Handle DualDialogue — extract inner paragraphs */
+    const dualDlg=p.querySelector('DualDialogue');
+    if(dualDlg){
+      flushPendingChar();
+      const innerParas=Array.from(dualDlg.querySelectorAll('Paragraph'));
+      let dChar=null;
+      innerParas.forEach(ip=>{
+        const iType=ip.getAttribute('Type')||'';
+        const iTxt=paraText(ip);
+        if(iType==='Character'){dChar=iTxt;}
+        else if(iType==='Dialogue'&&dChar){
+          const name=normName(dChar);
+          ensureChar(name);
+          ensureActScene();
+          curScene.lines.push({type:'dialogue',value:iTxt,character:{name,description:''},dialogueAction:''});
+          dChar=null;
+        }else if(iType==='Parenthetical'&&dChar){
+          /* Will be attached to next dialogue — store as pending action */
+        }
+      });
+      continue;
+    }
+
+    switch(type){
+      case 'Act Break':{
+        flushPendingChar();
+        /* Parse act name: "ACT ONE", "ACT TWO — Title", etc. */
+        let actName='';
+        if(txt){
+          /* Strip "ACT ONE/TWO/..." prefix, keep optional user name */
+          actName=txt.replace(/^ACT\s+\w+/i,'').replace(/^\s*[-—]\s*/,'').trim();
+        }
+        curAct={name:actName,description:'',scenes:[]};acts.push(curAct);
+        curScene=null;
+        break;
+      }
+      case 'Scene Heading':{
+        flushPendingChar();
+        ensureActScene();
+        /* In stage plays, scene headings describe the scene setting */
+        /* Create a new scene if we already have lines in the current one */
+        if(curScene&&curScene.lines.length>0){
+          curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);
+        }
+        if(txt)curScene.lines.push({type:'setting',value:txt});
+        break;
+      }
+      case 'Character':{
+        flushPendingChar();
+        if(txt)pendingChar={raw:txt,name:normName(txt)};
+        break;
+      }
+      case 'Parenthetical':{
+        if(pendingChar){
+          /* Strip surrounding parens if present */
+          let pa=txt;
+          if(pa.startsWith('(')&&pa.endsWith(')'))pa=pa.slice(1,-1).trim();
+          pendingChar.action=pa;
+        }
+        break;
+      }
+      case 'Dialogue':{
+        if(pendingChar){
+          const name=pendingChar.name;
+          ensureChar(name);
+          ensureActScene();
+          curScene.lines.push({
+            type:'dialogue',value:txt,
+            character:{name,description:''},
+            dialogueAction:pendingChar.action||''
+          });
+          pendingChar=null;
+        }else{
+          /* Orphaned dialogue — treat as action */
+          ensureActScene();
+          if(txt)curScene.lines.push({type:'action',value:txt});
+        }
+        break;
+      }
+      case 'Action':{
+        flushPendingChar();
+        ensureActScene();
+        if(txt)curScene.lines.push({type:'action',value:txt});
+        break;
+      }
+      case 'Transition':{
+        flushPendingChar();
+        ensureActScene();
+        if(txt)curScene.lines.push({type:'direction',value:txt});
+        break;
+      }
+      case 'General':
+      case 'Show/Ep. Title':
+      default:{
+        flushPendingChar();
+        /* For unrecognized types, treat as action if they have text */
+        if(txt){ensureActScene();curScene.lines.push({type:'action',value:txt});}
+        break;
+      }
+    }
+  }
+  flushPendingChar();
+
+  /* If no acts were created, wrap everything in a default act */
+  if(!acts.length)acts=[{name:'',description:'',scenes:[{name:'',description:'',lines:[]}]}];
+
+  /* Ensure we got title from TitlePage or use filename heuristic */
+  /* If title is still Untitled, try to extract from first Action line that looks like a title */
 
   /* Load into app */
   pushUndo();

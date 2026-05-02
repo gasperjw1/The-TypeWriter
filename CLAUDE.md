@@ -129,6 +129,7 @@ S = {
 - [x] Mobile responsive layout with touch drag-and-drop (Session 7)
 - [x] Fountain export (.fountain plain-text format) (Session 8)
 - [x] Fountain import with round-trip fidelity (Session 8)
+- [x] FDX import — Final Draft .fdx XML parsing with stage play support (Session 8)
 
 ### Remaining (priority order)
 - [ ] FDX export (Final Draft format — industry standard)
