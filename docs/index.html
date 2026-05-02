@@ -440,6 +440,29 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 #sub-btn{font-size:11px;padding:4px 12px;border:none;border-radius:20px;background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;}
 #sub-btn:hover{opacity:.85;}
 
+/* ── Auto-detect input mode ── */
+#auto-ta{width:100%;padding:10px 12px;font-family:'Courier New',monospace;font-size:var(--script-font-size);border:none;background:transparent;color:var(--tx1);resize:none;outline:none;line-height:1.6;min-height:42px;max-height:160px;overflow-y:auto;display:none;}
+#auto-detect-bar{display:none;align-items:center;gap:6px;padding:4px 12px;border-top:1px solid var(--bd3);font-size:11px;color:var(--tx3);}
+#auto-detect-bar.visible{display:flex;}
+.ad-pill{font-size:10px;padding:2px 10px;border-radius:12px;font-weight:500;font-family:var(--sans);border:1px solid transparent;cursor:pointer;transition:all .15s;}
+.ad-pill.direction{background:rgba(239,159,39,0.12);color:#EF9F27;border-color:#EF9F27;}
+.ad-pill.dialogue{background:rgba(55,138,221,0.12);color:#378ADD;border-color:#378ADD;}
+.ad-pill.action{background:rgba(216,90,48,0.12);color:#D85A30;border-color:#D85A30;}
+.ad-hint{font-size:10px;color:var(--tx3);flex:1;}
+.ad-override{font-size:10px;color:var(--tx3);cursor:pointer;text-decoration:underline;font-family:var(--sans);background:none;border:none;padding:0;}
+.ad-override:hover{color:var(--tx1);}
+/* Fuzzy match suggestion */
+#auto-suggest{display:none;padding:4px 12px;font-size:11px;color:var(--tx2);background:rgba(55,138,221,0.06);border-top:1px solid var(--bd3);}
+#auto-suggest a{color:#378ADD;cursor:pointer;font-weight:500;text-decoration:underline;}
+/* Input mode choice in setup */
+.im-choice{display:flex;gap:10px;margin-top:12px;justify-content:center;}
+.im-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 16px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;min-width:130px;max-width:170px;text-align:center;}
+.im-card:hover{border-color:var(--bd1);background:var(--bg1);}
+.im-card.selected{border-color:var(--tx1);background:var(--bg1);}
+.im-card-icon{font-size:18px;color:var(--tx2);}
+.im-card-label{font-size:12px;font-weight:500;color:var(--tx1);}
+.im-card-desc{font-size:10px;color:var(--tx3);line-height:1.4;}
+
 /* ── Right panel ── */
 #right-panel-wrap{display:flex;flex-direction:column;border-left:var(--panel-border);background:var(--bg1);flex-shrink:0;position:relative;}
 #rp-resize-handle{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:col-resize;z-index:10;background:transparent;}
@@ -484,8 +507,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 /* ── Modal ── */
 #mlayer{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:800;align-items:center;justify-content:center;}
 #mlayer.open{display:flex;}
-.mbox{background:#3a3a3a;border-radius:var(--rl);border:1px solid #555;padding:20px;width:440px;max-width:95%;cursor:move;user-select:none;}
-.mbox h3{font-size:15px;font-weight:500;color:#fff;margin-bottom:12px;}
+.mbox{background:#3a3a3a;border-radius:var(--rl);border:1px solid #555;padding:20px;width:440px;max-width:95%;max-height:90vh;overflow:auto;resize:both;min-width:280px;min-height:160px;user-select:none;}
+.mbox h3{font-size:15px;font-weight:500;color:#fff;margin-bottom:12px;cursor:move;}
 .mbox p{font-size:13px;color:#ccc;margin-bottom:12px;line-height:1.5;}
 .mf{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
 .mf label{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;}
@@ -672,10 +695,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   .cue-list{gap:4px;}
   .cue-chip{font-size:10px;padding:3px 7px;}
 
+  /* Auto-detect input */
+  #auto-ta{font-size:13px;}
+  .im-choice{flex-direction:column;align-items:stretch;}
+  .im-card{max-width:100%;flex-direction:row;gap:10px;padding:10px 14px;}
+
   /* Submit row */
   #input-footer{padding:5px 10px 6px;}
 
-  /* ── Panels (View, Summaries, Settings, Guide) ── */
+  /* ── Panels (View, Settings, Outline) ── */
   #view-panel{padding:20px 14px;max-width:100%;}
   #view-panel .v-setting{padding-left:20px;}
   #view-panel .v-direction{padding-left:20px;}
@@ -828,6 +856,18 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         </div>
         <div id="new-title-wrap">
           <input class="setup-input" id="setup-input" placeholder="Script title..."/>
+          <div class="im-choice" id="im-choice">
+            <div class="im-card" id="im-auto" onclick="pickInputMode('auto')">
+              <div class="im-card-icon">✦</div>
+              <div class="im-card-label">Smart input</div>
+              <div class="im-card-desc">Type naturally — line type is auto-detected from your text</div>
+            </div>
+            <div class="im-card" id="im-pills" onclick="pickInputMode('pills')">
+              <div class="im-card-icon">⊞</div>
+              <div class="im-card-label">Manual pills</div>
+              <div class="im-card-desc">Select a line type pill before typing each line</div>
+            </div>
+          </div>
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
@@ -837,7 +877,22 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <div id="view-panel"></div>
     <div id="outline-panel"></div>
     <div id="settings-panel">
-      <div class="psec-title">Formatting</div>
+      <div class="psec-title">Input</div>
+      <div class="setting-row">
+        <div class="setting-label">Input mode</div>
+        <div class="setting-desc">Choose how you add new lines to your script.</div>
+        <div class="setting-options">
+          <label class="setting-option" id="opt-auto" onclick="setInputMode('auto')">
+            <input type="radio" name="inputmode" value="auto"/>
+            <div><div class="setting-option-label">Smart input</div><div class="setting-option-desc">Type naturally in a single textbox. Line type (Dialogue, Cue, Stage Direction) is auto-detected from your text.</div></div>
+          </label>
+          <label class="setting-option selected" id="opt-pills" onclick="setInputMode('pills')">
+            <input type="radio" name="inputmode" value="pills" checked/>
+            <div><div class="setting-option-label">Manual pills</div><div class="setting-option-desc">Select a line type pill before typing each line. Gives explicit control over type selection.</div></div>
+          </label>
+        </div>
+      </div>
+      <div class="psec-title" style="margin-top:28px;">Formatting</div>
       <div class="setting-row">
         <div class="setting-label">Autosave</div>
         <div class="setting-desc">When enabled, changes are automatically saved to your browser and to the file on disk (if one is linked).</div>
@@ -931,7 +986,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="type-pills">
         <div class="tpill-wrap">
           <span class="tpill active" data-t="direction" data-n="3" onclick="selPill(this,'direction')">Cue<span class="sc">` 3</span></span>
-          <div class="pill-tip"><strong>Cue</strong> &nbsp;·&nbsp; Shortcut: <code>` 4</code><br>Marks character entrances and exits<br>using cue chips. Also includes a text<br>field for accompanying stage directions.</div>
+          <div class="pill-tip"><strong>Cue</strong> &nbsp;·&nbsp; Shortcut: <code>` 3</code><br>Marks character entrances and exits<br>using cue chips. Also includes a text<br>field for accompanying stage directions.</div>
         </div>
         <div class="tpill-wrap">
           <span class="tpill" data-t="dialogue" data-n="1" onclick="selPill(this,'dialogue')">Dialogue<span class="sc">` 1</span></span>
@@ -944,7 +999,11 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <button id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel">Panel</button>
       </div>
       <div id="input-box">
-        <!-- Setting / Stage Direction -->
+        <!-- Auto-detect unified textbox -->
+        <textarea id="auto-ta" placeholder="Type a line... (CHAR: text for dialogue, [ENTER/EXIT NAME] for cue)" rows="1" oninput="onAutoInput()" onkeydown="autoKey(event)"></textarea>
+        <div id="auto-suggest"></div>
+        <div id="auto-detect-bar"><span class="ad-hint" id="ad-hint">Type to begin</span></div>
+        <!-- Setting / Stage Direction (pills mode) -->
         <textarea id="simple-ta" placeholder="Type a line..." rows="1" style="display:none" onkeydown="lastFieldKey(event)"></textarea>
         <!-- Dialogue: left col (char name + dlg action) | right col (spoken text) -->
         <div id="dlg-box">
@@ -977,7 +1036,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         </div>
         <div id="input-footer">
           <span id="ins-ctx">Adding to end of script</span>
-          <button id="sub-btn" onclick="submitLine()">Add ↵</button>
+          <button id="sub-btn" onclick="inputMode==='auto'?submitAutoLine():submitLine()">Add ↵</button>
         </div>
       </div>
     </div>
@@ -1037,6 +1096,7 @@ function typeLabel(t){return{setting:'Setting',direction:'Cue',action:'Stage Dir
 let ltColors={direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
 let ltEnabled={direction:false,action:false,dialogue:true};
 let pillHotkeys={dialogue:'1',action:'2',direction:'3'};
+let inputMode='pills'; /* 'pills' = manual pill selection, 'auto' = unified textbox with auto-detection */
 let charPanelExpanded={};
 let showRevMarks=true;
 const REV_COLORS=[
@@ -1054,7 +1114,7 @@ const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -1197,7 +1257,7 @@ function toggleFileDd(){
 }
 function closeFDD(){$('file-dd').classList.remove('open');const bd=$('mob-fdd-backdrop');if(bd)bd.classList.remove('open');}
 function resetEditorState(){undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};$('undo-btn').disabled=true;$('redo-btn').disabled=true;}
-function showEditor(title){$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=title;updateSaveIndicator();}
+function showEditor(title){$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=title;updateSaveIndicator();applyInputMode();}
 document.addEventListener('click',e=>{if(!$('file-menu-wrap').contains(e.target))closeFDD();});
 async function menuSave(){
   closeFDD();if(!S.title)return;
@@ -1434,14 +1494,14 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();if(editingLine)saveInlineEdit();doUndo();return;}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||((e.key==='z'||e.key==='Z')&&e.shiftKey))){e.preventDefault();if(editingLine)saveInlineEdit();doRedo();return;}
   if(editingLine)return;
-  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){submitLine();return;}
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){inputMode==='auto'?submitAutoLine():submitLine();return;}
   if(e.key==='`'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();pendingPillKey=true;return;}
   if(pendingPillKey){const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}}
   pendingPillKey=false;
 });
 
-function hasInput(){if(cType==='dialogue')return($('dlg-char-ta').value.trim()||$('dlg-act-ta').value.trim()||$('dlg-text-ta').value.trim());if(cType==='direction')return $('dir-desc-ta').value.trim()||pendingCues.enters.length||pendingCues.exits.length;return $('simple-ta').value.trim();}
-function clearInput(){$('simple-ta').value='';$('dlg-char-ta').value='';$('dlg-act-ta').value='';$('dlg-text-ta').value='';$('dir-desc-ta').value='';pendingCues={enters:[],exits:[]};ghostMatch='';$('char-ghost').textContent='';[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta')].forEach(el=>{if(el)as(el);});}
+function hasInput(){if(inputMode==='auto')return $('auto-ta').value.trim();if(cType==='dialogue')return($('dlg-char-ta').value.trim()||$('dlg-act-ta').value.trim()||$('dlg-text-ta').value.trim());if(cType==='direction')return $('dir-desc-ta').value.trim()||pendingCues.enters.length||pendingCues.exits.length;return $('simple-ta').value.trim();}
+function clearInput(){$('simple-ta').value='';$('dlg-char-ta').value='';$('dlg-act-ta').value='';$('dlg-text-ta').value='';$('dir-desc-ta').value='';$('auto-ta').value='';pendingCues={enters:[],exits:[]};ghostMatch='';$('char-ghost').textContent='';$('auto-suggest').style.display='none';[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta'),$('auto-ta')].forEach(el=>{if(el)as(el);});}
 function selPill(el,t){if(t===cType&&!pendingPill)return;if(hasInput()&&pendingPill!==t){pendingPill=t;document.querySelectorAll('.tpill').forEach(p=>{p.classList.remove('warn');if(p.dataset.t===t)p.classList.add('warn');});$('type-alert').textContent='You have unsaved text. Select the same option again to switch and discard it.';$('type-alert').style.display='block';return;}pendingPill=null;$('type-alert').style.display='none';document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function activatePillByType(t){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));const el=document.querySelector(`.tpill[data-t="${t}"]`);if(el)el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function updateInputMode(){
@@ -1475,7 +1535,7 @@ function pickC(n){if(cddHideTimer){clearTimeout(cddHideTimer);cddHideTimer=null;
 function toggleSceneFilter(){sceneFilterOn=!sceneFilterOn;const btn=$('scene-filter-toggle');btn.classList.toggle('active',sceneFilterOn);$('sft-tip-content').innerHTML=`Scene filter: ${sceneFilterOn?'ON — scene characters only':'OFF — all characters'}`;renderCDD($('dlg-char-ta').value);}
 
 function as(el,maxR){if(!el)return;el.style.height='auto';const lh=parseFloat(getComputedStyle(el).lineHeight)||18;const max=(maxR||5)*lh+20;el.style.height=Math.min(el.scrollHeight,max)+'px';el.style.overflowY=el.scrollHeight>max?'auto':'hidden';}
-[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta')].forEach((el,i)=>{if(!el)return;const maxR=[5,2,2,5,5][i];el.addEventListener('input',()=>as(el,maxR));});
+[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta'),$('auto-ta')].forEach((el,i)=>{if(!el)return;const maxR=[5,2,2,5,5,6][i];el.addEventListener('input',()=>as(el,maxR));});
 $('dir-desc-ta').addEventListener('input',updateDirCues);
 
 function updateDirCues(){
@@ -1501,6 +1561,272 @@ function submitLine(){
   else scene.lines.push(line);
   clearInput();activatePillByType(nextPillAfter(t));autoSave();render();
   setTimeout(()=>{if(cType==='dialogue')$('dlg-char-ta').focus();else if(cType==='direction')$('dir-desc-ta').focus();else $('simple-ta').focus();},50);
+}
+
+/* ── Auto-detect input mode ── */
+function pickInputMode(mode){
+  inputMode=mode;
+  document.querySelectorAll('.im-card').forEach(c=>c.classList.remove('selected'));
+  const el=$('im-'+mode);if(el)el.classList.add('selected');
+}
+function setInputMode(mode){
+  inputMode=mode;
+  document.querySelectorAll('#settings-panel .setting-option').forEach(el=>{
+    if(el.id==='opt-auto'||el.id==='opt-pills'){el.classList.remove('selected');el.querySelector('input[type=radio]').checked=false;}
+  });
+  const opt=$('opt-'+mode);if(opt){opt.classList.add('selected');opt.querySelector('input[type=radio]').checked=true;}
+  applyInputMode();lsSaveSettings();
+}
+function applyInputMode(){
+  /* Update settings panel radio buttons */
+  const optAuto=$('opt-auto'),optPills=$('opt-pills');
+  if(optAuto&&optPills){
+    optAuto.classList.toggle('selected',inputMode==='auto');
+    optPills.classList.toggle('selected',inputMode==='pills');
+    const ra=optAuto.querySelector('input[type=radio]');if(ra)ra.checked=inputMode==='auto';
+    const rp=optPills.querySelector('input[type=radio]');if(rp)rp.checked=inputMode==='pills';
+  }
+  /* Toggle visibility: in pills mode, pills row + specialized boxes visible; in auto mode, unified textarea visible */
+  if(inputMode==='auto'){
+    $('type-pills').style.display='none';
+    $('simple-ta').style.display='none';
+    $('dlg-box').style.display='none';
+    $('direction-box').style.display='none';
+    $('auto-ta').style.display='block';
+    $('auto-detect-bar').classList.add('visible');
+  }else{
+    $('type-pills').style.display='flex';
+    $('auto-ta').style.display='none';
+    $('auto-detect-bar').classList.remove('visible');
+    $('auto-suggest').style.display='none';
+    updateInputMode();
+  }
+  /* Update setup screen choice cards if visible */
+  document.querySelectorAll('.im-card').forEach(c=>c.classList.remove('selected'));
+  const imEl=$('im-'+inputMode);if(imEl)imEl.classList.add('selected');
+}
+
+/* Levenshtein distance for fuzzy matching */
+function levenshtein(a,b){
+  const m=a.length,n=b.length;if(!m)return n;if(!n)return m;
+  const d=Array.from({length:m+1},(_,i)=>i);
+  for(let j=1;j<=n;j++){let prev=d[0];d[0]=j;
+    for(let i=1;i<=m;i++){const t=d[i];d[i]=a[i-1]===b[j-1]?prev:1+Math.min(prev,d[i],d[i-1]);prev=t;}}
+  return d[m];
+}
+function fuzzyCharMatch(name){
+  const up=name.toUpperCase();
+  /* Exact match — no suggestion needed */
+  if(S.characters.find(c=>c.name===up&&!c.archived))return null;
+  /* Find closest existing character within edit distance threshold */
+  let best=null,bestDist=Infinity;
+  S.characters.filter(c=>!c.archived).forEach(c=>{
+    const dist=levenshtein(up,c.name);
+    /* threshold: up to 2 edits for names <=5 chars, up to 3 for longer */
+    const thresh=c.name.length<=5?2:3;
+    if(dist>0&&dist<=thresh&&dist<bestDist){bestDist=dist;best=c.name;}
+  });
+  return best;
+}
+
+/* Detection: parse text to determine line type */
+const DLG_RE=/^([A-Z][A-Z\s'.\-]+?)(\s*\(([^)]*)\))?\s*:\s*([\s\S]+)/;
+const CUE_RE=/^\[(ENTER|EXIT)\s+([^\]]+)\](.*)$/i;
+/* Multi-line dialogue: NAME alone on first line, optional (action) on second, text on remaining.
+   Name must be all-caps letters/spaces/apostrophes/hyphens, no periods, max 3 words. */
+const MLDLG_NAME_RE=/^[A-Z][A-Z\s'\-]{1,}$/;
+function detectLineType(text){
+  if(!text.trim())return{type:'action',parsed:null};
+  /* 1. Cue pattern: [ENTER NAME] or [EXIT NAME] optionally followed by description */
+  const cm=text.match(CUE_RE);
+  if(cm){
+    const dir=cm[1].toUpperCase();
+    const names=cm[2].split(/\s*,\s*/).map(n=>n.trim().toUpperCase()).filter(Boolean);
+    const desc=cm[3]?cm[3].trim():'';
+    const cues=dir==='ENTER'?{enters:names,exits:[]}:{enters:[],exits:names};
+    return{type:'direction',parsed:{value:desc,cues}};
+  }
+  /* 2a. Colon dialogue: CHARNAME: text  or  CHARNAME (action): text */
+  const dm=text.match(DLG_RE);
+  if(dm){
+    const charName=dm[1].trim();
+    const dlgAction=dm[3]?dm[3].trim():'';
+    const dlgText=dm[4].trim();
+    return{type:'dialogue',parsed:{charName,dlgAction,dlgText}};
+  }
+  /* 2b. Multi-line dialogue: NAME on first line, then text below */
+  const lines=text.split('\n');
+  const firstLine=lines[0].trim();
+  if(firstLine&&MLDLG_NAME_RE.test(firstLine)&&firstLine.trim().split(/\s+/).length<=3){
+    /* Check if this name is a known character or plausible new one */
+    const isKnown=!!S.characters.find(c=>c.name===firstLine.toUpperCase()&&!c.archived);
+    const looksLikeName=firstLine.length>=2&&firstLine===firstLine.toUpperCase();
+    if(isKnown||looksLikeName){
+      /* Only name so far — partial dialogue (waiting for text on next line) */
+      if(lines.length===1||lines.slice(1).every(l=>!l.trim())){
+        return{type:'dialogue-partial',parsed:{charName:firstLine.toUpperCase()}};
+      }
+      /* Has content below — parse as full dialogue */
+      const charName=firstLine.toUpperCase();
+      let dlgAction='',textLines=[];
+      let rest=lines.slice(1);
+      /* Check if second line is a parenthetical action */
+      if(rest.length&&rest[0].trim().match(/^\(.*\)$/)){
+        dlgAction=rest[0].trim().replace(/^\(|\)$/g,'').trim();
+        rest=rest.slice(1);
+      }
+      const dlgText=rest.map(l=>l.trim()).filter(Boolean).join('\n');
+      if(dlgText){
+        return{type:'dialogue',parsed:{charName,dlgAction,dlgText}};
+      }
+      /* Name + parenthetical but no text yet */
+      return{type:'dialogue-partial',parsed:{charName,dlgAction}};
+    }
+  }
+  /* 3. Default: stage direction */
+  return{type:'action',parsed:{value:text.trim()}};
+}
+
+function onAutoInput(){
+  const text=$('auto-ta').value;
+  const det=detectLineType(text);
+  const hint=$('ad-hint');
+  const suggest=$('auto-suggest');
+  /* Update detection preview */
+  if(!text.trim()){
+    hint.innerHTML='Type to begin &nbsp;·&nbsp; <span style="color:var(--tx3)">CHAR: text</span> or <span style="color:var(--tx3)">CHAR ↵ text</span> for dialogue &nbsp;·&nbsp; <span style="color:var(--tx3)">[ENTER/EXIT NAME]</span> for cue';
+    suggest.style.display='none';
+    return;
+  }
+  const labels={direction:'Cue',dialogue:'Dialogue',action:'Stage Direction','dialogue-partial':'Dialogue'};
+  if(det.type==='dialogue-partial'){
+    const known=det.parsed&&S.characters.find(c=>c.name===det.parsed.charName&&!c.archived);
+    hint.innerHTML=`<span class="ad-pill dialogue">Dialogue</span> <span style="color:var(--tx3)">${esc(det.parsed.charName)}${known?'':'  (new character)'} — press Enter to add ${det.parsed.dlgAction?'spoken text':'dialogue text'}</span>`;
+    /* Show fuzzy suggestion if name is unrecognized */
+    if(!known&&det.parsed){
+      const fuzzy=fuzzyCharMatch(det.parsed.charName);
+      if(fuzzy){suggest.innerHTML=`Did you mean <a onclick="autoSuggestAccept('${escJs(fuzzy)}')">${esc(fuzzy)}</a>?`;suggest.style.display='block';}
+      else{suggest.style.display='none';}
+    }else{suggest.style.display='none';}
+    as($('auto-ta'),6);
+    return;
+  }
+  hint.innerHTML=`<span class="ad-pill ${det.type}">${labels[det.type]}</span>`;
+  /* Fuzzy character name suggestion for dialogue */
+  if(det.type==='dialogue'&&det.parsed){
+    const fuzzy=fuzzyCharMatch(det.parsed.charName);
+    if(fuzzy){
+      suggest.innerHTML=`Did you mean <a onclick="autoSuggestAccept('${escJs(fuzzy)}')">${esc(fuzzy)}</a>?`;
+      suggest.style.display='block';
+    }else{
+      suggest.style.display='none';
+    }
+  }else{
+    suggest.style.display='none';
+  }
+  as($('auto-ta'),6);
+}
+function autoSuggestAccept(name){
+  const ta=$('auto-ta');
+  const text=ta.value;
+  /* Replace the character name portion — works for both colon and multi-line */
+  const dm=text.match(DLG_RE);
+  if(dm){
+    ta.value=name+text.slice(dm[1].length);
+  }else{
+    /* Multi-line: replace first line */
+    const lines=text.split('\n');
+    lines[0]=name;
+    ta.value=lines.join('\n');
+  }
+  onAutoInput();
+}
+function autoKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){
+    const det=detectLineType($('auto-ta').value);
+    /* If partial dialogue (just name, or name+action but no text), insert newline instead of submitting */
+    if(det.type==='dialogue-partial'){/* let default textarea behavior insert \n */return;}
+    e.preventDefault();submitAutoLine();
+  }
+}
+function submitAutoLine(){
+  const text=$('auto-ta').value;
+  if(!text.trim())return;
+  const scene=insertAfter?insertAfter.scene:currentScene();
+  if(!scene){alert('Add an Act and Scene first.');return;}
+  const det=detectLineType(text);
+  let line=null;
+  if(det.type==='dialogue'&&det.parsed){
+    const cn=det.parsed.charName;
+    /* Check for fuzzy match and prompt */
+    const fuzzy=fuzzyCharMatch(cn);
+    if(fuzzy){
+      openModal(`<h3>Did you mean ${esc(fuzzy)}?</h3><p>"${esc(cn)}" isn't a known character, but "${esc(fuzzy)}" is similar.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();forceAutoSubmit('${escJs(cn)}')">Use "${esc(cn)}"</button><button class="mb-ok" onclick="closeModal();forceAutoSubmit('${escJs(fuzzy)}')">Use "${esc(fuzzy)}"</button></div>`,null);
+      return;
+    }
+    const ex=findChar(cn);
+    if(!ex){
+      /* New character — open creation modal then resume */
+      openNewCharModalAuto(cn,det.parsed.dlgAction,det.parsed.dlgText);
+      return;
+    }
+    const v=det.parsed.dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
+    line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};
+    if(det.parsed.dlgAction)line.dialogueAction=det.parsed.dlgAction;
+  }else if(det.type==='direction'&&det.parsed){
+    line={type:'direction',value:det.parsed.value||''};
+    if(det.parsed.cues&&(det.parsed.cues.enters.length||det.parsed.cues.exits.length)){
+      /* Ensure characters exist */
+      [...det.parsed.cues.enters,...det.parsed.cues.exits].forEach(n=>getOrCreate(n));
+      line.cues=det.parsed.cues;
+    }
+  }else{
+    line={type:'action',value:text.trim()};
+  }
+  if(!line)return;
+  pushUndo();
+  if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
+  else scene.lines.push(line);
+  $('auto-ta').value='';$('auto-suggest').style.display='none';
+  onAutoInput();autoSave();render();
+  setTimeout(()=>$('auto-ta').focus(),50);
+}
+function forceAutoSubmit(charName){
+  const text=$('auto-ta').value;
+  const det=detectLineType(text);
+  if(det.type!=='dialogue'||!det.parsed)return;
+  const scene=insertAfter?insertAfter.scene:currentScene();if(!scene)return;
+  const ex=getOrCreate(charName);
+  const v=det.parsed.dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
+  const line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};
+  if(det.parsed.dlgAction)line.dialogueAction=det.parsed.dlgAction;
+  pushUndo();
+  if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
+  else scene.lines.push(line);
+  $('auto-ta').value='';$('auto-suggest').style.display='none';
+  onAutoInput();autoSave();render();
+  setTimeout(()=>$('auto-ta').focus(),50);
+}
+function openNewCharModalAuto(cn,da,dlgText){
+  openModal(`<h3>New character</h3><p>"${esc(cn)}" doesn't exist yet. Add them?</p><div class="mf"><label>Name</label><input class="minput" id="nc-name" value="${esc(cn.toUpperCase())}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="nc-desc"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmNewCharAuto('${escJs(da)}','${escJs(dlgText)}')">Add &amp; submit line</button></div>`,null);
+  setTimeout(()=>{const el=$('nc-desc');if(el)el.focus();},50);
+}
+function confirmNewCharAuto(da,dlgText){
+  const n=$('nc-name').value.trim().toUpperCase();if(!n){alert('Name required.');return;}
+  const d=$('nc-desc').value.trim();
+  if(findCharAny(n)){alert(n+' already exists.');return;}
+  const c={name:n,description:d,archived:false};S.characters.push(c);closeModal();
+  /* Now submit the dialogue line */
+  const scene=insertAfter?insertAfter.scene:currentScene();if(!scene)return;
+  const v=dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
+  const line={type:'dialogue',value:v,character:{name:c.name,description:c.description}};
+  if(da)line.dialogueAction=da;
+  pushUndo();
+  if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
+  else scene.lines.push(line);
+  $('auto-ta').value='';$('auto-suggest').style.display='none';
+  onAutoInput();autoSave();render();
+  setTimeout(()=>$('auto-ta').focus(),50);
 }
 
 function selLine(ai,si,li){if(editingLine)saveInlineEdit();const scene=S.acts[ai].scenes[si];insertAfter={scene,lineIdx:li,actIdx:ai,sceneIdx:si};updateCtx();if(cType==='direction')updateDirCues();render();checkScrollBack();}
@@ -1987,7 +2313,7 @@ function executeTouchDrop(type,fromIdx,toIdx){
 /* ── Modal helpers ── */
 let mdrag={on:false,sx:0,sy:0};
 const mbox=$('mbox');
-mbox.addEventListener('mousedown',e=>{if(['INPUT','BUTTON','TEXTAREA'].includes(e.target.tagName))return;mdrag.on=true;const r=mbox.getBoundingClientRect();mdrag.sx=e.clientX-r.left;mdrag.sy=e.clientY-r.top;e.preventDefault();});
+mbox.addEventListener('mousedown',e=>{if(!e.target.closest('.mbox h3'))return;mdrag.on=true;const r=mbox.getBoundingClientRect();mdrag.sx=e.clientX-r.left;mdrag.sy=e.clientY-r.top;e.preventDefault();});
 document.addEventListener('mousemove',e=>{if(!mdrag.on)return;const lb=$('mlayer').getBoundingClientRect();mbox.style.position='absolute';mbox.style.left=(e.clientX-lb.left-mdrag.sx)+'px';mbox.style.top=(e.clientY-lb.top-mdrag.sy)+'px';mbox.style.transform='none';});
 document.addEventListener('mouseup',()=>{mdrag.on=false;});
 function openModal(html,onBg){mbox.style.position='';mbox.style.left='';mbox.style.top='';mbox.style.transform='';$('mcontent').innerHTML=html;$('mlayer').classList.add('open');$('mlayer').onclick=e=>{if(e.target===$('mlayer')&&onBg)onBg();};}
@@ -3231,8 +3557,9 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.ltColors){ltColors={...ltColors,...sets.ltColors};['direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
     if(sets.ltEnabled){ltEnabled={...ltEnabled,...sets.ltEnabled};['direction','action','dialogue'].forEach(t=>{const btn=$('ltt-'+t);if(btn)btn.classList.toggle('on',ltEnabled[t]);});}
     if(sets.pillHotkeys){pillHotkeys=sets.pillHotkeys;updatePillLabels();}
+    if(sets.inputMode){inputMode=sets.inputMode;}
   }
-  applyLTColors();renderHotkeySettings();
+  applyLTColors();renderHotkeySettings();applyInputMode();
 })();
 
 /* ── Mobile helpers ── */
