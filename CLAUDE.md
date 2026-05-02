@@ -112,6 +112,10 @@ S = {
 - [x] Find & replace with line-type filters (Session 4)
 - [x] File System Access API for persistent save/overwrite (Session 4)
 - [x] localStorage auto-persistence (Session 4)
+- [x] Metadata ZIP download + PDF bundling (Session 5)
+- [x] Character panel inline expansion with dialogue search (Session 5)
+- [x] Pill hotkey customization in Settings (Session 5)
+- [x] Describe page — feature guide for non-intuitive features (Session 5)
 
 ### Remaining (priority order)
 - [ ] FDX export (Final Draft format — industry standard)
@@ -179,3 +183,14 @@ S = {
 - **Bug fix: save indicator tooltip not displaying** — `.si-tip` had `position:absolute` with `transform:translateX(-50%)` conflicting with the JS IIFE that sets `position:fixed` and explicit `top`/`left`. Changed CSS to `position:fixed`, removed `transform` and the CSS hover rule (JS handles show/hide).
 - **Full codebase audit** — Programmatic validation of all `$()` references and `onclick` handlers. Confirmed no broken references, ghost calls, or dead code remaining.
 - **Synced `docs/index.html`** with latest `script_maker.html` for GitHub Pages.
+
+### Session 5 — 2026-05-02
+- **Metadata ZIP download** — New "Download metadata (.zip)" option in File menu. Uses JSZip (CDN) to create a ZIP containing the raw script JSON and a `manifest.json` with export timestamp, title, author, version, and app name. `buildMetadataZip()` / `downloadMetadata()` functions.
+- **PDF + metadata export** — New "Export PDF + metadata" option. Bundles the print-ready PDF HTML alongside a `metadata/` subfolder with the JSON and manifest in a single ZIP. `exportPDFWithMeta()`.
+- **Character panel inline expansion** — Revamped right-panel character list. Each character chip is now clickable to expand/collapse. Expanded view shows: full character description, a search input for filtering dialogue, and a scrollable list of all dialogue lines with scene location. `charPanelExpanded` state tracks open/closed per character. `toggleCharExpand()`, `filterCharDlg()`, `renderCharDlgList()`.
+- **Jump to line from character panel** — Clicking a dialogue line in the expanded character panel calls `jumpToLine(ai,si,li)` which switches to Edit tab, selects the line, and smooth-scrolls it to center of viewport.
+- **Pill hotkey customization** — New "Keyboard shortcuts" section in Settings tab. Each pill type (Dialogue, Action, Setting, Direction) has a click-to-capture input field. User clicks the field and presses any key to assign it. Conflicts auto-swap between pills. `pillHotkeys` state object, persisted to localStorage. `renderHotkeySettings()`, `startHkCapture()`, `stopHkCapture()`, `resetHotkeys()`, `updatePillLabels()`. Capture handler uses `addEventListener` with capture phase (`true`) to intercept before the regular keydown handler.
+- **Updated keyboard shortcut handler** — Replaced hardcoded `['1','2','3','4']` check with dynamic lookup against `pillHotkeys` object, so custom keys work immediately.
+- **Renamed app from "The TypeWriter" to "The Scriptwriter"** — Updated all display-facing references in `script_maker.html` (title tag, meta tags, setup screen brand text, default title text, metadata manifest app name), `CLAUDE.md`, `TODO.md`, and `README.md`. GitHub repo URL references left unchanged.
+- **Updated README.md** — Full rewrite reflecting all current features: localStorage + File System Access API persistence, find/replace, metadata ZIP, character panel expansion, hotkey customization, theme/color settings, describe page.
+- **Created `docs/describe.html`** — Feature guide page covering non-intuitive features: pill shortcuts, insert cursor, direction cues, inline editing, find/replace, save system, metadata export, character panel expansion, hotkey customization, and drag-and-drop. Styled to match the app's aesthetic with dark mode support. Linked from the app's setup screen.

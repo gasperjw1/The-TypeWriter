@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>The Scriptwriter — Feature Guide</title>
+<meta name="description" content="A guide to the non-obvious features of The Scriptwriter, a free browser-based screenplay editor."/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg1:#fff;--bg2:#f5f5f3;--bg3:#eeece8;
+  --tx1:#1a1a18;--tx2:#666663;--tx3:#999997;
+  --bd1:rgba(0,0,0,0.35);--bd2:rgba(0,0,0,0.2);--bd3:rgba(0,0,0,0.1);
+  --rm:8px;--rl:12px;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --accent:#378ADD;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg1:#1a1a18;--bg2:#242422;--bg3:#2c2c2a;
+  --tx1:#f0ede8;--tx2:#999997;--tx3:#666663;
+  --bd1:rgba(255,255,255,0.35);--bd2:rgba(255,255,255,0.2);--bd3:rgba(255,255,255,0.1);
+  --accent:#5BA3E6;
+}}
+body{font-family:var(--sans);background:var(--bg1);color:var(--tx1);line-height:1.7;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.page{max-width:680px;margin:0 auto;padding:48px 24px 80px;}
+
+/* Header */
+.header{margin-bottom:40px;text-align:center;}
+.header h1{font-family:'Courier New',Courier,monospace;font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+.header p{font-size:14px;color:var(--tx2);max-width:420px;margin:0 auto;}
+.back-link{display:inline-block;margin-bottom:20px;font-size:13px;color:var(--tx3);}
+.back-link:hover{color:var(--tx1);}
+
+/* Sections */
+.section{margin-bottom:36px;}
+.section h2{font-size:16px;font-weight:600;color:var(--tx1);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd3);}
+.section p{font-size:14px;color:var(--tx2);margin-bottom:10px;}
+
+/* Feature cards */
+.feature{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--rl);padding:16px 18px;margin-bottom:12px;}
+.feature h3{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.feature h3 .badge{font-size:10px;font-weight:500;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:1px 6px;text-transform:uppercase;letter-spacing:.04em;}
+.feature p{font-size:13px;color:var(--tx2);margin-bottom:0;line-height:1.6;}
+.feature ul{margin:6px 0 0 18px;font-size:13px;color:var(--tx2);line-height:1.8;}
+.feature code{font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;color:var(--tx1);}
+
+/* Key badge */
+.key{display:inline-block;font-family:'Courier New',monospace;font-size:11px;font-weight:600;background:var(--bg3);border:1px solid var(--bd2);border-radius:4px;padding:2px 7px;color:var(--tx1);min-width:22px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+
+/* Indicator dot */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin:0 2px;}
+
+/* Footer */
+.footer{text-align:center;font-size:12px;color:var(--tx3);padding-top:24px;border-top:1px solid var(--bd3);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<a class="back-link" href="index.html">← Back to The Scriptwriter</a>
+
+<div class="header">
+  <h1>Feature Guide</h1>
+  <p>A quick reference for the features that aren't immediately obvious. Everything here works without an account, install, or internet connection.</p>
+</div>
+
+<!-- ─── WRITING ─── -->
+<div class="section">
+  <h2>Writing</h2>
+
+  <div class="feature">
+    <h3>Line type pills &amp; shortcuts <span class="badge">Keyboard</span></h3>
+    <p>Every line you write is one of four types — <strong>Setting</strong>, <strong>Direction</strong>, <strong>Dialogue</strong>, or <strong>Action</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
+    <ul>
+      <li>Press <span class="key">`</span> (backtick) then <span class="key">1</span> → Dialogue</li>
+      <li>Press <span class="key">`</span> then <span class="key">2</span> → Action</li>
+      <li>Press <span class="key">`</span> then <span class="key">3</span> → Setting</li>
+      <li>Press <span class="key">`</span> then <span class="key">4</span> → Direction</li>
+    </ul>
+    <p style="margin-top:8px;">These keys are customizable — go to <strong>Settings → Keyboard shortcuts</strong> to remap them to any key you like.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Smart auto-advance</h3>
+    <p>After you submit a line, the pill automatically advances to the next likely type. Setting advances to Direction, Direction advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Insert cursor</h3>
+    <p>By default, new lines are added to the end of the current scene. To insert a line in the middle, <strong>click any existing line</strong> — it'll be highlighted and new lines will be inserted after it. Click an empty area of the script to deselect and go back to appending at the end.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Direction cues (entrances &amp; exits) <span class="badge">Unique</span></h3>
+    <p>When writing a Direction line, the input bar shows two lists of character chips:</p>
+    <ul>
+      <li><strong>In scene</strong> — characters currently present. Click one to mark them as exiting.</li>
+      <li><strong>Not in scene</strong> — characters who haven't entered yet. Click to mark an entrance.</li>
+    </ul>
+    <p style="margin-top:6px;">The app tracks who is "in the scene" based on all previous direction cues, so it always shows the correct state. Cues are validated when you drag-and-drop reorder lines.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Character autocomplete &amp; scene filter</h3>
+    <p>When writing Dialogue, start typing a character name and the app shows matching characters with ghost text completion. Press <span class="key">Tab</span> to accept the suggestion.</p>
+    <p style="margin-top:6px;">The <strong>⊙ button</strong> next to the character input toggles the scene filter — when on, the dropdown only shows characters who are currently in the scene (based on direction cues).</p>
+  </div>
+
+  <div class="feature">
+    <h3>Automatic (cont.)</h3>
+    <p>When the same character has two consecutive dialogue lines with no other line type between them, the app automatically adds <em>(cont.)</em> after their name. You don't need to type it.</p>
+  </div>
+</div>
+
+<!-- ─── EDITING ─── -->
+<div class="section">
+  <h2>Editing</h2>
+
+  <div class="feature">
+    <h3>Inline editing</h3>
+    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Setting and Action lines, you get a simple text area. For Dialogue, you get the character dropdown, action field, and text. For Direction lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
+    <p style="margin-top:6px;">Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Find &amp; Replace <span class="badge">Ctrl+F</span></h3>
+    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Setting, Direction, Dialogue, Action) to limit which line types are searched.</p>
+    <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong> (or <span class="key">Enter</span>/<span class="key">Shift+Enter</span>). Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and dialogue action, not the character name.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Drag &amp; drop</h3>
+    <p>Acts, scenes, and individual lines can be reordered by dragging. The app validates line moves against character presence — if you try to move a direction line with entrance cues to a position where the character is already present, you'll get a warning with the option to proceed (which removes the invalid cues) or cancel.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Undo &amp; Redo</h3>
+    <p>Full 50-level undo/redo with <span class="key">Ctrl</span>+<span class="key">Z</span> / <span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">Z</span> (or <span class="key">Ctrl</span>+<span class="key">Y</span>). Every structural change captures a complete state snapshot, so undo always brings you back to exactly how things were. The Undo/Redo buttons in the top bar show the current state.</p>
+  </div>
+</div>
+
+<!-- ─── CHARACTER PANEL ─── -->
+<div class="section">
+  <h2>Character panel</h2>
+
+  <div class="feature">
+    <h3>Expandable character cards</h3>
+    <p>In the right-side panel, <strong>click any character's name</strong> to expand their card. You'll see:</p>
+    <ul>
+      <li>Their full description</li>
+      <li>A search box to filter their dialogue</li>
+      <li>A scrollable list of every dialogue line they have, with the scene location shown</li>
+    </ul>
+    <p style="margin-top:6px;"><strong>Click any dialogue line</strong> in the list to jump straight to it in the editor — the view will scroll to center that line on screen.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Character filtering</h3>
+    <p>The dropdowns at the top of the character list let you filter by act and scene, so you only see characters who appear in a specific part of the script.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Standalone character creation</h3>
+    <p>The <strong>+ New character</strong> button at the bottom of the character list lets you create a character with a name and description without needing to write a dialogue line first. Useful for planning your cast before writing.</p>
+  </div>
+</div>
+
+<!-- ─── SAVING & EXPORT ─── -->
+<div class="section">
+  <h2>Saving &amp; export</h2>
+
+  <div class="feature">
+    <h3>How saving works</h3>
+    <p>Your script is automatically saved to your browser's local storage on every change. The colored dot next to the script title tells you the current state:</p>
+    <ul>
+      <li><span class="dot" style="background:#888780;"></span> <strong>Gray</strong> — no file opened yet</li>
+      <li><span class="dot" style="background:#378ADD;"></span> <strong>Blue</strong> — saved in browser only (use File → Save to link a disk file)</li>
+      <li><span class="dot" style="background:#4CAF50;"></span> <strong>Green</strong> — linked to a file on disk; auto-saves there too</li>
+    </ul>
+    <p style="margin-top:6px;">Hover over the dot to see a tooltip with more detail. The first time you use <strong>File → Save</strong>, you'll pick a location on disk. After that, every save overwrites that same file — no repeated downloads.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Metadata ZIP</h3>
+    <p><strong>File → Download metadata (.zip)</strong> exports a ZIP containing the raw JSON script file and a manifest with export metadata. This is the file you'd keep if you want to come back and edit the script later — it has everything needed to restore your work.</p>
+  </div>
+
+  <div class="feature">
+    <h3>PDF + metadata export</h3>
+    <p><strong>File → Export PDF + metadata</strong> creates a single ZIP containing both the print-ready screenplay (as an HTML file you can print or save as PDF) and the metadata folder with the raw JSON. One download, both the shareable output and the editable source.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Resume from browser</h3>
+    <p>When you return to The Scriptwriter and your last script is in local storage, a <strong>Resume</strong> card appears on the start screen so you can pick up right where you left off.</p>
+  </div>
+</div>
+
+<!-- ─── SETTINGS ─── -->
+<div class="section">
+  <h2>Settings</h2>
+
+  <div class="feature">
+    <h3>Pill hotkey customization</h3>
+    <p>Under <strong>Settings → Keyboard shortcuts</strong>, you can remap the key for each line-type pill. Click the input field next to a pill type, then press any key to assign it. If two pills would end up with the same key, they automatically swap. Click <strong>Reset to defaults</strong> to go back to 1/2/3/4.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Line-type colors</h3>
+    <p>Each line type (Setting, Direction, Dialogue, Action) has a configurable accent color that tints the left border and background in the editor. You can change the color with a color picker or disable the tint entirely with the toggle. These are purely visual — they don't affect the exported PDF.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Selected-line indicator</h3>
+    <p>Choose between two styles for highlighting the currently selected line: <strong>Barrier</strong> (a colored vertical line on the left edge) or <strong>Highlight</strong> (a colored background). Each style has its own color selector.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Theme override</h3>
+    <p>By default the app follows your system's light/dark preference. You can force light or dark mode in <strong>Settings → Theme</strong>. Your choice persists across sessions.</p>
+  </div>
+</div>
+
+<div class="footer">
+  The Scriptwriter — a free, open-source screenplay editor.
+</div>
+
+</div>
+</body>
+</html>

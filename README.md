@@ -2,22 +2,22 @@
 
 A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
 
+**[Try it live →](https://yashmahtani.github.io/The-TypeWriter/)**
+
 ## What it does
 
 The Scriptwriter gives you a structured screenplay writing environment with an **Act > Scene > Line** hierarchy. You write using four line types — Setting, Direction, Dialogue, and Action — and the app handles formatting, numbering, and continuity for you.
 
-Scripts are saved as lightweight JSON files on your machine. When you're ready to share, export to a properly formatted screenplay PDF with a title page, character list, and table of contents.
+Scripts auto-save to your browser's localStorage and can be linked to a file on disk via the File System Access API. When you're ready to share, export to a formatted screenplay PDF or download a metadata ZIP containing the raw JSON for later editing.
 
 ## Quick start
 
-Open `script_maker.html` in any modern browser. That's it.
-
-You can also try it live at the [GitHub Pages demo](https://yashmahtani.github.io/The-TypeWriter/) if one is configured via the `docs/` folder.
+Open `script_maker.html` in any modern browser. That's it. You can start a new script, open a saved JSON file, or try the built-in sample script.
 
 ## Features
 
 **Writing**
-- Four line types with keyboard shortcuts (`` ` ``+1 through `` ` ``+4) and smart auto-advance between types
+- Four line types (Setting, Direction, Dialogue, Action) with customizable keyboard shortcuts (default: backtick + 1/2/3/4) and smart auto-advance between types
 - Character management with autocomplete, ghost text, scene filtering, and archiving
 - Direction cues that track character entrances and exits per scene with visual toggle chips
 - Automatic `(cont.)` detection for consecutive dialogue from the same character
@@ -28,53 +28,56 @@ You can also try it live at the [GitHub Pages demo](https://yashmahtani.github.i
 - Drag-and-drop reordering for acts, scenes, and lines with validation against character presence
 - 50-level undo/redo (Ctrl+Z / Ctrl+Shift+Z) with full state snapshots
 - Insert cursor — click a line to insert new content after it
+- Find and replace across the script with line-type filter chips (Ctrl+F)
 
 **Organization**
-- Collapsible side panel with table of contents and character list
+- Collapsible side panel with table of contents and expandable character list
+- Click a character to see their full description and searchable dialogue history; click any dialogue line to jump to it in the editor
 - Summaries tab with script statistics
-- Read-only View tab for distraction-free reading
-- Settings tab for font size, indicator styles, and colors
+- Read-only View tab with act/scene separators for distraction-free reading
+- Settings tab for font size, indicator styles, line-type colors, theme override, and pill hotkey customization
 
 **File handling**
-- Save/load as JSON — your data stays on your machine
-- Autosave after first manual save (toggleable)
-- Visual save indicator (gray/orange/red/green) so you always know where you stand
-- PDF export with professional screenplay formatting
-- Unsaved-changes warning on page close
+- localStorage auto-persistence — your work is saved in the browser automatically
+- File System Access API — link to a file on disk and overwrite on each save (no repeated downloads)
+- Fallback JSON download for browsers without File System Access API
+- Visual save indicator: gray (no file), blue (browser-only), green (linked to disk file)
+- PDF export with title page, character list, table of contents, and formatted script pages
+- Metadata ZIP download — exports the raw JSON and a manifest for re-importing later
+- PDF + metadata export — bundles the print-ready PDF with metadata in a single ZIP
+
+**Appearance**
+- Dark mode follows your system preference, or override with light/dark in Settings
+- Customizable line-type accent colors with per-type enable/disable toggles
+- Configurable selected-line indicator (barrier or highlight) with color options
 
 ## Project structure
 
 ```
 The-TypeWriter/
-  script_maker.html   # The app (open this)
-  docs/index.html               # GitHub Pages entry point
+  script_maker.html             # The app (open this)
+  docs/
+    index.html                  # GitHub Pages copy
+    describe.html               # Feature guide / manual
   TODO.md                       # Feature roadmap
   CLAUDE.md                     # Dev notes and project memory
+  README.md                     # This file
   archive/                      # Older versions kept for reference
-    script_maker.py             # Original Python CLI
-    script_maker_ui.html        # First web UI
-    script_maker_ui_v6.html     # Early standalone version
-    script_maker_ui_v9.html     # Host-app CSS variable version
-    script_maker_ui_v10.html    # Inline editing + undo/redo version
-    Script-Writer/              # Separate early text editor prototype
-    fonts/                      # Custom fonts from earlier iterations
 ```
 
 ## How it works under the hood
 
-The entire app is a single HTML file — no build step, no framework, no dependencies. All state lives in a global JavaScript object (`S`) that maps directly to the JSON save format. The UI re-renders from that object on every change, with undo snapshots captured before each mutation.
-
-Dark mode follows your system preference automatically.
+The entire app is a single HTML file with one external dependency (JSZip via CDN for ZIP export). No build step, no framework. All state lives in a global JavaScript object (`S`) that maps directly to the JSON save format. The UI re-renders from that object on every change, with undo snapshots captured before each mutation.
 
 ## Roadmap
 
-See [TODO.md](TODO.md) for the full list. The highlights:
+See [TODO.md](TODO.md) for the full list. Up next:
 
 - FDX export (Final Draft format)
-- Find and replace across the script
 - Auto-formatting for screenplay conventions
 - Beat board / index card view
 - Notes and comments on lines and scenes
+- Revision tracking / version history
 
 ## License
 
