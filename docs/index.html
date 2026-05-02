@@ -2310,7 +2310,7 @@ function buildFountain(){
           const isSlug=/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(v);
           out+=(isSlug?v.toUpperCase():'.'+v)+'\n\n';
         }else if(line.type==='direction'){
-          /* Direction → action text with cue notes */
+          /* Direction → transition text with cue notes */
           let cueText='';
           if(line.cues){
             const parts=[];
@@ -2318,7 +2318,10 @@ function buildFountain(){
             if(line.cues.exits&&line.cues.exits.length)parts.push(line.cues.exits.map(n=>n+' exits').join(', '));
             if(parts.length)cueText=' [['+parts.join('; ')+']]';
           }
-          out+=line.value+cueText+'\n\n';
+          /* Use > prefix for transitions that won't auto-detect (don't end with TO:) */
+          const val=line.value.trim();
+          const autoDetects=/^[A-Z\s]+TO:$/.test(val);
+          out+=(autoDetects?val:'> '+val)+cueText+'\n\n';
         }else if(line.type==='dialogue'){
           /* Character name (uppercase) + optional parenthetical + dialogue */
           out+=line.character.name.toUpperCase()+'\n';
@@ -2485,11 +2488,17 @@ function parseFountain(text){
       }
     }
 
-    /* --- Transitions (uppercase ending in TO:) --- */
-    if(paraLines.length===1&&/^[A-Z\s]+TO:$/.test(paraLines[0].trim())){
-      ensureActScene();
-      curScene.lines.push({type:'direction',value:paraLines[0].trim()});
-      p++;continue;
+    /* --- Transitions (uppercase ending in TO:, or forced with > prefix) --- */
+    if(paraLines.length===1){
+      const tl=paraLines[0].trim();
+      const isAutoTransition=/^[A-Z\s]+TO:$/.test(tl);
+      const isForcedTransition=/^>\s*/.test(tl);
+      if(isAutoTransition||isForcedTransition){
+        ensureActScene();
+        const val=isForcedTransition?tl.replace(/^>\s*/,'').trim():tl;
+        curScene.lines.push({type:'direction',value:val});
+        p++;continue;
+      }
     }
 
     /* --- Forced action (starts with !) --- */
@@ -2582,18 +2591,36 @@ function parseFDX(xmlText){
   /* --- Title page --- */
   const titlePage=doc.querySelector('TitlePage');
   if(titlePage){
-    const tpParas=titlePage.querySelectorAll('Paragraph');
-    tpParas.forEach(p=>{
+    const tpParas=Array.from(titlePage.querySelectorAll('Paragraph'));
+    const tpTexts=[]; /* collect {type, txt, index} for all non-empty paragraphs */
+    tpParas.forEach((p,idx)=>{
       const type=(p.getAttribute('Type')||'').toLowerCase();
       const txt=paraText(p);
-      if(!txt)return;
-      /* Title page paragraphs don't always have Type — check text content */
-      if(type.includes('title')||(!title||title==='Untitled')&&!type)title=txt;
-      if(type.includes('author')||/^(written by|by)\s/i.test(txt)){
-        const m=txt.match(/^(?:written by|by)\s+(.+)$/i);
-        if(m)author=m[1].trim(); else if(type.includes('author'))author=txt;
-      }
+      if(txt)tpTexts.push({type,txt,idx});
     });
+    let wrByIdx=-1; /* index in tpTexts of the "written by" line */
+    tpTexts.forEach((t,i)=>{
+      /* Explicit type-based extraction */
+      if(t.type.includes('title'))title=t.txt;
+      if(t.type.includes('author'))author=t.txt;
+      /* "written by Name" on one line */
+      if(/^(written by|by)\s/i.test(t.txt)){
+        const m=t.txt.match(/^(?:written by|by)\s+(.+)$/i);
+        if(m&&m[1].trim())author=m[1].trim();
+        wrByIdx=i;
+      }
+      /* Bare "written by" — author is next paragraph */
+      if(/^(written by|by)$/i.test(t.txt)){wrByIdx=i;}
+    });
+    /* Positional fallback: first non-empty paragraph = title, paragraph after "written by" = author */
+    if(title==='Untitled'&&tpTexts.length>0){
+      /* First paragraph that isn't "written by" or the author */
+      const first=tpTexts[0];
+      if(!/^(written by|by)\b/i.test(first.txt))title=first.txt;
+    }
+    if(!author&&wrByIdx>=0&&wrByIdx+1<tpTexts.length){
+      author=tpTexts[wrByIdx+1].txt;
+    }
   }
 
   /* --- Cast section — populate characters --- */
