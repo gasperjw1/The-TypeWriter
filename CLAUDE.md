@@ -109,10 +109,12 @@ S = {
 - [x] Auto-numbered acts and scenes (Session 3)
 - [x] Standalone character creation from side panel (Session 3)
 - [x] Rich pill tooltips with descriptions and shortcuts (Session 3)
+- [x] Find & replace with line-type filters (Session 4)
+- [x] File System Access API for persistent save/overwrite (Session 4)
+- [x] localStorage auto-persistence (Session 4)
 
 ### Remaining (priority order)
 - [ ] FDX export (Final Draft format — industry standard)
-- [ ] Find & replace across the script
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
 - [ ] Real-time collaboration
 - [ ] Revision tracking / version history
@@ -162,3 +164,18 @@ S = {
 - **Rich pill tooltips** — Expanded the four line-type pill tooltips from one-line hints to multi-line descriptions with the line type name in bold, the keyboard shortcut in a styled `<code>` badge, a description of what the line type is for, and practical tips (Setting = first line of a scene, Dialogue auto-detects `(cont.)`, Direction manages entrance/exit cues, Action = visible on-screen events). Updated `.pill-tip` CSS from `white-space:nowrap` to `white-space:normal` with `max-width:260px`, added styling for `strong`, `code`, and `em` inside tooltips.
 - **Bug fix: `positionTip` hiding tooltips** — After measuring tooltip dimensions, `positionTip()` was resetting `tip.style.display=''` which resolved to the CSS default `display:none`, causing tooltips to disappear immediately after positioning. Removed the display reset so tooltips remain visible after the `mouseenter` handler sets `display='block'`.
 - **Created TODO.md** — Feature roadmap file tracking completed features (inline editing, undo/redo, PDF export, auto-numbered acts/scenes, standalone character creation) and remaining gaps from the competitor analysis (FDX export, find & replace, auto-formatting, collaboration, revision tracking, beat board, notes/comments, cloud sync), plus additional improvements identified during development.
+
+### Session 4 — 2026-05-01 / 2026-05-02
+- **Action line width cap** — Added `max-width:50%` and `text-align:left` to `.l-action` (editor) and `#view-panel .v-action` (View tab) so action lines never exceed half the script width.
+- **Save system overhaul** — Replaced download-on-every-save with localStorage persistence (`tw_script`, `tw_settings` keys) plus File System Access API for disk file linking. `menuSave()` uses `showSaveFilePicker`/`createWritable` to pick a file once and overwrite on subsequent saves, with `triggerDownload` fallback for unsupported browsers. `menuOpen()` uses `showOpenFilePicker` to capture a file handle. `autoSave()` writes to both localStorage and the linked file handle. Save indicator now shows: gray (no file), blue (browser-only), green (linked to disk file). `beforeunload` guard compares `stateJSON()` vs `lastSavedJSON`. Extracted `loadFromData()` for DRY between `loadFile` and `menuOpen`.
+- **Find & Replace** — Full find/replace system across all line types. `buildFindMatches()` searches line values and `dialogueAction` (not character names), respects `findFilters` per line type. `highlightText()` wraps matches with `<span class="find-hl">` / `<span class="find-hl-active">`. Navigation with `findNext()`/`findPrev()` and match counter. `doReplace()` replaces current match, `doReplaceAll()` processes in reverse order to preserve string positions. Find bar with filter chips for Setting/Direction/Dialogue/Action. Ctrl+F opens find bar, Escape closes.
+- **View tab separators** — Added subtle `border-top` rules to `.v-act` and `.v-scene` in the View tab with smart selectors (`:first-child` and `+` combinator) to avoid double lines at act/scene boundaries.
+- **Default indicator change** — Changed default `indicatorMode` from `'barrier'` to `'highlight'` and default highlight color to `rgba(128,128,128,0.13)` (gray).
+- **Bug fix: `doNewScript` not resetting `fileHandle`** — Added `fileHandle=null;` to prevent auto-saves from overwriting old file with empty data after creating a new script.
+- **Bug fix: ghost `menuDownloadJSON` function** — Defined but the corresponding menu item had been removed. Deleted.
+- **Bug fix: dead `character` field branches in Replace** — `buildFindMatches` no longer produces character field matches, but `doReplace`/`doReplaceAll` still had branches for it. Removed.
+- **Bug fix: stale autosave description** — Still referenced "re-downloaded after every change." Updated to reflect browser + file persistence.
+- **Bug fix: highlight color selector mismatch** — Default `rgba(128,128,128,0.13)` didn't match dropdown value `rgba(136,135,128,0.13)`. Fixed dropdown and added `selected` attribute.
+- **Bug fix: save indicator tooltip not displaying** — `.si-tip` had `position:absolute` with `transform:translateX(-50%)` conflicting with the JS IIFE that sets `position:fixed` and explicit `top`/`left`. Changed CSS to `position:fixed`, removed `transform` and the CSS hover rule (JS handles show/hide).
+- **Full codebase audit** — Programmatic validation of all `$()` references and `onclick` handlers. Confirmed no broken references, ghost calls, or dead code remaining.
+- **Synced `docs/index.html`** with latest `script_maker.html` for GitHub Pages.
