@@ -131,11 +131,13 @@ S = {
 - [x] Fountain import with round-trip fidelity (Session 8)
 - [x] FDX import — Final Draft .fdx XML parsing with stage play support (Session 8)
 - [x] FDX export — Final Draft .fdx XML generation with TitlePage and Cast (Session 8)
+- [x] Revision tracking with colored revision marks (Session 9)
 
 ### Remaining (priority order)
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
+- [ ] Scene cards / outline view
+- [ ] Lockable scene numbers
 - [ ] Real-time collaboration
-- [ ] Revision tracking / version history
 - [ ] Beat board / index card view
 - [ ] Notes and comments on lines/scenes
 - [ ] Cloud sync / account-based storage
@@ -230,3 +232,10 @@ S = {
 - **File menu reorganization** — Added "Export to Final Draft (.fdx)" menu item. Reorganized file dropdown to group exports together (PDF, Fountain, FDX) separately from imports (Fountain, FDX) with separator dividers.
 - **Live browser testing** — All parsers tested in Chrome's real DOMParser via code injection into example.com, using sample FDX/Fountain files from the `rsdoiel/fdx` GitHub repository. Verified: FDX→FDX round-trip (perfect), Fountain→Fountain round-trip (perfect), FDX→Fountain→FDX cross-format round-trip (perfect).
 - **Portability complete** — All Priority 1 (Portability) items in TODO.md are now done: Fountain export, Fountain import, FDX import, FDX export. Scripts can be freely exchanged between The Scriptwriter, Final Draft, Highland, Beat, Fade In, and any other editor supporting Fountain or FDX formats.
+
+### Session 9 — 2026-05-02
+- **FDX export** — `buildFDXText()` generates Final Draft XML from the S data model. Maps line types to FDX paragraph types: setting → Scene Heading, action → Action, dialogue → Character + Parenthetical + Dialogue, direction → Transition. Builds `TitlePage` section (title, "written by", author) and `Cast` section from active characters. Multi-act scripts emit `Act Break` paragraphs. XML entities properly escaped. `exportFDX()` triggers browser download.
+- **FDX title page fix** — Standard FDX files use `Type="Action"` for all title page paragraphs. Fixed with positional extraction: first non-empty paragraph = title, paragraph after "written by" = author.
+- **Fountain transition round-trip fix** — Direction lines that don't end with `TO:` (like "FADE TO BLACK.") now export with `>` forced transition prefix and import via `>` prefix detection.
+- **File menu cleanup** — Added FDX export item. Reorganized dropdown into logical groups: saves, opens, PDF exports, format exports (Fountain + FDX), format imports (Fountain + FDX), metadata, and revisions.
+- **Revision tracking** — Manual snapshot-based revision system with industry-standard colored marks. Data model: `S.revisions` array of `{name, colorIdx, timestamp, snapshot}` where snapshot is a frozen copy of acts/characters. Six colors cycle: White, Blue, Pink, Yellow, Green, Goldenrod. `computeRevisionChanges()` compares current state against latest snapshot using `lineFingerprint()` content hashing. Changed lines get a colored left border and `✱` margin indicator. UI: revision color chip + toggle button in top bar, "New Revision" and "Revision History" in File menu, generic modal for history view with clear option. Revision marks toggle on/off. Persisted in localStorage and JSON saves. Survives undo/redo.

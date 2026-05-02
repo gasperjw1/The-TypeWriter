@@ -29,6 +29,7 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 - 50-level undo/redo (Ctrl+Z / Ctrl+Shift+Z) with full state snapshots
 - Insert cursor — click a line to insert new content after it
 - Find and replace across the script with line-type filter chips (Ctrl+F)
+- Revision tracking — create named snapshots, changed lines highlighted with industry-standard colored marks (white, blue, pink, yellow, green, goldenrod) and margin asterisks
 
 **Organization**
 - Collapsible side panel with table of contents and expandable character list
@@ -87,7 +88,7 @@ See [TODO.md](TODO.md) for the full list. Up next:
 
 - Auto-formatting for screenplay conventions
 - Scene cards / outline view
-- Revision tracking / version history
+- Lockable scene numbers for production drafts
 - Notes and comments on lines and scenes
 - Real-time collaboration
 

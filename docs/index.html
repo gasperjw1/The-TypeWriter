@@ -158,6 +158,11 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 .insert-bar{height:3px;background:var(--ins-color);border-radius:2px;margin:0 12px;opacity:0;}
 .insert-bar.on{opacity:1;}
 
+/* Revision marks */
+.line-item.rev-changed{border-left:3px solid var(--rev-color,#4A90D9);}
+.line-item.rev-changed::after{content:'✱';position:absolute;right:2px;top:2px;font-size:10px;color:var(--rev-color,#4A90D9);opacity:0.7;pointer-events:none;}
+#rev-toggle.active{background:var(--bg3);color:var(--tx1);}
+
 /* Inline editing */
 .line-item.inline-editing{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rm);padding:6px 12px;margin:4px 0;cursor:default;}
 .line-item.inline-editing:hover{background:var(--bg2);}
@@ -729,10 +734,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <input type="file" id="fdx-open-in" accept=".fdx,.xml" style="display:none" onchange="loadFDXFile(event)"/>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="downloadMetadata()">Download metadata (.zip)</div>
+        <div class="fdd-sep"></div>
+        <div class="fdd-item" onclick="createRevision()">New revision</div>
+        <div class="fdd-item" onclick="closeFDD();openRevisionHistory()">Revision history</div>
       </div>
     </div>
   </div>
   <div id="tb-right">
+    <span id="rev-chip" style="display:none;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--bd2);border-radius:12px;font-size:11px;color:var(--tx2);cursor:pointer;margin-right:4px;" onclick="openRevisionHistory()" title="View revision history"><span class="rev-chip-dot" style="width:8px;height:8px;border-radius:50%;"></span><span class="rev-chip-label"></span></span>
+    <button class="tb-btn" id="rev-toggle" style="display:none;font-size:11px;padding:2px 6px;" onclick="toggleRevMarks()" title="Toggle revision marks">✱</button>
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
   </div>
@@ -1085,7 +1095,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </div>
 
 <script>
-let S={title:'',author:'',acts:[],characters:[]};
+let S={title:'',author:'',acts:[],characters:[],revisions:[]};
 let activeTab='edit',cType='setting',pendingPill=null,pendingPillKey=null;
 let insertAfter=null,undoStack=[],undoCursor=-1,dragSrc=null;
 let hasFilename=false,lastSavedJSON='';
@@ -1102,6 +1112,16 @@ let ltColors={setting:'#1D9E75',direction:'#EF9F27',action:'#D85A30',dialogue:'#
 let ltEnabled={setting:true,direction:true,action:true,dialogue:true};
 let pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
 let charPanelExpanded={};
+let showRevMarks=true;
+const REV_COLORS=[
+  {name:'White',color:'#FFFFFF',bg:'rgba(255,255,255,0.08)'},
+  {name:'Blue',color:'#4A90D9',bg:'rgba(74,144,217,0.12)'},
+  {name:'Pink',color:'#D94A8C',bg:'rgba(217,74,140,0.12)'},
+  {name:'Yellow',color:'#D9C84A',bg:'rgba(217,200,74,0.12)'},
+  {name:'Green',color:'#4AD97A',bg:'rgba(74,217,122,0.12)'},
+  {name:'Goldenrod',color:'#DAA520',bg:'rgba(218,165,32,0.12)'}
+];
+let revisionChanges={}; /* key: 'ai-si-li' → {color,bg} for changed lines */
 
 const LS_SCRIPT_KEY='tw_script';
 const LS_SETTINGS_KEY='tw_settings';
@@ -1114,7 +1134,7 @@ function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);retu
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
-function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters});}
+function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[]});}
 function cloneState(){return JSON.parse(stateJSON());}
 
 function updateSaveIndicator(){
@@ -1127,7 +1147,7 @@ async function writeToFileHandle(json){
   if(!fileHandle)return;
   try{const w=await fileHandle.createWritable();await w.write(json);await w.close();}catch(e){console.warn('File write failed:',e);fileHandle=null;updateSaveIndicator();}
 }
-function autoSave(){if(S.title)lsSaveScript();lastSavedJSON=stateJSON();if(fileHandle&&autosaveEnabled)writeToFileHandle(lastSavedJSON);updateSaveIndicator();}
+function autoSave(){if(S.title)lsSaveScript();lastSavedJSON=stateJSON();if(fileHandle&&autosaveEnabled)writeToFileHandle(lastSavedJSON);updateSaveIndicator();computeRevisionChanges();}
 function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
 function triggerDownload(title,json){const b=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json';a.click();}
 function pushUndo(){
@@ -1141,17 +1161,17 @@ function doUndo(){
   if(undoCursor<0)return;
   if(undoCursor===undoStack.length-1){undoStack.push(cloneState());if(undoStack.length>51)undoStack.shift();undoCursor=undoStack.length-2;}
   const p=undoStack[undoCursor];
-  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));
+  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));
   undoCursor--;
-  updateUndoRedoBtns();updateSaveIndicator();render();
+  updateUndoRedoBtns();updateSaveIndicator();computeRevisionChanges();render();
 }
 function doRedo(){
   if(undoCursor>=undoStack.length-2)return;
   undoCursor+=2;
   const p=undoStack[undoCursor];
-  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));
+  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));
   undoCursor--;
-  updateUndoRedoBtns();updateSaveIndicator();render();
+  updateUndoRedoBtns();updateSaveIndicator();computeRevisionChanges();render();
 }
 function updateUndoRedoBtns(){
   $('undo-btn').disabled=undoCursor<0;
@@ -1280,13 +1300,13 @@ function loadFile(e){
   reader.readAsText(file);e.target.value='';
 }
 function loadFromData(data){
-  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));
-  resetEditorState();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
+  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];
+  resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
-  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));
-  resetEditorState();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];
+  resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Last Cigarette',
@@ -1349,12 +1369,12 @@ const SAMPLE_SCRIPT={
 };
 function loadSample(){
   const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
-  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;
+  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];revisionChanges={};
   resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
 }
 function menuNew(){closeFDD();if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
 function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[]};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
@@ -1642,7 +1662,7 @@ function render(){
 <div class="act-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'act',${ai})">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
-  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();
+  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();
 }
 
 function renderScene(act,ai,sc,si){
@@ -1659,6 +1679,10 @@ function renderScene(act,ai,sc,si){
     const ldc=confirmState[ldk]==='d'?'rbtn cd':'rbtn';
     const isSel=insertAfter&&insertAfter.actIdx===ai&&insertAfter.sceneIdx===si&&insertAfter.lineIdx===li;
     const selClass=isSel?(indicatorMode==='barrier'?'sel-barrier':'sel-highlight'):'';
+    const revKey=ai+'-'+si+'-'+li;
+    const revInfo=showRevMarks&&revisionChanges[revKey]?revisionChanges[revKey]:null;
+    const revClass=revInfo?'rev-changed':'';
+    const revStyle=revInfo?`--rev-color:${revInfo.color};background:${revInfo.bg};`:'';
     const cont=isCont(sc,li);
     let inner='';
     const hl=(text,field)=>findQuery?highlightText(text,ai,si,li,field):esc(text);
@@ -1666,7 +1690,7 @@ function renderScene(act,ai,sc,si){
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
     else if(line.type==='dialogue')inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;
     else if(line.type==='action')inner=`<div class="l-action">${hl(line.value,'value')}</div>`;
-    return`<div class="line-item ${selClass}" onclick="selLine(${ai},${si},${li})" ondblclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})" draggable="true" ondragstart="DS(event,'line',${ai},${si},${li})" ondragover="DO(event,'line',${ai},${si},${li})" ondrop="DP(event,'line',${ai},${si},${li})" ondragend="DE()">
+    return`<div class="line-item ${selClass} ${revClass}" style="${revStyle}" onclick="selLine(${ai},${si},${li})" ondblclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})" draggable="true" ondragstart="DS(event,'line',${ai},${si},${li})" ondragover="DO(event,'line',${ai},${si},${li})" ondrop="DP(event,'line',${ai},${si},${li})" ondragend="DE()">
 <span class="line-drag-handle drag-handle" ontouchstart="touchDS(event,'line',${ai},${si},${li})">⠿</span>${inner}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
 </div>${isSel&&indicatorMode==='barrier'?'<div class="insert-bar on"></div>':''}`;
   }).join('');
@@ -2547,7 +2571,8 @@ function parseFountain(text){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];
+  revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
 }
@@ -2771,7 +2796,8 @@ function parseFDX(xmlText){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];
+  revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
 }
@@ -2779,7 +2805,7 @@ function parseFDX(xmlText){
 /* ── FDX (Final Draft) export ── */
 function buildFDXText(){
   /* Generate Final Draft XML from our S data model */
-  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function xmlEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   let xml='<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n';
   xml+='<FinalDraft DocumentType="Script" Template="No" Version="3">\n';
 
@@ -2789,7 +2815,7 @@ function buildFDXText(){
     /* Act Break for multi-act scripts (skip for single unnamed act) */
     if(S.acts.length>1||act.name){
       xml+='    <Paragraph Type="Act Break">\n';
-      xml+='      <Text>'+esc(actLabel(ai).toUpperCase())+'</Text>\n';
+      xml+='      <Text>'+xmlEsc(actLabel(ai).toUpperCase())+'</Text>\n';
       xml+='    </Paragraph>\n';
     }
     act.scenes.forEach((sc,si)=>{
@@ -2797,30 +2823,30 @@ function buildFDXText(){
         switch(line.type){
           case 'setting':
             xml+='    <Paragraph Type="Scene Heading">\n';
-            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
             break;
           case 'action':
             xml+='    <Paragraph Type="Action">\n';
-            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
             break;
           case 'dialogue':
             xml+='    <Paragraph Type="Character">\n';
-            xml+='      <Text>'+esc(line.character.name.toUpperCase())+'</Text>\n';
+            xml+='      <Text>'+xmlEsc(line.character.name.toUpperCase())+'</Text>\n';
             xml+='    </Paragraph>\n';
             if(line.dialogueAction){
               xml+='    <Paragraph Type="Parenthetical">\n';
-              xml+='      <Text>('+esc(line.dialogueAction)+')</Text>\n';
+              xml+='      <Text>('+xmlEsc(line.dialogueAction)+')</Text>\n';
               xml+='    </Paragraph>\n';
             }
             xml+='    <Paragraph Type="Dialogue">\n';
-            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
             break;
           case 'direction':
             xml+='    <Paragraph Type="Transition">\n';
-            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
             break;
         }
@@ -2833,14 +2859,14 @@ function buildFDXText(){
   xml+='  <TitlePage>\n';
   xml+='    <Content>\n';
   xml+='      <Paragraph Type="Action">\n';
-  xml+='        <Text>'+esc(S.title||'Untitled')+'</Text>\n';
+  xml+='        <Text>'+xmlEsc(S.title||'Untitled')+'</Text>\n';
   xml+='      </Paragraph>\n';
   if(S.author){
     xml+='      <Paragraph Type="Action">\n';
     xml+='        <Text>written by</Text>\n';
     xml+='      </Paragraph>\n';
     xml+='      <Paragraph Type="Action">\n';
-    xml+='        <Text>'+esc(S.author)+'</Text>\n';
+    xml+='        <Text>'+xmlEsc(S.author)+'</Text>\n';
     xml+='      </Paragraph>\n';
   }
   xml+='    </Content>\n';
@@ -2851,7 +2877,7 @@ function buildFDXText(){
   if(activeChars.length){
     xml+='  <Cast>\n';
     activeChars.forEach(c=>{
-      xml+='    <Member Character="'+esc(c.name.toUpperCase())+'" Actor=""/>\n';
+      xml+='    <Member Character="'+xmlEsc(c.name.toUpperCase())+'" Actor=""/>\n';
     });
     xml+='  </Cast>\n';
   }
@@ -2870,6 +2896,155 @@ function exportFDX(){
   a.download=(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.fdx';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+/* ── Revision tracking ── */
+function lineFingerprint(line){
+  /* Create a content hash string for a line to detect changes */
+  let fp=line.type+'|'+line.value;
+  if(line.character)fp+='|'+line.character.name;
+  if(line.dialogueAction)fp+='|'+line.dialogueAction;
+  if(line.cues){
+    fp+='|e:'+(line.cues.enters||[]).join(',');
+    fp+='|x:'+(line.cues.exits||[]).join(',');
+  }
+  return fp;
+}
+
+function computeRevisionChanges(){
+  /* Compare current state against the latest revision snapshot.
+     Populates revisionChanges map: key 'ai-si-li' → {color, bg} */
+  revisionChanges={};
+  if(!S.revisions||!S.revisions.length)return;
+  const rev=S.revisions[S.revisions.length-1];
+  const snap=rev.snapshot;
+  if(!snap||!snap.acts)return;
+  const colorIdx=rev.colorIdx||0;
+  const rc=REV_COLORS[colorIdx%REV_COLORS.length];
+
+  /* Build fingerprint maps for snapshot and current */
+  const snapFPs={};
+  snap.acts.forEach((act,ai)=>{
+    (act.scenes||[]).forEach((sc,si)=>{
+      (sc.lines||[]).forEach((line,li)=>{
+        snapFPs[ai+'-'+si+'-'+li]=lineFingerprint(line);
+      });
+    });
+  });
+
+  /* Check current lines against snapshot */
+  S.acts.forEach((act,ai)=>{
+    act.scenes.forEach((sc,si)=>{
+      sc.lines.forEach((line,li)=>{
+        const key=ai+'-'+si+'-'+li;
+        const curFP=lineFingerprint(line);
+        const snapFP=snapFPs[key];
+        /* Mark as changed if: line is new (no snapshot match) or content differs */
+        if(!snapFP||snapFP!==curFP){
+          revisionChanges[key]={color:rc.color,bg:rc.bg};
+        }
+      });
+    });
+  });
+}
+
+function createRevision(){
+  closeFDD();
+  const colorIdx=S.revisions.length%REV_COLORS.length;
+  const rc=REV_COLORS[colorIdx];
+  const name=rc.name+' Revision';
+  const snapshot=JSON.parse(JSON.stringify({acts:S.acts,characters:S.characters}));
+  pushUndo();
+  S.revisions.push({name,colorIdx,timestamp:Date.now(),snapshot});
+  computeRevisionChanges();
+  autoSave();render();
+  updateRevisionUI();
+}
+
+function clearRevisions(){
+  if(!S.revisions.length)return;
+  if(!confirm('Clear all revision history? This cannot be undone.'))return;
+  pushUndo();
+  S.revisions=[];
+  revisionChanges={};
+  autoSave();render();
+  updateRevisionUI();
+  closeGenericModal();
+}
+
+function toggleRevMarks(){
+  showRevMarks=!showRevMarks;
+  render();
+  updateRevisionUI();
+}
+
+function updateRevisionUI(){
+  const chip=$('rev-chip');
+  const toggle=$('rev-toggle');
+  if(!chip||!toggle)return;
+  if(!S.revisions||!S.revisions.length){
+    chip.style.display='none';
+    toggle.style.display='none';
+    return;
+  }
+  const rev=S.revisions[S.revisions.length-1];
+  const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+  chip.style.display='inline-flex';
+  chip.querySelector('.rev-chip-dot').style.background=rc.color;
+  chip.querySelector('.rev-chip-label').textContent=rev.name;
+  toggle.style.display='inline-flex';
+  toggle.classList.toggle('active',showRevMarks);
+  toggle.title=showRevMarks?'Hide revision marks':'Show revision marks';
+}
+
+function openRevisionHistory(){
+  if(!S.revisions||!S.revisions.length){alert('No revisions yet. Use File options → New Revision to create one.');return;}
+  let h='<div style="font-size:15px;font-weight:600;margin-bottom:12px;">Revision History</div>';
+  h+='<div style="max-height:300px;overflow-y:auto;">';
+  S.revisions.forEach((rev,i)=>{
+    const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+    const date=new Date(rev.timestamp).toLocaleString();
+    const isCurrent=i===S.revisions.length-1;
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd3);${isCurrent?'font-weight:500':''}">
+      <span style="width:12px;height:12px;border-radius:50%;background:${rc.color};flex-shrink:0;border:1px solid var(--bd2);"></span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;color:var(--tx1);">${esc(rev.name)}</div>
+        <div style="font-size:11px;color:var(--tx3);">${date}</div>
+      </div>
+      ${isCurrent?'<span style="font-size:10px;color:var(--tx3);border:1px solid var(--bd3);border-radius:4px;padding:1px 6px;">current</span>':''}
+    </div>`;
+  });
+  h+='</div>';
+  h+='<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">';
+  h+='<button class="rbtn" onclick="clearRevisions()">Clear all</button>';
+  h+='<button class="rbtn" style="background:var(--bg3);" onclick="closeGenericModal()">Close</button>';
+  h+='</div>';
+  openGenericModal(h);
+}
+
+function openGenericModal(innerHtml){
+  let overlay=document.getElementById('generic-modal-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='generic-modal-overlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.onclick=e=>{if(e.target===overlay)closeGenericModal();};
+    document.body.appendChild(overlay);
+  }
+  let modal=document.getElementById('generic-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='generic-modal';
+    modal.style.cssText='background:var(--bg1);border:1px solid var(--bd2);border-radius:var(--rl);padding:20px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.25);';
+    overlay.appendChild(modal);
+  }
+  modal.innerHTML=innerHtml;
+  overlay.style.display='flex';
+}
+
+function closeGenericModal(){
+  const o=document.getElementById('generic-modal-overlay');
+  if(o)o.style.display='none';
 }
 
 /* ── Character panel inline expansion ── */
