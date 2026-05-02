@@ -134,6 +134,7 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 .act-block{margin-bottom:32px;}
 .act-hdr{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rm);background:var(--bg2);border:1px solid var(--bd3);margin-bottom:12px;cursor:grab;}
 .drag-handle{color:var(--tx3);font-size:13px;user-select:none;}
+.line-drag-handle{display:none;}
 .act-name-disp{font-size:var(--script-font-size);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
 .act-subdesc{font-size:11px;color:var(--tx2);}
 .row-btns{display:flex;gap:4px;flex-shrink:0;}
@@ -664,6 +665,22 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
   /* ── Line-type color rows ── */
   .lt-row{flex-wrap:wrap;gap:6px;}
+
+  /* ── Touch drag-and-drop ── */
+  .drag-handle{padding:8px 6px;cursor:grab;touch-action:none;}
+  .line-drag-handle{display:inline-block;position:absolute;left:0;top:50%;transform:translateY(-50%);padding:8px 4px;font-size:11px;}
+  .line-item{position:relative;padding-left:22px!important;}
+  .touch-drag-ghost{
+    position:fixed;pointer-events:none;z-index:900;
+    opacity:.85;border:2px solid var(--accent);border-radius:var(--rl);
+    background:var(--bg1);box-shadow:0 8px 24px rgba(0,0,0,.25);
+    max-width:80vw;overflow:hidden;max-height:80px;
+    padding:6px 10px;font-size:12px;color:var(--tx1);
+  }
+  .touch-drop-indicator{
+    height:3px;background:var(--accent);border-radius:2px;
+    margin:0 8px;pointer-events:none;transition:opacity .1s;
+  }
 
 }
 
@@ -1614,7 +1631,7 @@ function render(){
     const el=confirmState[ek]==='e'?'Confirm edit?':'Edit',dl=confirmState[dk]==='d'?'Confirm delete?':'Delete';
     const ec=confirmState[ek]==='e'?'rbtn ce':'rbtn',dc=confirmState[dk]==='d'?'rbtn cd':'rbtn';
     return`<div class="act-block" draggable="true" ondragstart="DS(event,'act',${ai})" ondragover="DO(event,'act',${ai})" ondrop="DP(event,'act',${ai})" ondragend="DE()">
-<div class="act-hdr"><span class="drag-handle">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
+<div class="act-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'act',${ai})">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
   updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();
@@ -1642,11 +1659,11 @@ function renderScene(act,ai,sc,si){
     else if(line.type==='dialogue')inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;
     else if(line.type==='action')inner=`<div class="l-action">${hl(line.value,'value')}</div>`;
     return`<div class="line-item ${selClass}" onclick="selLine(${ai},${si},${li})" ondblclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})" draggable="true" ondragstart="DS(event,'line',${ai},${si},${li})" ondragover="DO(event,'line',${ai},${si},${li})" ondrop="DP(event,'line',${ai},${si},${li})" ondragend="DE()">
-${inner}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
+<span class="line-drag-handle drag-handle" ontouchstart="touchDS(event,'line',${ai},${si},${li})">⠿</span>${inner}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
 </div>${isSel&&indicatorMode==='barrier'?'<div class="insert-bar on"></div>':''}`;
   }).join('');
   return`<div class="scene-block" draggable="true" ondragstart="DS(event,'scene',${ai},${si})" ondragover="DO(event,'scene',${ai},${si})" ondrop="DP(event,'scene',${ai},${si})" ondragend="DE()">
-<div class="scene-hdr"><span class="drag-handle">⠿</span><div style="flex:1;min-width:0"><div class="scene-name-disp">${esc(sceneLabel(ai,si))}${charSum}</div>${sc.description?`<div class="scene-subdesc">${esc(sc.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditScene(${ai},${si}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delScene(${ai},${si}))">${dl}</button></div></div>
+<div class="scene-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'scene',${ai},${si})">⠿</span><div style="flex:1;min-width:0"><div class="scene-name-disp">${esc(sceneLabel(ai,si))}${charSum}</div>${sc.description?`<div class="scene-subdesc">${esc(sc.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditScene(${ai},${si}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delScene(${ai},${si}))">${dl}</button></div></div>
 <div class="lines-wrap">${lines||`<div class="scene-empty">No lines yet</div>`}</div></div>`;
 }
 
@@ -1719,7 +1736,11 @@ function DS(e,type,...idx){dragSrc={type,idx};e.dataTransfer.effectAllowed='move
 function DO(e,type,...idx){if(dragSrc&&dragSrc.type===type)e.preventDefault();}
 function DP(e,type,...idx){
   e.preventDefault();e.stopPropagation();if(!dragSrc||dragSrc.type!==type)return;
-  const f=dragSrc.idx,t=idx;if(JSON.stringify(f)===JSON.stringify(t))return;
+  performDrop(type,dragSrc.idx,idx);
+}
+function DE(){dragSrc=null;}
+function performDrop(type,f,t){
+  if(JSON.stringify(f)===JSON.stringify(t)){dragSrc=null;return;}
   if(type==='line'){const result=validateMoveLine(f[0],f[1],f[2],t[0],t[1],t[2]);if(!result.ok){if(result.hardBlock){openModal(`<h3>Cannot move line</h3><p>${result.errors.join('<br/>')}</p><div class="mbtns"><button class="mb-ok" onclick="closeModal()">OK</button></div>`,null);}else{openModal(`<h3>Invalid move</h3><p>${result.errors.join('<br/>')}</p><p style="color:#aaa;font-size:12px;">Moving will remove the invalid cue(s). Continue?</p><div class="mbtns"><button class="mb-c" onclick="closeModal()">Keep in place</button><button class="mb-warn" onclick="forceMoveLine(${f[0]},${f[1]},${f[2]},${t[0]},${t[1]},${t[2]})">Move anyway</button></div>`,null);}dragSrc=null;return;}}
   if(type==='act'){pushUndo();const item=S.acts.splice(f[0],1)[0];S.acts.splice(t[0],0,item);}
   else if(type==='scene'&&f[0]===t[0]){pushUndo();const a=S.acts[f[0]];const item=a.scenes.splice(f[1],1)[0];a.scenes.splice(t[1],0,item);}
@@ -1727,8 +1748,154 @@ function DP(e,type,...idx){
   else{dragSrc=null;return;}
   dragSrc=null;autoSave();render();
 }
-function DE(){dragSrc=null;}
 function forceMoveLine(fai,fsi,fli,tai,tsi,tli){closeModal();if(fai!==tai||fsi!==tsi)return;pushUndo();const sc=S.acts[fai].scenes[fsi];const item=sc.lines.splice(fli,1)[0];if(item.cues){const tl=[...sc.lines];tl.splice(tli,0,item);const ni=tl.findIndex(l=>l===item);const pb=getSceneCharsAt({lines:tl},ni-1);item.cues.enters=(item.cues.enters||[]).filter(n=>!pb.has(n));item.cues.exits=(item.cues.exits||[]).filter(n=>pb.has(n));if(!item.cues.enters.length&&!item.cues.exits.length)delete item.cues;}sc.lines.splice(tli,0,item);autoSave();render();}
+
+/* ── Touch drag-and-drop (mobile) ── */
+let touchDrag=null; // {type, idx, ghost, scrollTimer, indicator, srcEl}
+const TOUCH_HOLD_MS=250;
+
+function touchDS(e,type,...idx){
+  if(window.innerWidth>768)return; // desktop uses HTML5 drag
+  e.stopPropagation();
+  const touch=e.touches[0];
+  const startX=touch.clientX,startY=touch.clientY;
+  let holdTimer=null,moved=false;
+  const handle=e.currentTarget;
+  const srcEl=handle.closest('.'+type+'-block')||handle.closest('.line-item');
+
+  function onMove(ev){
+    const t=ev.touches[0];
+    if(Math.abs(t.clientX-startX)>8||Math.abs(t.clientY-startY)>8){moved=true;clearTimeout(holdTimer);cleanup();}
+  }
+  function cleanup(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);document.removeEventListener('touchcancel',onEnd);}
+  function onEnd(){clearTimeout(holdTimer);cleanup();}
+
+  document.addEventListener('touchmove',onMove,{passive:true});
+  document.addEventListener('touchend',onEnd,{once:true});
+  document.addEventListener('touchcancel',onEnd,{once:true});
+
+  holdTimer=setTimeout(()=>{
+    cleanup();
+    if(moved)return;
+    // Haptic feedback if available
+    if(navigator.vibrate)navigator.vibrate(30);
+    startTouchDrag(type,idx,srcEl,touch);
+  },TOUCH_HOLD_MS);
+}
+
+function startTouchDrag(type,idx,srcEl,touch){
+  // Create ghost
+  const ghost=document.createElement('div');
+  ghost.className='touch-drag-ghost';
+  const label=type==='act'?actLabel(idx[0]):type==='scene'?sceneLabel(idx[0],idx[1]):(S.acts[idx[0]].scenes[idx[1]].lines[idx[2]]?.value||'').slice(0,60);
+  ghost.textContent=(type==='act'?'Act: ':type==='scene'?'Scene: ':'')+label;
+  ghost.style.left=(touch.clientX-40)+'px';
+  ghost.style.top=(touch.clientY-30)+'px';
+  document.body.appendChild(ghost);
+
+  // Create drop indicator
+  const indicator=document.createElement('div');
+  indicator.className='touch-drop-indicator';
+  indicator.style.display='none';
+
+  if(srcEl)srcEl.style.opacity='.4';
+
+  touchDrag={type,idx,ghost,indicator,srcEl,scrollTimer:null,lastTarget:null};
+
+  document.addEventListener('touchmove',touchDM,{passive:false});
+  document.addEventListener('touchend',touchDE,{once:true});
+  document.addEventListener('touchcancel',touchDE,{once:true});
+}
+
+function touchDM(e){
+  if(!touchDrag)return;
+  e.preventDefault(); // prevent scroll while dragging
+  const touch=e.touches[0];
+  const{ghost,indicator,type}=touchDrag;
+
+  // Move ghost
+  ghost.style.left=(touch.clientX-40)+'px';
+  ghost.style.top=(touch.clientY-30)+'px';
+
+  // Auto-scroll near edges
+  const scroll=$('script-scroll');
+  const sr=scroll.getBoundingClientRect();
+  const EDGE=50,SPEED=6;
+  clearInterval(touchDrag.scrollTimer);
+  if(touch.clientY<sr.top+EDGE&&touch.clientY>sr.top){
+    touchDrag.scrollTimer=setInterval(()=>scroll.scrollTop-=SPEED,16);
+  }else if(touch.clientY>sr.bottom-EDGE&&touch.clientY<sr.bottom){
+    touchDrag.scrollTimer=setInterval(()=>scroll.scrollTop+=SPEED,16);
+  }
+
+  // Find drop target via elementFromPoint
+  ghost.style.display='none';
+  const el=document.elementFromPoint(touch.clientX,touch.clientY);
+  ghost.style.display='';
+
+  if(!el)return;
+  const targetBlock=type==='act'?el.closest('.act-block'):type==='scene'?el.closest('.scene-block'):el.closest('.line-item');
+  if(!targetBlock){hideDropIndicator();return;}
+
+  // Parse target indices from the block's ondragover attribute
+  const dropAttr=targetBlock.getAttribute('ondragover');
+  if(!dropAttr)return;
+  const match=dropAttr.match(/DO\(event,'(\w+)',([\d,]+)\)/);
+  if(!match||match[1]!==type){hideDropIndicator();return;}
+  const targetIdx=match[2].split(',').map(Number);
+
+  // Show drop indicator
+  const rect=targetBlock.getBoundingClientRect();
+  const midY=rect.top+rect.height/2;
+  const insertBefore=touch.clientY<midY;
+  const parent=targetBlock.parentNode;
+
+  if(indicator.parentNode!==parent)parent.appendChild(indicator);
+  indicator.style.display='block';
+  if(insertBefore){parent.insertBefore(indicator,targetBlock);}
+  else{if(targetBlock.nextSibling)parent.insertBefore(indicator,targetBlock.nextSibling);else parent.appendChild(indicator);}
+
+  touchDrag.lastTarget={targetIdx,insertBefore};
+}
+
+function hideDropIndicator(){
+  if(touchDrag&&touchDrag.indicator)touchDrag.indicator.style.display='none';
+}
+
+function touchDE(e){
+  if(!touchDrag)return;
+  const{type,idx,ghost,indicator,srcEl,scrollTimer,lastTarget}=touchDrag;
+  clearInterval(scrollTimer);
+
+  // Clean up DOM
+  if(ghost.parentNode)ghost.parentNode.removeChild(ghost);
+  if(indicator.parentNode)indicator.parentNode.removeChild(indicator);
+  if(srcEl)srcEl.style.opacity='';
+
+  document.removeEventListener('touchmove',touchDM);
+  document.removeEventListener('touchend',touchDE);
+  document.removeEventListener('touchcancel',touchDE);
+
+  if(!lastTarget){touchDrag=null;return;}
+
+  // Calculate the correct splice-to index accounting for insertBefore and source removal shift.
+  // insertPos = the desired position in the ORIGINAL array (before any removal).
+  // spliceTo  = the index to pass to splice AFTER removing the source element.
+  const fIdx=[...idx];
+  const tIdx=[...lastTarget.targetIdx];
+  const last=tIdx.length-1; // the index component to adjust (0 for acts, 1 for scenes, 2 for lines)
+  const insertPos=lastTarget.insertBefore?tIdx[last]:tIdx[last]+1;
+  const fromPos=fIdx[last];
+  tIdx[last]=fromPos<insertPos?insertPos-1:insertPos;
+
+  executeTouchDrop(type,fIdx,tIdx);
+  touchDrag=null;
+}
+
+function executeTouchDrop(type,fromIdx,toIdx){
+  dragSrc={type,idx:fromIdx};
+  performDrop(type,fromIdx,toIdx);
+}
 
 /* ── Modal helpers ── */
 let mdrag={on:false,sx:0,sy:0};
