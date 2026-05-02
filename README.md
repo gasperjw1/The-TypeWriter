@@ -1,14 +1,14 @@
 # The Scriptwriter
 
-A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
+A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
 
 **[Try it live →](https://yashmahtani.github.io/The-TypeWriter/)**
 
 ## What it does
 
-The Scriptwriter gives you a structured screenplay writing environment with an **Act > Scene > Line** hierarchy. You write using four line types — Setting, Direction, Dialogue, and Action — and the app handles formatting, numbering, and continuity for you.
+The Scriptwriter gives you a structured stage play writing environment with an **Act > Scene > Line** hierarchy. You write using four line types — Setting, Cue, Dialogue, and Stage Direction — and the app handles formatting, numbering, and continuity for you.
 
-Scripts auto-save to your browser's localStorage and can be linked to a file on disk via the File System Access API. When you're ready to share, export to a formatted screenplay PDF or download a metadata ZIP containing the raw JSON for later editing.
+Scripts auto-save to your browser's localStorage and can be linked to a file on disk via the File System Access API. When you're ready to share, export to a formatted script PDF or download a metadata ZIP containing the raw JSON for later editing.
 
 ## Quick start
 
@@ -17,9 +17,9 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 ## Features
 
 **Writing**
-- Four line types (Setting, Direction, Dialogue, Action) with customizable keyboard shortcuts (default: backtick + 1/2/3/4) and smart auto-advance between types
+- Four line types (Setting, Cue, Dialogue, Stage Direction) with customizable keyboard shortcuts (default: backtick + 1/2/3/4) and smart auto-advance between types
 - Character management with autocomplete, ghost text, scene filtering, and archiving
-- Direction cues that track character entrances and exits per scene with visual toggle chips
+- Cue lines that track character entrances and exits per scene with visual toggle chips
 - Automatic `(cont.)` detection for consecutive dialogue from the same character
 - Auto-numbered acts and scenes ("Act One", "Scene Three") with optional custom names
 - Lockable scene numbers for production drafts — lock to freeze numbering, edit locked numbers inline, numbers persist through reordering
@@ -46,8 +46,8 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 - Fallback JSON download for browsers without File System Access API
 - Visual save indicator: gray (no file), blue (browser-only), green (linked to disk file)
 - PDF export with title page, character list, table of contents, and formatted script pages
-- Fountain export/import — the open plain-text screenplay format used by Highland, Beat, and others
-- Final Draft (FDX) export/import — the industry-standard XML format for screenplay interchange
+- Fountain export/import — the open plain-text script format used by Highland, Beat, and others
+- Final Draft (FDX) export/import — the industry-standard XML format for script interchange
 - Full round-trip fidelity across formats: FDX → Fountain → FDX preserves all content
 - Metadata ZIP download — exports the raw JSON and a manifest for re-importing later
 - PDF + metadata export — bundles the print-ready PDF with metadata in a single ZIP
@@ -88,7 +88,7 @@ The entire app is a single HTML file with one external dependency (JSZip via CDN
 
 See [TODO.md](TODO.md) for the full list. Up next:
 
-- Auto-formatting for screenplay conventions
+- Auto-formatting for stage play conventions
 - Notes and comments on lines and scenes
 - Real-time collaboration
 

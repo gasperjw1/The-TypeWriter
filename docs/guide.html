@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>The Scriptwriter — Feature Guide</title>
-<meta name="description" content="A guide to the non-obvious features of The Scriptwriter, a free browser-based screenplay editor."/>
+<meta name="description" content="A guide to the non-obvious features of The Scriptwriter, a free browser-based stage play editor."/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -81,19 +81,19 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Line type pills &amp; shortcuts <span class="badge">Keyboard</span></h3>
-    <p>Every line you write is one of four types — <strong>Setting</strong>, <strong>Direction</strong>, <strong>Dialogue</strong>, or <strong>Action</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
+    <p>Every line you write is one of four types — <strong>Setting</strong>, <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
     <ul>
       <li>Press <span class="key">`</span> (backtick) then <span class="key">1</span> → Dialogue</li>
-      <li>Press <span class="key">`</span> then <span class="key">2</span> → Action</li>
+      <li>Press <span class="key">`</span> then <span class="key">2</span> → Stage Direction</li>
       <li>Press <span class="key">`</span> then <span class="key">3</span> → Setting</li>
-      <li>Press <span class="key">`</span> then <span class="key">4</span> → Direction</li>
+      <li>Press <span class="key">`</span> then <span class="key">4</span> → Cue</li>
     </ul>
     <p style="margin-top:8px;">These keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them to any key you like. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
   </div>
 
   <div class="feature">
     <h3>Smart auto-advance</h3>
-    <p>After you submit a line, the pill automatically advances to the next likely type. Setting advances to Direction, Direction advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
+    <p>After you submit a line, the pill automatically advances to the next likely type. Setting advances to Cue, Cue advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
   </div>
 
   <div class="feature">
@@ -102,19 +102,19 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
-    <h3>Direction cues (entrances &amp; exits) <span class="badge">Unique</span></h3>
-    <p>When writing a Direction line, the input bar shows two lists of character chips:</p>
+    <h3>Cues (entrances &amp; exits) <span class="badge">Unique</span></h3>
+    <p>When writing a Cue line, the input bar shows two lists of character chips:</p>
     <ul>
       <li><strong>In scene</strong> — characters currently present. Click one to mark them as exiting.</li>
       <li><strong>Not in scene</strong> — characters who haven't entered yet. Click to mark an entrance.</li>
     </ul>
-    <p style="margin-top:6px;">The app tracks who is "in the scene" based on all previous direction cues, so it always shows the correct state. Cues are validated when you drag-and-drop reorder lines.</p>
+    <p style="margin-top:6px;">The app tracks who is "in the scene" based on all previous cues, so it always shows the correct state. Cues are validated when you drag-and-drop reorder lines.</p>
   </div>
 
   <div class="feature">
     <h3>Character autocomplete &amp; scene filter</h3>
     <p>When writing Dialogue, start typing a character name and the app shows matching characters with ghost text completion. Press <span class="key">Tab</span> to accept the suggestion.</p>
-    <p style="margin-top:6px;">The <strong>⊙ button</strong> next to the character input toggles the scene filter — when on, the dropdown only shows characters who are currently in the scene (based on direction cues).</p>
+    <p style="margin-top:6px;">The <strong>⊙ button</strong> next to the character input toggles the scene filter — when on, the dropdown only shows characters who are currently in the scene (based on cues).</p>
   </div>
 
   <div class="feature">
@@ -129,14 +129,14 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Inline editing</h3>
-    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Setting and Action lines, you get a simple text area. For Dialogue, you get the character dropdown, action field, and text. For Direction lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
+    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Setting and Stage Direction lines, you get a simple text area. For Dialogue, you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
     <p style="margin-top:6px;">Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
   </div>
 
   <div class="feature">
     <h3>Find &amp; Replace <span class="badge">Ctrl+F</span></h3>
-    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Setting, Direction, Dialogue, Action) to limit which line types are searched.</p>
-    <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong> (or <span class="key">Enter</span>/<span class="key">Shift+Enter</span>). Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and dialogue action, not the character name.</p>
+    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Setting, Cue, Dialogue, Stage Dir.) to limit which line types are searched.</p>
+    <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong> (or <span class="key">Enter</span>/<span class="key">Shift+Enter</span>). Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and parentheticals, not the character name.</p>
   </div>
 
   <div class="feature">
@@ -198,7 +198,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>PDF + metadata export</h3>
-    <p><strong>File → Export PDF + metadata</strong> creates a single ZIP containing both the print-ready screenplay (as an HTML file you can print or save as PDF) and the metadata folder with the raw JSON. One download, both the shareable output and the editable source.</p>
+    <p><strong>File → Export PDF + metadata</strong> creates a single ZIP containing both the print-ready script (as an HTML file you can print or save as PDF) and the metadata folder with the raw JSON. One download, both the shareable output and the editable source.</p>
   </div>
 
   <div class="feature">
@@ -218,7 +218,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Line-type colors</h3>
-    <p>Each line type (Setting, Direction, Dialogue, Action) has a configurable accent color that tints the left border and background in the editor. You can change the color with a color picker or disable the tint entirely with the toggle. These are purely visual — they don't affect the exported PDF.</p>
+    <p>Each line type (Setting, Cue, Dialogue, Stage Direction) has a configurable accent color that tints the left border and background in the editor. You can change the color with a color picker or disable the tint entirely with the toggle. These are purely visual — they don't affect the exported PDF.</p>
   </div>
 
   <div class="feature">
@@ -233,7 +233,7 @@ a:hover{text-decoration:underline;}
 </div>
 
 <div class="footer">
-  The Scriptwriter — a free, open-source screenplay editor. · <a href="compare.html">Compare editors</a>
+  The Scriptwriter — a free, open-source stage play editor. · <a href="compare.html">Compare editors</a>
 </div>
 
 </div>

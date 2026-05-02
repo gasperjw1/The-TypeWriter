@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>The Scriptwriter — Free Screenplay Editor</title>
-<meta name="description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<title>The Scriptwriter — Free Stage Play Editor</title>
+<meta name="description" content="A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
 <meta property="og:title" content="The Scriptwriter"/>
-<meta property="og:description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<meta property="og:description" content="A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://yashmahtani.github.io/The-TypeWriter/"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Scriptwriter"/>
-<meta name="twitter:description" content="A free, open-source screenplay editor in your browser. No accounts, no installs."/>
+<meta name="twitter:description" content="A free, open-source stage play editor in your browser. No accounts, no installs."/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "The Scriptwriter",
-  "description": "A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing.",
+  "description": "A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing.",
   "url": "https://yashmahtani.github.io/The-TypeWriter/",
   "applicationCategory": "Multimedia",
   "operatingSystem": "Any (browser-based)",
@@ -191,14 +191,14 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 /* Setting — bold slugline */
 .l-setting{text-transform:uppercase;font-weight:700;color:var(--tx1);border-left:3px solid var(--lt-setting);background:var(--lt-setting-bg);letter-spacing:.02em;}
 
-/* Direction — italic, centered */
+/* Cue — italic, centered */
 .l-direction{font-style:italic;color:var(--tx2);text-align:center;border-left:3px solid var(--lt-direction);background:var(--lt-direction-bg);}
 .lcues{font-size:calc(var(--script-font-size)*0.88);color:var(--tx3);margin-top:3px;text-align:center;font-style:normal;}
 .lcues .enter{color:#3B6D11;font-weight:500;}
 .lcues .exit{color:#A32D2D;font-weight:500;}
 @media(prefers-color-scheme:dark){.lcues .enter{color:#97C459;}.lcues .exit{color:#F09595;}}
 
-/* Action — plain text, capped at half width */
+/* Stage Direction — plain text, capped at half width */
 .l-action{color:var(--tx1);text-align:left;max-width:50%;border-left:3px solid var(--lt-action);background:var(--lt-action-bg);}
 
 /* Dialogue — indented block */
@@ -419,7 +419,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   min-height:80px;max-height:160px;overflow-y:auto;
 }
 
-/* Direction box */
+/* Cue box */
 #direction-box{display:none;flex-direction:column;}
 #dir-desc-ta{width:100%;padding:10px 12px;font-family:var(--sans);font-size:13px;border:none;background:transparent;color:var(--tx1);resize:none;outline:none;line-height:1.5;min-height:42px;max-height:100px;overflow-y:auto;}
 #dir-cues-area{border-top:1px solid var(--bd2);padding:8px 12px;display:flex;flex-direction:column;gap:6px;}
@@ -653,7 +653,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #dlg-right{flex:unset;}
   #dlg-text-ta{min-height:60px;}
 
-  /* Direction cues: tighter */
+  /* Cue lines: tighter */
   #dir-cues-area{padding:6px 10px;}
   .cue-list{gap:4px;}
   .cue-chip{font-size:10px;padding:3px 7px;}
@@ -780,9 +780,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   <div class="fr-filters">
     <span>In:</span>
     <button class="fr-chip on" data-ft="setting" onclick="toggleFindFilter(this)">Setting</button>
-    <button class="fr-chip on" data-ft="direction" onclick="toggleFindFilter(this)">Direction</button>
+    <button class="fr-chip on" data-ft="direction" onclick="toggleFindFilter(this)">Cue</button>
     <button class="fr-chip on" data-ft="dialogue" onclick="toggleFindFilter(this)">Dialogue</button>
-    <button class="fr-chip on" data-ft="action" onclick="toggleFindFilter(this)">Action</button>
+    <button class="fr-chip on" data-ft="action" onclick="toggleFindFilter(this)">Stage Dir.</button>
   </div>
   <button id="find-close" onclick="closeFindBar()">✕</button>
 </div>
@@ -793,7 +793,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
         <div class="setup-brand">The Scriptwriter</div>
-        <div class="setup-tagline">A free screenplay editor in your browser. No accounts, no installs — just write.<br><a href="guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a></div>
+        <div class="setup-tagline">A free stage play editor in your browser. No accounts, no installs — just write.<br><a href="guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a></div>
         <div id="resume-card">
           <div class="setup-card" onclick="resumeFromLS()">
             <div class="setup-card-icon">▶</div>
@@ -846,7 +846,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <select class="size-select" id="font-size-sel" onchange="setFontSize(this.value)">
             <option value="11">11px</option><option value="12">12px</option><option value="13" selected>13px</option><option value="14">14px</option><option value="15">15px</option><option value="16">16px</option><option value="18">18px</option><option value="20">20px</option><option value="24">24px</option><option value="28">28px</option><option value="32">32px</option><option value="36">36px</option><option value="40">40px</option><option value="44">44px</option><option value="48">48px</option>
           </select>
-          <div class="font-preview" id="font-preview">INT. KITCHEN — DAY</div>
+          <div class="font-preview" id="font-preview">A dimly lit parlor. Evening.</div>
         </div>
       </div>
       <div class="setting-row">
@@ -891,13 +891,13 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </div>
           <div class="lt-row">
             <div class="lt-swatch" id="lts-direction" style="background:#EF9F27;"></div>
-            <div class="lt-name">Direction</div>
+            <div class="lt-name">Cue</div>
             <input type="color" class="lt-color-input" id="ltc-direction" value="#EF9F27" onchange="setLTColor('direction',this.value)"/>
             <button class="stoggle on" id="ltt-direction" onclick="toggleLT('direction')"></button>
           </div>
           <div class="lt-row">
             <div class="lt-swatch" id="lts-action" style="background:#D85A30;"></div>
-            <div class="lt-name">Action</div>
+            <div class="lt-name">Stage Direction</div>
             <input type="color" class="lt-color-input" id="ltc-action" value="#D85A30" onchange="setLTColor('action',this.value)"/>
             <button class="stoggle on" id="ltt-action" onclick="toggleLT('action')"></button>
           </div>
@@ -925,12 +925,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
       <div class="setting-row">
         <div class="setting-label">Line type pills &amp; shortcuts</div>
-        <div class="setting-desc" style="line-height:1.7;">Every line is one of four types — <strong>Setting</strong>, <strong>Direction</strong>, <strong>Dialogue</strong>, or <strong>Action</strong> — selected by clicking a pill above the input bar. Keyboard shortcut: press <code style="font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;">`</code> (backtick) then the assigned key (default: 1=Dialogue, 2=Action, 3=Setting, 4=Direction). These keys are customizable in <strong>Settings &rarr; Keyboard shortcuts</strong>. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
+        <div class="setting-desc" style="line-height:1.7;">Every line is one of four types — <strong>Setting</strong>, <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. Keyboard shortcut: press <code style="font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;">`</code> (backtick) then the assigned key (default: 1=Dialogue, 2=Stage Dir., 3=Setting, 4=Cue). These keys are customizable in <strong>Settings &rarr; Keyboard shortcuts</strong>. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
       </div>
 
       <div class="setting-row">
         <div class="setting-label">Smart auto-advance</div>
-        <div class="setting-desc">After submitting a line, the pill automatically advances to the next likely type. Setting → Direction → Dialogue. Dialogue stays on Dialogue for continuous exchanges.</div>
+        <div class="setting-desc">After submitting a line, the pill automatically advances to the next likely type. Setting → Cue → Dialogue. Dialogue stays on Dialogue for continuous exchanges.</div>
       </div>
 
       <div class="setting-row">
@@ -939,13 +939,13 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       </div>
 
       <div class="setting-row">
-        <div class="setting-label">Direction cues (entrances &amp; exits)</div>
-        <div class="setting-desc" style="line-height:1.7;">When writing a Direction line, the input bar shows two chip lists: <strong>In scene</strong> (characters present — click to mark an exit) and <strong>Not in scene</strong> (click to mark an entrance). The app tracks who is present based on all previous direction cues and validates moves on drag-and-drop reorder.</div>
+        <div class="setting-label">Cues (entrances &amp; exits)</div>
+        <div class="setting-desc" style="line-height:1.7;">When writing a Cue line, the input bar shows two chip lists: <strong>In scene</strong> (characters present — click to mark an exit) and <strong>Not in scene</strong> (click to mark an entrance). The app tracks who is present based on all previous cues and validates moves on drag-and-drop reorder.</div>
       </div>
 
       <div class="setting-row">
         <div class="setting-label">Character autocomplete &amp; scene filter</div>
-        <div class="setting-desc">When writing Dialogue, start typing and matching characters appear with ghost text. Press <strong>Tab</strong> to accept. The <strong>⊙ button</strong> toggles the scene filter — when on, only characters currently in the scene (per direction cues) appear.</div>
+        <div class="setting-desc">When writing Dialogue, start typing and matching characters appear with ghost text. Press <strong>Tab</strong> to accept. The <strong>⊙ button</strong> toggles the scene filter — when on, only characters currently in the scene (per cues) appear.</div>
       </div>
 
       <div class="setting-row">
@@ -957,17 +957,17 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
       <div class="setting-row">
         <div class="setting-label">Inline editing</div>
-        <div class="setting-desc"><strong>Double-click</strong> any line or click its <strong>Edit</strong> button to edit in place. For Dialogue you get the character dropdown, action field, and text. For Direction, the full cue editor modal opens. Press <strong>Enter</strong> to save, <strong>Esc</strong> to cancel. Clicking away auto-saves.</div>
+        <div class="setting-desc"><strong>Double-click</strong> any line or click its <strong>Edit</strong> button to edit in place. For Dialogue you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens. Press <strong>Enter</strong> to save, <strong>Esc</strong> to cancel. Clicking away auto-saves.</div>
       </div>
 
       <div class="setting-row">
         <div class="setting-label">Find &amp; Replace</div>
-        <div class="setting-desc">Press <strong>Ctrl+F</strong> to open the find bar. Use the <strong>filter chips</strong> (Setting, Direction, Dialogue, Action) to limit which line types are searched. Navigate matches with Prev/Next or Enter/Shift+Enter. Replace individually or use Replace All. Dialogue search covers spoken text and action, not character names.</div>
+        <div class="setting-desc">Press <strong>Ctrl+F</strong> to open the find bar. Use the <strong>filter chips</strong> (Setting, Cue, Dialogue, Stage Dir.) to limit which line types are searched. Navigate matches with Prev/Next or Enter/Shift+Enter. Replace individually or use Replace All. Dialogue search covers spoken text and parentheticals, not character names.</div>
       </div>
 
       <div class="setting-row">
         <div class="setting-label">Drag &amp; drop</div>
-        <div class="setting-desc">Acts, scenes, and lines can be reordered by dragging. Line moves are validated against character presence — moving a direction line with entrance cues to a position where the character is already present triggers a warning.</div>
+        <div class="setting-desc">Acts, scenes, and lines can be reordered by dragging. Line moves are validated against character presence — moving a cue line with entrances to a position where the character is already present triggers a warning.</div>
       </div>
 
       <div class="setting-row">
@@ -1011,7 +1011,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
       <div class="setting-row">
         <div class="setting-label">PDF + metadata export</div>
-        <div class="setting-desc"><strong>File → Export PDF + metadata</strong> bundles the print-ready screenplay (HTML) with the metadata folder in a single ZIP — the shareable output and the editable source in one download.</div>
+        <div class="setting-desc"><strong>File → Export PDF + metadata</strong> bundles the print-ready script (HTML) with the metadata folder in a single ZIP — the shareable output and the editable source in one download.</div>
       </div>
 
       <div class="setting-row">
@@ -1027,24 +1027,24 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="type-pills">
         <div class="tpill-wrap">
           <span class="tpill active" data-t="setting" data-n="3" onclick="selPill(this,'setting')">Setting<span class="sc">` 3</span></span>
-          <div class="pill-tip"><strong>Setting</strong> &nbsp;·&nbsp; Shortcut: <code>` 3</code><br>Establishes the location and time of a scene.<br><em>e.g. INT. KITCHEN — DAY</em><br>Typically the first line of every scene.</div>
+          <div class="pill-tip"><strong>Setting</strong> &nbsp;·&nbsp; Shortcut: <code>` 3</code><br>Establishes the location and time of a scene.<br><em>e.g. A dimly lit parlor. Evening.</em><br>Typically the first line of every scene.</div>
         </div>
         <div class="tpill-wrap">
-          <span class="tpill" data-t="direction" data-n="4" onclick="selPill(this,'direction')">Direction<span class="sc">` 4</span></span>
-          <div class="pill-tip"><strong>Direction</strong> &nbsp;·&nbsp; Shortcut: <code>` 4</code><br>Stage directions describing what happens<br>in the scene. Also marks character<br>entrances and exits using cue chips.</div>
+          <span class="tpill" data-t="direction" data-n="4" onclick="selPill(this,'direction')">Cue<span class="sc">` 4</span></span>
+          <div class="pill-tip"><strong>Cue</strong> &nbsp;·&nbsp; Shortcut: <code>` 4</code><br>Marks character entrances and exits<br>using cue chips. Also includes a text<br>field for accompanying stage directions.</div>
         </div>
         <div class="tpill-wrap">
           <span class="tpill" data-t="dialogue" data-n="1" onclick="selPill(this,'dialogue')">Dialogue<span class="sc">` 1</span></span>
           <div class="pill-tip"><strong>Dialogue</strong> &nbsp;·&nbsp; Shortcut: <code>` 1</code><br>Spoken lines by a character. Includes<br>character name, optional dialogue action<br>(e.g. whispering), and the spoken text.<br>Auto-detects <em>(cont.)</em> for consecutive lines.</div>
         </div>
         <div class="tpill-wrap">
-          <span class="tpill" data-t="action" data-n="2" onclick="selPill(this,'action')">Action<span class="sc">` 2</span></span>
-          <div class="pill-tip"><strong>Action</strong> &nbsp;·&nbsp; Shortcut: <code>` 2</code><br>Describes visible action, movement, or<br>events on screen. Attributed to a specific<br>character — appears alongside their name.</div>
+          <span class="tpill" data-t="action" data-n="2" onclick="selPill(this,'action')">Stage Dir.<span class="sc">` 2</span></span>
+          <div class="pill-tip"><strong>Stage Direction</strong> &nbsp;·&nbsp; Shortcut: <code>` 2</code><br>Describes physical action, movement, or<br>stage business. Attributed to a specific<br>character — appears alongside their name.</div>
         </div>
         <button id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel">Panel</button>
       </div>
       <div id="input-box">
-        <!-- Setting / Action -->
+        <!-- Setting / Stage Direction -->
         <textarea id="simple-ta" placeholder="Type a line..." rows="1" style="display:none" onkeydown="lastFieldKey(event)"></textarea>
         <!-- Dialogue: left col (char name + dlg action) | right col (spoken text) -->
         <div id="dlg-box">
@@ -1067,9 +1067,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
             <textarea id="dlg-text-ta" placeholder="Spoken line..." rows="1" onkeydown="lastFieldKey(event)"></textarea>
           </div>
         </div>
-        <!-- Direction with cues -->
+        <!-- Cue with entrances/exits -->
         <div id="direction-box">
-          <textarea id="dir-desc-ta" placeholder="Stage direction..." rows="1" onkeydown="lastFieldKey(event)"></textarea>
+          <textarea id="dir-desc-ta" placeholder="Cue description..." rows="1" onkeydown="lastFieldKey(event)"></textarea>
           <div id="dir-cues-area">
             <div><div class="cue-label">In scene — toggle exit</div><div class="cue-list" id="in-scene-list"></div></div>
             <div style="margin-top:6px"><div class="cue-label">Not in scene — toggle entrance</div><div class="cue-list" id="out-scene-list"></div></div>
@@ -1129,6 +1129,7 @@ let ghostMatch='',cddHideTimer=null;
 let modalCues={enters:[],exits:[]};
 let autosaveEnabled=true;
 let themeMode='system';
+function typeLabel(t){return{setting:'Setting',direction:'Cue',action:'Stage Direction',dialogue:'Dialogue'}[t]||t;}
 let ltColors={setting:'#1D9E75',direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
 let ltEnabled={setting:true,direction:true,action:true,dialogue:true};
 let pillHotkeys={dialogue:'1',action:'2',setting:'3',direction:'4'};
@@ -1332,60 +1333,61 @@ function resumeFromLS(){
   resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
-  title:'The Last Cigarette',
+  title:'The Garden Party',
   author:'Sample Script',
   characters:[
-    {name:'MARLOWE',description:'Private detective, world-weary, sharp tongue',archived:false},
-    {name:'VIVIAN',description:'Mysterious client, elegant, hiding something',archived:false},
-    {name:'EDDIE',description:'Bartender at The Blue Door, knows everyone',archived:false},
-    {name:'SANTOS',description:'Hired muscle, few words, quick hands',archived:false}
+    {name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile',archived:false},
+    {name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain',archived:false},
+    {name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone',archived:false},
+    {name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town',archived:false}
   ],
   acts:[
-    {name:'The Setup',description:'Marlowe takes a case that smells like trouble.',scenes:[
-      {name:'The Office',description:'A slow night turns interesting.',lines:[
-        {type:'setting',value:'INT. MARLOWE\'S OFFICE — NIGHT'},
-        {type:'direction',value:'Rain streaks down the frosted glass door. A desk lamp casts the only light.',cues:{enters:['MARLOWE'],exits:[]}},
-        {type:'action',value:'MARLOWE sits behind his desk, nursing a glass of bourbon. An ashtray overflows beside a stack of unpaid bills.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Three days without a case. The rain\'s got more ambition than my phone.'},
-        {type:'action',value:'A sharp knock at the door. MARLOWE doesn\'t move.'},
-        {type:'direction',value:'The door opens without invitation.',cues:{enters:['VIVIAN'],exits:[]}},
-        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'Mr. Marlowe? I was told you find things.',dialogueAction:'stepping in from the rain'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Depends on what\'s lost.'},
-        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'My husband. He disappeared two weeks ago. The police stopped looking after one.',dialogueAction:'sitting without being asked'},
-        {type:'action',value:'She slides a photograph across the desk. MARLOWE studies it, then her.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'I charge fifty a day plus expenses. And I don\'t promise happy endings.'},
-        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'I\'m not looking for happy. I\'m looking for the truth.'}
+    {name:'Arrivals',description:'A garden party brings old tensions to the surface.',scenes:[
+      {name:'Preparations',description:'Helen sets the stage for a perfect afternoon.',lines:[
+        {type:'setting',value:'The back garden of a large country house. Late afternoon, summer. A long table is set for tea under a canopy of fairy lights. Bunting hangs between the trees. Everything is immaculate.'},
+        {type:'direction',value:'HELEN arranges flowers in a vase at the centre of the table, stepping back to check the effect.',cues:{enters:['HELEN'],exits:[]}},
+        {type:'action',value:'HELEN adjusts a napkin, then adjusts it again. She checks her watch.'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Four o\'clock. They\'ll be here any minute.'},
+        {type:'action',value:'HELEN smooths her dress, takes a breath, composes her face into a warm smile.'},
+        {type:'direction',value:'RUTH appears from the house, carrying a teapot.',cues:{enters:['RUTH'],exits:[]}},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'You\'ve rearranged the table three times. It\'s a garden party, not a state dinner.'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'It\'s the first time James has been home in two years. I want it to feel right.'},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'It\'s a garden. It feels like a garden.',dialogueAction:'setting the teapot down heavily'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'You know what I mean.'},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'I know exactly what you mean. And he\'ll see through it in about thirty seconds, same as always.'},
+        {type:'action',value:'HELEN turns away and fusses with the flowers again. A silence sits between them.'}
       ]},
-      {name:'The Blue Door',description:'Marlowe follows his first lead.',lines:[
-        {type:'setting',value:'INT. THE BLUE DOOR BAR — LATER THAT NIGHT'},
-        {type:'direction',value:'A jazz trio plays in the corner. Smoke curls under amber lights.',cues:{enters:['MARLOWE','EDDIE'],exits:[]}},
-        {type:'action',value:'MARLOWE slides onto a barstool. EDDIE polishes a glass without looking up.'},
-        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'Marlowe. Bourbon?'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Make it a double. And make it come with information.'},
-        {type:'action',value:'MARLOWE places the photograph on the bar.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Richard Loomis. His wife says he vanished. You know him?'},
-        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'Used to come in Thursdays. Gin and tonic, two limes. Stopped showing about two weeks back.',dialogueAction:'glancing at the photo'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'He meet anyone here? Anyone unusual?'},
-        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'There was a guy. Big. Didn\'t order anything. They talked in the back booth maybe twenty minutes, then Loomis left in a hurry.',dialogueAction:'leaning in, lowering his voice'},
-        {type:'action',value:'MARLOWE finishes his bourbon and drops a bill on the bar.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'If the big guy shows up again, you never saw me.'}
+      {name:'The Return',description:'James arrives and old patterns resurface.',lines:[
+        {type:'setting',value:'The same garden, moments later. The light has shifted slightly. A bird sings offstage.'},
+        {type:'direction',value:'JAMES enters from the side gate, carrying a small bag. He stops when he sees the garden.',cues:{enters:['JAMES'],exits:[]}},
+        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'You\'ve outdone yourself.',dialogueAction:'looking around'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'James!'},
+        {type:'action',value:'HELEN crosses to him quickly and embraces him. She holds on a moment too long. JAMES gently pulls back.'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Let me look at you. You\'re thin.'},
+        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'I\'m fine, Mum.'},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'He looks the same to me.',dialogueAction:'from her chair'},
+        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'Hello, Aunt Ruth.'},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'Sit down. Have some tea. Your mother\'s been preparing this since Tuesday.'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Ruth.',dialogueAction:'a warning'},
+        {type:'action',value:'JAMES sits. He picks up a teacup but doesn\'t drink. He looks at the garden as if seeing it for the first time, or the last.'}
       ]}
     ]},
-    {name:'The Confrontation',description:'The truth catches up.',scenes:[
-      {name:'The Alley',description:'Marlowe finds more than he bargained for.',lines:[
-        {type:'setting',value:'EXT. ALLEY BEHIND THE BLUE DOOR — CONTINUOUS'},
-        {type:'direction',value:'Rain hammers the pavement. A single streetlight flickers at the far end.',cues:{enters:['MARLOWE'],exits:[]}},
-        {type:'action',value:'MARLOWE turns up his collar and heads for his car. A shadow detaches from the wall behind him.'},
-        {type:'direction',value:'Heavy footsteps on wet concrete.',cues:{enters:['SANTOS'],exits:[]}},
-        {type:'dialogue',character:{name:'SANTOS',description:'Hired muscle, few words, quick hands'},value:'You\'re asking questions about Loomis.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'That\'s what people pay me for.',dialogueAction:'turning slowly'},
-        {type:'dialogue',character:{name:'SANTOS',description:'Hired muscle, few words, quick hands'},value:'People should be more careful with their money.'},
-        {type:'action',value:'SANTOS cracks his knuckles. MARLOWE takes a step back, hand drifting toward his coat pocket.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Let me guess — you\'re the welcoming committee. Loomis get the same introduction?'},
-        {type:'action',value:'SANTOS lunges. MARLOWE sidesteps and catches him with an elbow to the jaw. SANTOS staggers but doesn\'t go down.'},
-        {type:'direction',value:'A car horn blares from the street. Headlights sweep across the alley.',cues:{enters:[],exits:['SANTOS']}},
-        {type:'action',value:'SANTOS glares at MARLOWE, then vanishes into the dark.'},
-        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Nice chat.\n(beat)\nI need a bigger bourbon.'}
+    {name:'Revelations',description:'The party takes an unexpected turn.',scenes:[
+      {name:'An Old Friend',description:'Claire arrives and shifts the balance.',lines:[
+        {type:'setting',value:'The garden. The tea things are partly used. Late golden light.'},
+        {type:'direction',value:'CLAIRE enters through the garden gate, a bottle of wine in hand.',cues:{enters:['CLAIRE'],exits:[]}},
+        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'I brought something stronger than tea.',dialogueAction:'holding up the bottle'},
+        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'Claire.'},
+        {type:'action',value:'They look at each other. A beat. Then CLAIRE crosses to him and they embrace — brief, careful, aware of being watched.'},
+        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'Two years. You could have written.'},
+        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'I know. I\'m sorry.'},
+        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'Don\'t be sorry. Be here.',dialogueAction:'firmly'},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'Open that bottle, dear. I think we\'re all going to need it.'},
+        {type:'action',value:'HELEN watches JAMES and CLAIRE together. Something crosses her face — not jealousy, but the recognition that her son has a life she doesn\'t control.'},
+        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'I\'ll get some glasses.',dialogueAction:'quietly'},
+        {type:'direction',value:'HELEN exits into the house.',cues:{enters:[],exits:['HELEN']}},
+        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'She\'ll be alright. Give her a moment.',dialogueAction:'to James, gently'},
+        {type:'action',value:'JAMES nods. CLAIRE takes his hand. The fairy lights begin to glow as the daylight fades.'}
       ]}
     ]}
   ]
@@ -1535,7 +1537,7 @@ function selPill(el,t){if(t===cType&&!pendingPill)return;if(hasInput()&&pendingP
 function activatePillByType(t){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));const el=document.querySelector(`.tpill[data-t="${t}"]`);if(el)el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function updateInputMode(){
   $('simple-ta').style.display='none';$('dlg-box').style.display='none';$('direction-box').style.display='none';
-  if(cType==='setting'){$('simple-ta').style.display='block';$('simple-ta').placeholder='e.g. INT. KITCHEN — DAY';setTimeout(()=>$('simple-ta').focus(),30);}
+  if(cType==='setting'){$('simple-ta').style.display='block';$('simple-ta').placeholder='e.g. A dimly lit parlor. Evening.';setTimeout(()=>$('simple-ta').focus(),30);}
   else if(cType==='action'){$('simple-ta').style.display='block';$('simple-ta').placeholder='Describe the action...';setTimeout(()=>$('simple-ta').focus(),30);}
   else if(cType==='dialogue'){$('dlg-box').style.display='flex';setTimeout(()=>$('dlg-char-ta').focus(),30);}
   else if(cType==='direction'){$('direction-box').style.display='flex';updateDirCues();setTimeout(()=>$('dir-desc-ta').focus(),30);}
@@ -2101,8 +2103,8 @@ function openEditLine(ai,si,li){
     setTimeout(()=>{const el=$('el-v');if(el)el.focus();},50);
     return;
   }
-  openModal(`<h3>Edit ${l.type}</h3>${isDlg?`<div class="mf"><label>Character</label><input class="minput" id="el-c" value="${esc(l.character?.name||'')}"/></div>`:''}${isDlg?`<div class="mf"><label>Dialogue action <em>(optional)</em></label><input class="minput" id="el-da" value="${esc(l.dialogueAction||'')}"/></div>`:''}
-<div class="mf"><label>${l.type}</label><input class="minput" id="el-v" value="${esc(l.value)}"/></div>
+  openModal(`<h3>Edit ${typeLabel(l.type)}</h3>${isDlg?`<div class="mf"><label>Character</label><input class="minput" id="el-c" value="${esc(l.character?.name||'')}"/></div>`:''}${isDlg?`<div class="mf"><label>Parenthetical <em>(optional)</em></label><input class="minput" id="el-da" value="${esc(l.dialogueAction||'')}"/></div>`:''}
+<div class="mf"><label>${typeLabel(l.type)}</label><input class="minput" id="el-v" value="${esc(l.value)}"/></div>
 <div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveLineEdit(${ai},${si},${li},${isDlg})">Save</button></div>`,()=>closeModal());
   setTimeout(()=>{const el=$('el-v');if(el)el.focus();},50);
 }
@@ -2122,8 +2124,8 @@ function buildDirEditModal(ai,si,li){
   const canExit=[...presentBefore];
   const entersHtml=canEnter.map(n=>{const isOn=modalCues.enters.includes(n);return`<div class="m-cue-chip${isOn?' enters':''}" onclick="toggleModalCue('enter','${escJs(n)}',${ai},${si},${li})">${esc(n)} ${isOn?'✓ entering':'+ entrance'}</div>`;}).join('')||'<span style="font-size:11px;color:#777;">No characters available to enter</span>';
   const exitsHtml=canExit.map(n=>{const isOn=modalCues.exits.includes(n);return`<div class="m-cue-chip${isOn?' exits':''}" onclick="toggleModalCue('exit','${escJs(n)}',${ai},${si},${li})">${esc(n)} ${isOn?'✕ exiting':'+ exit'}</div>`;}).join('')||'<span style="font-size:11px;color:#777;">No characters in scene yet</span>';
-  return`<h3>Edit direction</h3>
-<div class="mf"><label>Direction text</label><input class="minput" id="el-v" value="${esc(l.value)}"/></div>
+  return`<h3>Edit Cue</h3>
+<div class="mf"><label>Cue text</label><input class="minput" id="el-v" value="${esc(l.value)}"/></div>
 <div class="m-cue-section"><div class="m-cue-label">Character entrances</div><div class="m-cue-list">${entersHtml}</div></div>
 <div class="m-cue-section"><div class="m-cue-label">Character exits</div><div class="m-cue-list">${exitsHtml}</div></div>
 <div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveDirEdit(${ai},${si},${li})">Save</button></div>`;
@@ -2312,7 +2314,7 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 /* Stage direction: centered, italic, blank line before/after */
 .s-direction{font-style:italic;text-align:center;margin:12pt auto;width:50%;padding:0 5%;}
 .s-direction .cues{font-style:normal;font-size:10pt;color:#333;}
-/* Action: centered like stage direction */
+/* Stage Direction: centered */
 .s-action{text-align:center;margin:12pt auto;width:60%;}
 /* Dialogue block */
 .s-dlg{margin:8pt 0;}
@@ -2478,7 +2480,7 @@ function buildFountain(){
           const isSlug=/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(v);
           out+=(isSlug?v.toUpperCase():'.'+v)+'\n\n';
         }else if(line.type==='direction'){
-          /* Direction → transition text with cue notes */
+          /* Cue → transition text with cue notes */
           let cueText='';
           if(line.cues){
             const parts=[];
@@ -2496,7 +2498,7 @@ function buildFountain(){
           if(line.dialogueAction)out+='('+line.dialogueAction+')\n';
           out+=line.value+'\n\n';
         }else if(line.type==='action'){
-          /* Action — use ! prefix to force if it might be misread as another element */
+          /* Stage Direction — use ! prefix to force if it might be misread as another element */
           const v=line.value.trim();
           const mightMisread=/^[A-Z][A-Z\s\d\.]+$/.test(v)||/^(INT|EXT|EST)[\.\s]/i.test(v);
           out+=(mightMisread?'!'+v:v)+'\n\n';
@@ -3252,7 +3254,7 @@ function jumpToLine(ai,si,li){
 /* ── Pill hotkey customization ── */
 function renderHotkeySettings(){
   const c=$('hk-settings');if(!c)return;
-  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Action'},{key:'setting',label:'Setting'},{key:'direction',label:'Direction'}];
+  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Stage Direction'},{key:'setting',label:'Setting'},{key:'direction',label:'Cue'}];
   c.innerHTML=types.map(t=>`<div class="hk-row"><div class="hk-name">${t.label}</div><div class="hk-key-wrap"><span class="hk-prefix">\` +</span><input class="hk-input" id="hk-${t.key}" value="${esc(pillHotkeys[t.key])}" readonly onfocus="startHkCapture('${t.key}')" onblur="stopHkCapture('${t.key}')"/></div></div>`).join('');
 }
 let hkCapturing=null;

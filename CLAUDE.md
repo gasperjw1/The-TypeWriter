@@ -4,7 +4,7 @@
 Yash Mahtani (yashmahtani@gmail.com)
 
 ## Project Overview
-**The Scriptwriter** is a screenplay/script writing application. The main app is `script_maker.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
+**The Scriptwriter** is a stage play writing application. The main app is `script_maker.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
 
 ## Architecture
 
@@ -37,11 +37,11 @@ S = {
       name: string,        // optional user-given name (display uses sceneLabel which adds "Scene One" numbering)
       description: string,
       lines: [{
-        type: 'setting' | 'direction' | 'dialogue' | 'action',
+        type: 'setting' | 'direction' | 'dialogue' | 'action',  // internal keys; display names: Setting, Cue, Dialogue, Stage Direction
         value: string,
-        character?: { name, description },      // for dialogue & action
-        dialogueAction?: string,                 // for dialogue
-        cues?: { enters: string[], exits: string[] }  // for direction
+        character?: { name, description },      // for dialogue & action (stage direction)
+        dialogueAction?: string,                 // for dialogue (parenthetical)
+        cues?: { enters: string[], exits: string[] }  // for direction (cue)
       }]
     }]
   }]
@@ -245,3 +245,9 @@ S = {
 - **Scene cards / outline view** — New "Outline" tab in top bar. `renderOutline()` renders scene cards in a responsive CSS Grid layout grouped by act. Each card shows: scene label, optional description, line count, dialogue count, character count, and character name chips. Cards are drag-and-drop reorderable within the same act (desktop HTML5 DnD + mobile touch hold). Clicking a card switches to the Edit tab and smooth-scrolls to that scene. `getSceneCharsList(sc)` extracts unique character names from dialogue, action, and direction cues. Right panel hidden on outline tab. Mobile-responsive grid (2-col on tablet, 1-col on phone).
 - **Outline touch drag** — `outlineTouchStart`/`outlineTouchMove`/`outlineTouchEnd` provide long-press-to-drag on mobile, with ghost element, drag-over highlighting, and haptic feedback. Same reorder logic as desktop.
 - **Lockable scene numbers** — `S.scenesLocked` boolean + `scene.lockedNum` string per scene. `toggleSceneLock()` in File menu: when locking, snapshots current positional numbers as `lockedNum` on each scene; when unlocking, clears all `lockedNum` values. `sceneLabel()` uses `lockedNum` when present instead of `numWord(si+1)`. Scene edit modal shows editable "Locked scene number" field when locked. `updateSceneLockUI()` toggles menu item text between "Lock/Unlock scene numbers". Persisted in `stateJSON`, restored in `loadFromData`/`resumeFromLS`, reset in `doNewScript`/`parseFountain`/`parseFDX`/`loadSample`. Survives undo/redo.
+
+### Session 11 — 2026-05-02
+- **Repositioned as stage play editor** — Based on Reddit feedback pointing out the app mixed stage play and screenplay conventions, committed to stage play format as the primary target. Updated all user-facing text: page title, meta tags, JSON-LD, setup screen tagline, guide tab, compare page.
+- **Renamed line types for stage play terminology** — Display labels changed: "Direction" → "Cue" (entrance/exit cues), "Action" → "Stage Direction" (physical action/business). Internal type values (`'direction'`, `'action'`) kept unchanged for backward compatibility with saved scripts, Fountain/FDX exports. Added `typeLabel(t)` helper function for mapping internal keys to display names. Updated: pill labels (abbreviated "Stage Dir." for pill, full in tooltip), find/replace filter chips, Settings color labels, hotkey settings labels, Guide tab descriptions, modal titles, placeholder text, CSS comments, HTML comments.
+- **Updated all docs and metadata** — README.md, CLAUDE.md, TODO.md, `docs/guide.html`, `docs/compare.html` updated to reflect stage play focus and new line type names. "screenplay" → "stage play" across all user-facing text. Setting pill tooltip changed from "INT. KITCHEN — DAY" to "A dimly lit parlor. Evening." to match stage play conventions.
+- **Scene card upgrades bookmarked** — Added TODO.md section "Priority 2b — Scene Card Upgrades" with five items from competitor research: editable synopsis, color coding/labels, status markers, card size toggle, beat board mode.

@@ -37,6 +37,14 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **Revision tracking** — Track script revisions with industry-standard colored revision marks (white, blue, pink, yellow, green, goldenrod). Highlight changes between revisions. Beat and Final Draft both support this. *(Session 9)*
 - [x] **Lockable scene numbers** — Lock scene numbers for production drafts so they don't change when scenes are reordered. Allow inline editing of locked numbers. Beat and Final Draft support this. *(Session 10)*
 
+### To Do — Scene Card Upgrades (Priority 2b)
+
+- [ ] **Editable synopsis on cards** — Add a synopsis/notes field per scene, editable inline on the card. Every major competitor (Scrivener, Final Draft, Arc Studio) centers their corkboard around this.
+- [ ] **Color coding / labels** — Color-dot or left-border accent per scene, selectable from a palette, with optional custom label names (e.g., "A-Plot", "B-Plot", "Flashback"). Provides instant visual structure mapping.
+- [ ] **Status markers** — Per-scene status badge (Outline / Draft / Revised / Final) for tracking progress at a glance. Inspired by Scrivener's status labels.
+- [ ] **Card size toggle** — Compact (title + color only) vs expanded (synopsis + stats + characters) view for the outline grid.
+- [ ] **Beat board mode** — Free-form cards not tied to scenes, for brainstorming story beats before committing to script structure. Larger feature inspired by Final Draft and Arc Studio.
+
 ### To Do — Collaboration & Storage (Priority 3)
 
 - [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet.
@@ -56,3 +64,4 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [ ] **Print-friendly View tab** — Add print CSS or a dedicated print button to the View tab for quick paper output without PDF export.
 - [ ] **Plugin / extension system** — Allow user scripts (JavaScript) to process the script data. Beat supports this on macOS.
 - [ ] **Document styles** — Customizable page layout (fonts, margins) for the exported screenplay. Beat supports this.
+- [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.
