@@ -131,25 +131,27 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 #scroll-back-btn button:hover{background:var(--bg2);}
 
 /* Script blocks */
-.act-block{margin-bottom:32px;}
-.act-hdr{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rm);background:var(--bg2);border:1px solid var(--bd3);margin-bottom:12px;cursor:grab;}
-.drag-handle{color:var(--tx3);font-size:13px;user-select:none;}
+.act-block{margin-bottom:24px;}
+.act-hdr{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--rm);background:var(--bg2);border:1px solid var(--bd3);margin-bottom:8px;cursor:grab;}
+.drag-handle{color:var(--bd2);font-size:11px;user-select:none;opacity:0;transition:opacity .15s;}
+.act-hdr:hover .drag-handle,.scene-hdr:hover .drag-handle{opacity:.5;}
 .line-drag-handle{display:none;}
 .act-name-disp{font-size:var(--script-font-size);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
 .act-subdesc{font-size:11px;color:var(--tx2);}
-.row-btns{display:flex;gap:4px;flex-shrink:0;}
-.rbtn{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--bd3);background:var(--bg1);color:var(--tx2);cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .1s;}
+.row-btns{display:flex;gap:3px;flex-shrink:0;opacity:0;transition:opacity .15s;}
+.act-hdr:hover .row-btns,.scene-hdr:hover .row-btns{opacity:1;}
+.rbtn{font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--bd3);background:var(--bg1);color:var(--tx2);cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all .1s;}
 .rbtn:hover{border-color:var(--bd2);color:var(--tx1);}
 .rbtn.ce{border-color:#185FA5;color:#185FA5;background:#E6F1FB;}
 .rbtn.cd{border-color:#E24B4A;color:#E24B4A;background:#FCEBEB;}
-.scenes-wrap{display:flex;flex-direction:column;gap:12px;}
+.scenes-wrap{display:flex;flex-direction:column;gap:8px;}
 .scene-block{border:1px solid var(--bd3);border-radius:var(--rl);}
-.scene-hdr{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--bg2);border-bottom:1px solid var(--bd3);border-radius:var(--rl) var(--rl) 0 0;}
+.scene-hdr{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg2);border-bottom:1px solid var(--bd3);border-radius:var(--rl) var(--rl) 0 0;}
 .scene-name-disp{font-size:var(--script-font-size);font-weight:500;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
 .scene-subdesc{font-size:11px;color:var(--tx2);}
-.lines-wrap{padding:8px 0;}
-.scene-empty{padding:8px 12px;font-size:11px;color:var(--tx3);}
-.line-item{position:relative;padding:2px 12px;cursor:pointer;transition:background .1s;}
+.lines-wrap{padding:4px 0;}
+.scene-empty{padding:6px 12px;font-size:11px;color:var(--tx3);}
+.line-item{position:relative;padding:1px 12px;cursor:pointer;transition:background .1s;}
 .line-item:hover{background:var(--bg2);}
 .line-item.sel-barrier{outline:2px solid var(--ins-color);outline-offset:-2px;border-radius:4px;}
 .line-item.sel-highlight{background:var(--highlight-color);border-radius:4px;}
@@ -248,7 +250,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .outline-empty{text-align:center;color:var(--tx3);padding:48px 0;font-size:14px;}
 @media(max-width:768px){.outline-grid{grid-template-columns:1fr 1fr;gap:10px;}.outline-card{padding:10px;}}
 @media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
-#summaries-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 #settings-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 .psec-title{font-size:15px;font-weight:500;color:var(--tx1);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
 .setting-row{margin-bottom:20px;}
@@ -280,21 +281,17 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .theme-btn{font-size:12px;padding:6px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);transition:all .1s;}
 .theme-btn:hover{background:var(--bg1);color:var(--tx1);}
 .theme-btn.active{border-color:var(--bd1);background:var(--bg1);color:var(--tx1);font-weight:500;}
-.sum-field-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.sum-field-label{font-size:12px;color:var(--tx2);min-width:80px;}
-.sum-input{font-family:var(--sans);font-size:13px;padding:6px 10px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);outline:none;flex:1;}
-.sum-input:focus{border-color:var(--bd1);background:var(--bg1);}
-.sum-save-btn{font-size:12px;padding:5px 12px;border:none;border-radius:var(--rm);background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);}
 
 /* ── INPUT BAR ── */
-#input-bar{flex-shrink:0;border-top:var(--panel-border);padding:10px 14px 12px;background:var(--bg1);}
+#input-bar{flex-shrink:0;border-top:var(--panel-border);padding:8px 12px 10px;background:var(--bg1);}
 #type-alert{font-size:12px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:var(--rm);padding:6px 12px;margin-bottom:7px;display:none;}
-#type-pills{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+#type-pills{display:flex;gap:5px;margin-bottom:6px;align-items:center;}
 
 /* Pills with tooltips — tooltip renders ABOVE, outside the input box */
 .tpill-wrap{position:relative;}
-.tpill{font-size:12px;padding:5px 14px;border-radius:20px;border:1.5px solid var(--bd2);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);transition:all .15s;font-weight:500;user-select:none;display:block;}
-.tpill .sc{font-size:10px;opacity:.5;margin-left:3px;}
+.tpill{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--bd2);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);transition:all .15s;font-weight:500;user-select:none;display:block;}
+.tpill .sc{font-size:9px;opacity:0;margin-left:3px;transition:opacity .15s;}
+.tpill:hover .sc{opacity:.5;}
 .tpill.active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
 .tpill.warn{background:#FAEEDA;color:#854F0B;border-color:#EF9F27;}
 .tpill:hover:not(.active):not(.warn){border-color:var(--bd1);color:var(--tx1);}
@@ -436,9 +433,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .cue-chip{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:20px;border:1px solid var(--bd2);font-size:11px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-family:var(--sans);transition:all .1s;}
 .cue-chip.enters{border-color:#3B6D11;color:#3B6D11;background:#EAF3DE;}
 .cue-chip.exits{border-color:#A32D2D;color:#A32D2D;background:#FCEBEB;}
-#input-footer{display:flex;align-items:center;justify-content:space-between;padding:5px 12px 7px;border-top:1px solid var(--bd3);}
-#ins-ctx{font-size:11px;color:var(--tx3);}
-#sub-btn{font-size:12px;padding:5px 14px;border:none;border-radius:20px;background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;}
+#input-footer{display:flex;align-items:center;justify-content:space-between;padding:4px 12px 5px;border-top:1px solid var(--bd3);}
+#ins-ctx{font-size:10px;color:var(--tx3);}
+#sub-btn{font-size:11px;padding:4px 12px;border:none;border-radius:20px;background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;}
 #sub-btn:hover{opacity:.85;}
 
 /* ── Right panel ── */
@@ -472,6 +469,13 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .char-chip-btns{display:flex;gap:3px;}
 .char-chip-btn{font-size:10px;border:none;background:none;cursor:pointer;color:var(--tx3);padding:1px 5px;border-radius:3px;font-family:var(--sans);}
 .char-chip-btn:hover{background:var(--bg2);}
+.rp-stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px;}
+.rp-stat{text-align:center;padding:6px 4px;background:var(--bg2);border:1px solid var(--bd3);border-radius:4px;}
+.rp-stat-val{font-size:16px;font-weight:600;color:var(--tx1);}
+.rp-stat-label{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px;}
+.rp-stat-input{width:calc(100% - 28px);font-size:11px;padding:3px 6px;border:1px solid var(--bd3);border-radius:4px;background:var(--bg1);color:var(--tx1);font-family:var(--sans);}
+.rp-stat-save{width:24px;height:24px;font-size:12px;border:1px solid var(--bd3);border-radius:4px;background:var(--bg2);color:var(--tx2);cursor:pointer;margin-left:2px;vertical-align:top;}
+.rp-stat-save:hover{background:var(--bg3);color:var(--tx1);}
 .rp-add-char-btn{width:100%;margin-top:8px;padding:6px 0;font-size:11px;font-family:var(--sans);font-weight:500;color:var(--tx2);background:transparent;border:1px dashed var(--bd2);border-radius:var(--rm);cursor:pointer;transition:background .15s,color .15s;}
 .rp-add-char-btn:hover{background:var(--bg2);color:var(--tx1);}
 
@@ -603,7 +607,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   .act-block{margin-bottom:20px;}
   .act-hdr,.scene-hdr{padding:6px 8px;gap:6px;}
   .act-name-disp,.scene-name-disp{font-size:13px;}
-  .row-btns{gap:3px;}
+  .row-btns{gap:3px;opacity:1;}
+  .drag-handle{opacity:.5;}
   .rbtn{font-size:10px;padding:4px 8px;min-height:28px;}
   .line-item{padding:4px 8px;}
   .lbtns{opacity:1;position:static;transform:none;display:flex;gap:4px;margin-top:6px;justify-content:flex-end;}
@@ -674,9 +679,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #view-panel .v-direction{padding-left:20px;}
   #view-panel .v-action{padding-left:20px;}
   #view-panel .v-dlg .vt{padding:0 20px;}
-  #summaries-panel{padding:20px 14px;}
   #settings-panel{padding:20px 14px;}
-  #guide-panel{padding:20px 14px!important;}
   .guide-grid{grid-template-columns:1fr!important;}
 
   /* ── Modals ── */
@@ -731,12 +734,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <span id="ctx-crumb"></span>
   </div>
   <div id="tb-tabs">
-    <div class="tab active" onclick="switchTab('edit')">Edit script</div>
-    <div class="tab" onclick="switchTab('summaries')">Summaries</div>
+    <div class="tab active" onclick="switchTab('edit')">Edit</div>
     <div class="tab" onclick="switchTab('view')">View</div>
     <div class="tab" onclick="switchTab('outline')">Outline</div>
     <div class="tab" onclick="switchTab('settings')">Settings</div>
-    <div class="tab" onclick="switchTab('guide')">Guide</div>
     <div id="file-menu-wrap">
       <div class="tab" onclick="toggleFileDd()">File options ▾</div>
       <div id="file-dd">
@@ -834,7 +835,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     </div>
     <div id="view-panel"></div>
     <div id="outline-panel"></div>
-    <div id="summaries-panel"></div>
     <div id="settings-panel">
       <div class="psec-title">Formatting</div>
       <div class="setting-row">
@@ -923,109 +923,11 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div id="hk-settings"></div>
         <button class="hk-reset" style="margin-top:8px;" onclick="resetHotkeys()">Reset to defaults</button>
       </div>
-    </div>
-
-    <div id="guide-panel" style="display:none;flex:1;overflow-y:auto;padding:32px 48px;">
-      <div class="guide-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 32px;">
-      <div>
-      <div class="psec-title">Writing</div>
-
+      <div class="psec-title" style="margin-top:28px;">Help</div>
       <div class="setting-row">
-        <div class="setting-label">Line type pills &amp; shortcuts</div>
-        <div class="setting-desc" style="line-height:1.7;">Every line is one of four types — <strong>Setting</strong>, <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. Keyboard shortcut: press <code style="font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;">`</code> (backtick) then the assigned key (default: 1=Dialogue, 2=Stage Dir., 3=Setting, 4=Cue). These keys are customizable in <strong>Settings &rarr; Keyboard shortcuts</strong>. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Smart auto-advance</div>
-        <div class="setting-desc">After submitting a line, the pill automatically advances to the next likely type. Setting → Cue → Dialogue. Dialogue stays on Dialogue for continuous exchanges.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Insert cursor</div>
-        <div class="setting-desc">By default, new lines append to the end of the current scene. <strong>Click any existing line</strong> to set the insert point — new lines go after the selected line. Click empty space in the script to deselect and return to appending.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Cues (entrances &amp; exits)</div>
-        <div class="setting-desc" style="line-height:1.7;">When writing a Cue line, the input bar shows two chip lists: <strong>In scene</strong> (characters present — click to mark an exit) and <strong>Not in scene</strong> (click to mark an entrance). The app tracks who is present based on all previous cues and validates moves on drag-and-drop reorder.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Character autocomplete &amp; scene filter</div>
-        <div class="setting-desc">When writing Dialogue, start typing and matching characters appear with ghost text. Press <strong>Tab</strong> to accept. The <strong>⊙ button</strong> toggles the scene filter — when on, only characters currently in the scene (per cues) appear.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Automatic (cont.)</div>
-        <div class="setting-desc">When the same character has consecutive dialogue lines with no other line type between them, <em>(cont.)</em> is added automatically.</div>
-      </div>
-
-      <div class="psec-title" style="margin-top:28px;">Editing</div>
-
-      <div class="setting-row">
-        <div class="setting-label">Inline editing</div>
-        <div class="setting-desc"><strong>Double-click</strong> any line or click its <strong>Edit</strong> button to edit in place. For Dialogue you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens. Press <strong>Enter</strong> to save, <strong>Esc</strong> to cancel. Clicking away auto-saves.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Find &amp; Replace</div>
-        <div class="setting-desc">Press <strong>Ctrl+F</strong> to open the find bar. Use the <strong>filter chips</strong> (Setting, Cue, Dialogue, Stage Dir.) to limit which line types are searched. Navigate matches with Prev/Next or Enter/Shift+Enter. Replace individually or use Replace All. Dialogue search covers spoken text and parentheticals, not character names.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Drag &amp; drop</div>
-        <div class="setting-desc">Acts, scenes, and lines can be reordered by dragging. Line moves are validated against character presence — moving a cue line with entrances to a position where the character is already present triggers a warning.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Undo &amp; Redo</div>
-        <div class="setting-desc">50-level undo/redo with <strong>Ctrl+Z</strong> / <strong>Ctrl+Shift+Z</strong> (or Ctrl+Y). Every structural change captures a complete state snapshot. Buttons in the top bar show the current state.</div>
-      </div>
-      </div>
-
-      <div>
-      <div class="psec-title">Character panel</div>
-
-      <div class="setting-row">
-        <div class="setting-label">Expandable character cards</div>
-        <div class="setting-desc">In the right panel, <strong>click any character's name</strong> to expand their card showing: full description, a search box to filter their dialogue, and a scrollable list of every dialogue line with scene location. <strong>Click a dialogue line</strong> to jump to it in the editor.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Character filtering</div>
-        <div class="setting-desc">The act/scene dropdowns at the top of the character list let you filter to only see characters who appear in a specific part of the script.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Standalone character creation</div>
-        <div class="setting-desc">The <strong>+ New character</strong> button at the bottom of the panel creates a character with a name and description without needing to write a dialogue line first.</div>
-      </div>
-
-      <div class="psec-title" style="margin-top:28px;">Saving &amp; export</div>
-
-      <div class="setting-row">
-        <div class="setting-label">How saving works</div>
-        <div class="setting-desc" style="line-height:1.7;">Your script auto-saves to browser local storage on every change. The colored dot next to the title shows the state:
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#888780;vertical-align:middle;margin:0 2px;"></span> gray = no file,
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#378ADD;vertical-align:middle;margin:0 2px;"></span> blue = browser only,
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#4CAF50;vertical-align:middle;margin:0 2px;"></span> green = linked to disk file. Hover the dot for details. The first <strong>File → Save</strong> picks a file location; subsequent saves overwrite it automatically.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Metadata ZIP</div>
-        <div class="setting-desc"><strong>File → Download metadata (.zip)</strong> exports a ZIP with the raw JSON and a manifest. This is what you need to restore your work later.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">PDF + metadata export</div>
-        <div class="setting-desc"><strong>File → Export PDF + metadata</strong> bundles the print-ready script (HTML) with the metadata folder in a single ZIP — the shareable output and the editable source in one download.</div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">Resume from browser</div>
-        <div class="setting-desc">When you return and your last script is in local storage, a <strong>Resume</strong> card appears on the start screen to pick up where you left off.</div>
-      </div>
-      </div>
+        <div class="setting-label">Feature guide</div>
+        <div class="setting-desc">Covers pill shortcuts, cues, inline editing, find &amp; replace, saving, drag-and-drop, and more.</div>
+        <a href="docs/guide.html" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">Open feature guide →</a>
       </div>
     </div>
 
@@ -1095,6 +997,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <div id="rp-toggle" onclick="toggleRP()">◀</div>
     <div id="right-panel">
       <div id="rp-body">
+        <div class="rp-section rp-stats-section">
+          <div class="rp-label" onclick="toggleRPStats()" style="cursor:pointer"><span id="rp-stats-toggle">▶</span> <span>Stats</span></div>
+          <div id="rp-stats" style="display:none"></div>
+        </div>
         <div class="rp-section">
           <div class="rp-label"><span>Table of contents</span>
             <div style="display:flex;gap:4px">
@@ -1277,20 +1183,17 @@ function scrollToSelected(){const scrl=$('script-scroll'),sel=scrl.querySelector
 
 function switchTab(t){
   activeTab=t;
-  document.querySelectorAll('.tab').forEach(el=>{el.classList.remove('active');const tx=el.textContent.toLowerCase();if((t==='edit'&&tx.includes('edit'))||(t==='summaries'&&tx.includes('summ'))||(t==='view'&&tx.startsWith('view'))||(t==='outline'&&tx.includes('outl'))||(t==='settings'&&tx.includes('sett'))||(t==='guide'&&tx.includes('guide')))el.classList.add('active');});
+  document.querySelectorAll('.tab').forEach(el=>{el.classList.remove('active');const tx=el.textContent.toLowerCase();if((t==='edit'&&tx.includes('edit'))||(t==='view'&&tx.startsWith('view'))||(t==='outline'&&tx.includes('outl'))||(t==='settings'&&tx.includes('sett')))el.classList.add('active');});
   $('script-scroll').style.display=t==='edit'?'flex':'none';
   $('script-scroll').style.flexDirection='column';
   $('view-panel').style.display=t==='view'?'block':'none';
   $('outline-panel').style.display=t==='outline'?'block':'none';
-  $('summaries-panel').style.display=t==='summaries'?'block':'none';
   $('settings-panel').style.display=t==='settings'?'block':'none';
-  $('guide-panel').style.display=t==='guide'?'block':'none';
   $('input-bar').style.display=(t==='edit'&&S.title)?'block':'none';
-  $('right-panel-wrap').style.display=(t==='settings'||t==='guide'||t==='outline')?'none':(S.title?'flex':'none');
+  $('right-panel-wrap').style.display=(t==='settings'||t==='outline')?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
   if(t==='outline')renderOutline();
-  if(t==='summaries')renderSummaries();
-  if(t==='settings')renderHotkeySettings();
+  if(t==='settings'){renderHotkeySettings();renderStats();}
   closeFDD();
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
@@ -1858,16 +1761,17 @@ function outlineTouchEnd(e){
   outlineTouchDrag=null;
 }
 
-function renderSummaries(){
-  const p=$('summaries-panel');if(!S.title){p.innerHTML=`<div style="color:var(--tx3);font-size:13px;">Open or create a script first.</div>`;return;}
+let rpStatsOpen=false;
+function toggleRPStats(){rpStatsOpen=!rpStatsOpen;$('rp-stats').style.display=rpStatsOpen?'block':'none';$('rp-stats-toggle').textContent=rpStatsOpen?'▼':'▶';if(rpStatsOpen)renderStats();}
+function renderStats(){
+  const p=$('rp-stats');if(!p||!S.title)return;
   let tl=0,tdlg=0;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{tl++;if(l.type==='dialogue')tdlg++;})));let ts=0;S.acts.forEach(a=>ts+=a.scenes.length);const cc=S.characters.filter(c=>!c.archived).length,ac=S.characters.filter(c=>c.archived).length;
-  p.innerHTML=`<div class="psec-title">Script summary</div>
-<div class="sum-field-row"><span class="sum-field-label">Title</span><input class="sum-input" id="sum-title-input" value="${esc(S.title)}"/><button class="sum-save-btn" onclick="updateScriptTitle()">Update</button></div>
-<div class="sum-field-row"><span class="sum-field-label">Author</span><input class="sum-input" id="sum-author-input" value="${esc(S.author||'')}"/><button class="sum-save-btn" onclick="updateScriptAuthor()">Update</button></div>
-<div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">${[['Acts',S.acts.length],['Scenes',ts],['Total lines',tl],['Dialogue lines',tdlg],['Characters',cc],['Archived',ac]].map(([label,val])=>`<div style="padding:10px 14px;border:1px solid var(--bd3);border-radius:var(--rm);background:var(--bg2);"><div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">${label}</div><div style="font-size:22px;font-weight:500;color:var(--tx1);">${val}</div></div>`).join('')}</div><div style="margin-top:20px;"><div class="psec-title">Characters</div>${S.characters.length===0?`<div style="font-size:13px;color:var(--tx3);">No characters yet.</div>`:S.characters.map(ch=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd3);"><div style="flex:1;font-size:13px;font-weight:500;color:var(--tx1)${ch.archived?';opacity:.5':''};">${esc(ch.name)}${ch.archived?` <span style="font-size:10px;color:var(--tx3);border:1px solid var(--bd3);border-radius:4px;padding:0 4px;">archived</span>`:''}</div><div style="font-size:12px;color:var(--tx2);">${esc(ch.description||'')}</div></div>`).join('')}</div>`;
+  p.innerHTML=`<div class="rp-stats-grid">${[['Acts',S.acts.length],['Scenes',ts],['Lines',tl],['Dialogue',tdlg],['Characters',cc],['Archived',ac]].map(([label,val])=>`<div class="rp-stat"><div class="rp-stat-val">${val}</div><div class="rp-stat-label">${label}</div></div>`).join('')}</div>
+<div style="margin-top:8px;"><input class="rp-stat-input" id="rp-title-input" value="${esc(S.title)}" placeholder="Title"/><button class="rp-stat-save" onclick="rpUpdateTitle()">✓</button></div>
+<div style="margin-top:4px;"><input class="rp-stat-input" id="rp-author-input" value="${esc(S.author||'')}" placeholder="Author"/><button class="rp-stat-save" onclick="rpUpdateAuthor()">✓</button></div>`;
 }
-function updateScriptTitle(){const el=$('sum-title-input');if(!el)return;const v=el.value.trim();if(!v)return;pushUndo();S.title=v;$('script-title-text').textContent=v;autoSave();renderSummaries();}
-function updateScriptAuthor(){const el=$('sum-author-input');if(!el)return;pushUndo();S.author=el.value.trim();autoSave();renderSummaries();}
+function rpUpdateTitle(){const el=$('rp-title-input');if(!el)return;const v=el.value.trim();if(!v)return;pushUndo();S.title=v;$('script-title-text').textContent=v;autoSave();render();}
+function rpUpdateAuthor(){const el=$('rp-author-input');if(!el)return;pushUndo();S.author=el.value.trim();autoSave();}
 
 function renderTOC(){
   const c=$('toc-list');if(!c)return;if(!S.acts.length){c.innerHTML=`<div style="font-size:11px;color:var(--tx3);">No acts yet</div>`;return;}
