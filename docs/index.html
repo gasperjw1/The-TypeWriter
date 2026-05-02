@@ -523,6 +523,157 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .hk-input:focus{border-color:var(--tx1);box-shadow:0 0 0 2px rgba(55,138,221,0.2);}
 .hk-reset{font-size:11px;padding:3px 8px;border:1px solid var(--bd3);border-radius:var(--rm);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);}
 .hk-reset:hover{background:var(--bg2);color:var(--tx1);}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE / RESPONSIVE  (max-width: 768px)
+   ══════════════════════════════════════════════════════════ */
+@media(max-width:768px){
+
+  /* ── Root ── */
+  #root{min-height:unset;height:100dvh;}
+
+  /* ── Topbar ── */
+  #topbar{flex-wrap:wrap;min-height:unset;}
+  #tb-left{padding:0 10px;min-height:44px;}
+  #ctx-crumb{display:none;}
+
+  /* Hamburger toggle for tabs */
+  #mobile-menu-btn{display:flex;align-items:center;justify-content:center;width:40px;min-height:44px;border:none;background:none;color:var(--tx2);font-size:20px;cursor:pointer;border-left:1px solid var(--bd3);flex-shrink:0;}
+  #mobile-menu-btn:hover{color:var(--tx1);}
+
+  /* Tabs: hidden by default, shown as a full-width row when toggled */
+  #tb-tabs{display:none;width:100%;border-left:none;border-top:1px solid var(--bd3);order:10;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #tb-tabs.mob-open{display:flex;}
+  .tab{padding:0 12px;height:40px;font-size:12px;flex-shrink:0;}
+
+  /* Undo/Redo: icon-only on mobile */
+  #tb-right{padding:0 6px;gap:4px;border-left:1px solid var(--bd3);}
+  .tb-btn{padding:6px 10px;font-size:14px;}
+  .tb-btn-label{display:none;}
+
+  /* File dropdown: fixed full-width bottom sheet on mobile */
+  #file-dd{position:fixed;top:auto;bottom:0;left:0;right:0;min-width:unset;border-radius:var(--rl) var(--rl) 0 0;z-index:810;box-shadow:0 -4px 20px rgba(0,0,0,.25);max-height:60vh;overflow-y:auto;}
+  .fdd-item{padding:14px 18px;font-size:15px;}
+  .fdd-key{display:none;}
+  #mob-fdd-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:805;}
+  #mob-fdd-backdrop.open{display:block;}
+
+  /* ── Find bar ── */
+  #find-bar{flex-direction:column;align-items:stretch;gap:6px;padding:8px 10px;}
+  #find-input,#replace-input{width:100%;}
+  .fr-filters{flex-wrap:wrap;}
+
+  /* ── Main area ── */
+  #main{flex-direction:column;position:relative;}
+  #script-body{border-right:none;}
+  #script-scroll{padding:16px 14px 12px;}
+
+  /* ── Script blocks ── */
+  .act-block{margin-bottom:20px;}
+  .act-hdr,.scene-hdr{padding:6px 8px;gap:6px;}
+  .act-name-disp,.scene-name-disp{font-size:13px;}
+  .row-btns{gap:3px;}
+  .rbtn{font-size:10px;padding:4px 8px;min-height:28px;}
+  .line-item{padding:4px 8px;}
+  .lbtns{opacity:1;position:static;transform:none;display:flex;gap:4px;margin-top:6px;justify-content:flex-end;}
+  .lbtns .rbtn{padding:4px 10px;font-size:11px;}
+  .l-action{max-width:100%;}
+  .l-dialogue .dl-text{padding:0 5%;}
+  .l-dialogue .dl-paren{padding:0 10%;}
+  .ie-dlg-action{padding:2px 10%;}
+  .ie-dlg-text{padding:0 5%;}
+
+  /* ── Right panel: slide-over overlay ── */
+  #right-panel-wrap{
+    position:fixed;top:0;right:0;bottom:0;width:min(280px,85vw);
+    border-left:var(--panel-border);
+    z-index:700;
+    transform:translateX(100%);
+    transition:transform .2s ease;
+    box-shadow:none;
+  }
+  #right-panel-wrap.mob-visible{transform:translateX(0);box-shadow:-4px 0 20px rgba(0,0,0,.2);}
+  #right-panel-wrap.collapsed{width:min(280px,85vw)!important;transform:translateX(100%);}
+  #right-panel-wrap.collapsed.mob-visible{transform:translateX(0);}
+  #right-panel-wrap.collapsed #right-panel{display:flex;}
+  #rp-resize-handle{display:none;}
+  #rp-toggle{display:none;}
+
+  /* Hide tooltips that don't work on touch */
+  .sft-tip{display:none!important;}
+
+  /* Overlay backdrop when panel is open */
+  #mob-panel-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:699;}
+  #mob-panel-backdrop.open{display:block;}
+
+  /* Panel toggle — inline in pills row on mobile */
+  #mob-panel-btn{
+    display:flex;align-items:center;justify-content:center;
+    padding:5px 11px;font-size:11px;font-weight:500;font-family:var(--sans);
+    border-radius:20px;border:1.5px solid var(--bd2);
+    background:var(--bg2);color:var(--tx2);
+    cursor:pointer;white-space:nowrap;
+    margin-left:auto;
+    transition:all .15s;
+  }
+  #mob-panel-btn:active{background:var(--bg3);}
+
+  /* ── Input bar ── */
+  #input-bar{padding:8px 10px 10px;}
+  #type-pills{flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+  .tpill{padding:5px 11px;font-size:11px;}
+  .pill-tip{display:none!important;}
+
+  /* Dialogue box: stack vertically */
+  #dlg-box{flex-direction:column!important;}
+  #dlg-left{flex:unset;border-right:none;border-bottom:1px solid var(--bd2);}
+  #dlg-right{flex:unset;}
+  #dlg-text-ta{min-height:60px;}
+
+  /* Direction cues: tighter */
+  #dir-cues-area{padding:6px 10px;}
+  .cue-list{gap:4px;}
+  .cue-chip{font-size:10px;padding:3px 7px;}
+
+  /* Submit row */
+  #input-footer{padding:5px 10px 6px;}
+
+  /* ── Panels (View, Summaries, Settings, Guide) ── */
+  #view-panel{padding:20px 14px;}
+  #view-panel .v-action{max-width:100%;}
+  #view-panel .v-direction{padding:4px 5%;}
+  #view-panel .v-dlg .vda{padding:0 10%;}
+  #view-panel .v-dlg .vt{padding:0 5%;}
+  #summaries-panel{padding:20px 14px;}
+  #settings-panel{padding:20px 14px;}
+  #guide-panel{padding:20px 14px!important;}
+  .guide-grid{grid-template-columns:1fr!important;}
+
+  /* ── Modals ── */
+  .mbox{width:100%;max-width:100%;margin:8px;border-radius:var(--rl);}
+
+  /* ── Setup screen ── */
+  .setup-brand{font-size:22px;}
+  .setup-tagline{font-size:13px;max-width:300px;}
+  #setup-cards{gap:10px;}
+  .setup-card{padding:16px 18px;min-width:110px;}
+
+  /* ── Settings: hotkey rows stack ── */
+  .hk-row{flex-wrap:wrap;gap:6px;}
+  .hk-name{min-width:unset;}
+
+  /* ── Line-type color rows ── */
+  .lt-row{flex-wrap:wrap;gap:6px;}
+
+}
+
+/* Hide mobile-only elements on desktop */
+@media(min-width:769px){
+  #mobile-menu-btn{display:none!important;}
+  #mob-panel-btn{display:none!important;}
+  #mob-panel-backdrop{display:none!important;}
+  #mob-fdd-backdrop{display:none!important;}
+}
 </style>
 </head>
 <body>
@@ -557,9 +708,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     </div>
   </div>
   <div id="tb-right">
-    <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩ Undo</button>
-    <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪ Redo</button>
+    <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
+    <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
   </div>
+  <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
 </div>
 
 <div id="find-bar">
@@ -704,20 +856,20 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div class="psec-title" style="margin-top:28px;">Keyboard shortcuts</div>
       <div class="setting-row">
         <div class="setting-label">Pill hotkeys</div>
-        <div class="setting-desc">Customize the key that activates each line-type pill. Press backtick (`) then the assigned key.</div>
+        <div class="setting-desc">Customize the key that activates each line-type pill. Press backtick (`) then the assigned key. <em style="display:block;margin-top:4px;color:var(--tx3);">Note: Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
         <div id="hk-settings"></div>
         <button class="hk-reset" style="margin-top:8px;" onclick="resetHotkeys()">Reset to defaults</button>
       </div>
     </div>
 
     <div id="guide-panel" style="display:none;flex:1;overflow-y:auto;padding:32px 48px;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 32px;">
+      <div class="guide-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 32px;">
       <div>
       <div class="psec-title">Writing</div>
 
       <div class="setting-row">
         <div class="setting-label">Line type pills &amp; shortcuts</div>
-        <div class="setting-desc" style="line-height:1.7;">Every line is one of four types — <strong>Setting</strong>, <strong>Direction</strong>, <strong>Dialogue</strong>, or <strong>Action</strong> — selected by clicking a pill above the input bar. Keyboard shortcut: press <code style="font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;">`</code> (backtick) then the assigned key (default: 1=Dialogue, 2=Action, 3=Setting, 4=Direction). These keys are customizable in <strong>Settings → Keyboard shortcuts</strong>.</div>
+        <div class="setting-desc" style="line-height:1.7;">Every line is one of four types — <strong>Setting</strong>, <strong>Direction</strong>, <strong>Dialogue</strong>, or <strong>Action</strong> — selected by clicking a pill above the input bar. Keyboard shortcut: press <code style="font-family:'Courier New',monospace;font-size:12px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 5px;">`</code> (backtick) then the assigned key (default: 1=Dialogue, 2=Action, 3=Setting, 4=Direction). These keys are customizable in <strong>Settings &rarr; Keyboard shortcuts</strong>. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
       </div>
 
       <div class="setting-row">
@@ -833,6 +985,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <span class="tpill" data-t="action" data-n="2" onclick="selPill(this,'action')">Action<span class="sc">` 2</span></span>
           <div class="pill-tip"><strong>Action</strong> &nbsp;·&nbsp; Shortcut: <code>` 2</code><br>Describes visible action, movement, or<br>events on screen. Attributed to a specific<br>character — appears alongside their name.</div>
         </div>
+        <button id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel">Panel</button>
       </div>
       <div id="input-box">
         <!-- Setting / Action -->
@@ -1062,14 +1215,20 @@ function switchTab(t){
   if(t==='view')renderView();
   if(t==='summaries')renderSummaries();
   if(t==='settings')renderHotkeySettings();
-  $('file-dd').classList.remove('open');
+  closeFDD();
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
 
-function toggleFileDd(){$('file-dd').classList.toggle('open');}
-document.addEventListener('click',e=>{if(!$('file-menu-wrap').contains(e.target))$('file-dd').classList.remove('open');});
+function toggleFileDd(){
+  $('file-dd').classList.toggle('open');
+  const bd=$('mob-fdd-backdrop');if(bd&&window.innerWidth<=768)bd.classList.toggle('open',$('file-dd').classList.contains('open'));
+}
+function closeFDD(){$('file-dd').classList.remove('open');const bd=$('mob-fdd-backdrop');if(bd)bd.classList.remove('open');}
+function resetEditorState(){undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};$('undo-btn').disabled=true;$('redo-btn').disabled=true;}
+function showEditor(title){$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=title;updateSaveIndicator();}
+document.addEventListener('click',e=>{if(!$('file-menu-wrap').contains(e.target))closeFDD();});
 async function menuSave(){
-  $('file-dd').classList.remove('open');if(!S.title)return;
+  closeFDD();if(!S.title)return;
   hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();
   if(fileHandle){await writeToFileHandle(lastSavedJSON);}
   else if(window.showSaveFilePicker){
@@ -1077,12 +1236,12 @@ async function menuSave(){
   }else{triggerDownload(S.title,lastSavedJSON);}
   updateSaveIndicator();
 }
-function menuSaveAs(){$('file-dd').classList.remove('open');if(!S.title)return;openModal(`<h3>Save as new file</h3><div class="mf"><label>File title</label><input class="minput" id="sa-title" value="${esc(S.title)}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmSaveAs()">Save</button></div>`,null);setTimeout(()=>{const el=$('sa-title');if(el)el.focus();},50);}
+function menuSaveAs(){closeFDD();if(!S.title)return;openModal(`<h3>Save as new file</h3><div class="mf"><label>File title</label><input class="minput" id="sa-title" value="${esc(S.title)}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmSaveAs()">Save</button></div>`,null);setTimeout(()=>{const el=$('sa-title');if(el)el.focus();},50);}
 async function confirmSaveAs(){const t=$('sa-title').value.trim()||S.title;S.title=t;$('script-title-text').textContent=t;hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();closeModal();
   if(window.showSaveFilePicker){try{fileHandle=await showSaveFilePicker({suggestedName:'raw_script_'+t.toLowerCase().replace(/ /g,'_')+'.json',types:[{description:'JSON',accept:{'application/json':['.json']}}]});await writeToFileHandle(lastSavedJSON);}catch(e){if(e.name!=='AbortError')console.warn(e);}}else{triggerDownload(t,lastSavedJSON);}
   updateSaveIndicator();}
 async function menuOpen(){
-  $('file-dd').classList.remove('open');
+  closeFDD();
   if(window.showOpenFilePicker){
     try{const [handle]=await showOpenFilePicker({types:[{description:'JSON',accept:{'application/json':['.json']}}],multiple:false});
     const file=await handle.getFile();const text=await file.text();
@@ -1096,11 +1255,13 @@ function loadFile(e){
   reader.readAsText(file);e.target.value='';
 }
 function loadFromData(data){
-  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=S.title;updateSaveIndicator();render();
+  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));
+  resetEditorState();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
-  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=S.title;updateSaveIndicator();render();}catch(err){alert('Could not restore script.');}
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));
+  resetEditorState();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Last Cigarette',
@@ -1164,20 +1325,15 @@ const SAMPLE_SCRIPT={
 function loadSample(){
   const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
   S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;
-  undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};
-  hasFilename=false;lastSavedJSON='';lsSaveScript();
-  $('undo-btn').disabled=true;$('redo-btn').disabled=true;
-  $('setup-screen').style.display='none';$('script-content').style.display='block';
-  $('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';
-  $('script-title-text').textContent=S.title;updateSaveIndicator();render();
+  resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
 }
-function menuNew(){$('file-dd').classList.remove('open');if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
+function menuNew(){closeFDD();if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
 function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';fileHandle=null;$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
-function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=t;$('setup-input').value='';lsSaveScript();updateSaveIndicator();openActModal(true);}
+function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-input').value='';showEditor(t);lsSaveScript();openActModal(true);}
 $('setup-input').addEventListener('keydown',e=>{if(e.key==='Enter')startScript();});
 
 /* ── Find / Replace ── */
@@ -1762,7 +1918,7 @@ function confirmNewChar(cn,da,vRaw){const desc=$('nc-d').value.trim();pushUndo()
 
 /* ── Export to PDF ── */
 function exportPDF(){
-  $('file-dd').classList.remove('open');
+  closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   const win=window.open('','_blank');
   if(!win){alert('Pop-up blocked — please allow pop-ups and try again.');return;}
@@ -1923,7 +2079,7 @@ async function buildMetadataZip(){
   return zip.generateAsync({type:'blob'});
 }
 async function downloadMetadata(){
-  $('file-dd').classList.remove('open');
+  closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   try{
     const blob=await buildMetadataZip();
@@ -1934,7 +2090,7 @@ async function downloadMetadata(){
   }catch(e){alert('Failed to create metadata ZIP: '+e.message);}
 }
 async function exportPDFWithMeta(){
-  $('file-dd').classList.remove('open');
+  closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   try{
     const zip=new JSZip();
@@ -2053,6 +2209,38 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
   }
   applyLTColors();renderHotkeySettings();
 })();
+
+/* ── Mobile helpers ── */
+function toggleMobileMenu(){$('tb-tabs').classList.toggle('mob-open');}
+function openMobilePanel(){
+  const wrap=$('right-panel-wrap');
+  wrap.classList.add('mob-visible');
+  $('mob-panel-backdrop').classList.add('open');
+}
+function closeMobilePanel(){
+  $('right-panel-wrap').classList.remove('mob-visible');
+  $('mob-panel-backdrop').classList.remove('open');
+}
+/* Close mobile tabs when a tab is tapped (but not File options) */
+document.querySelectorAll('#tb-tabs .tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    if(window.innerWidth<=768&&!t.closest('#file-menu-wrap'))$('tb-tabs').classList.remove('mob-open');
+  });
+});
+/* Close mobile menu when a file dropdown item is tapped */
+document.querySelectorAll('#file-dd .fdd-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    if(window.innerWidth<=768){
+      $('tb-tabs').classList.remove('mob-open');
+      closeFDD();
+    }
+  });
+});
 </script>
+
+<!-- Mobile-only elements (hidden on desktop via CSS) -->
+<div id="mob-panel-backdrop" onclick="closeMobilePanel()"></div>
+<div id="mob-fdd-backdrop" onclick="toggleFileDd()"></div>
+
 </body>
 </html>
