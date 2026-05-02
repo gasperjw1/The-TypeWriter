@@ -1,4 +1,4 @@
-# The TypeWriter — Feature Roadmap
+# The Scriptwriter — Feature Roadmap
 
 Based on comparison with WriterDuet, Arc Studio Pro, and WriterSolo (Session 1, 2026-04-30).
 

@@ -1,10 +1,10 @@
-# The TypeWriter
+# The Scriptwriter
 
 A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
 
 ## What it does
 
-The TypeWriter gives you a structured screenplay writing environment with an **Act > Scene > Line** hierarchy. You write using four line types — Setting, Direction, Dialogue, and Action — and the app handles formatting, numbering, and continuity for you.
+The Scriptwriter gives you a structured screenplay writing environment with an **Act > Scene > Line** hierarchy. You write using four line types — Setting, Direction, Dialogue, and Action — and the app handles formatting, numbering, and continuity for you.
 
 Scripts are saved as lightweight JSON files on your machine. When you're ready to share, export to a properly formatted screenplay PDF with a title page, character list, and table of contents.
 

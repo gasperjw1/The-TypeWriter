@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>The TypeWriter — Free Screenplay Editor</title>
+<title>The Scriptwriter — Free Screenplay Editor</title>
 <meta name="description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
-<meta property="og:title" content="The TypeWriter"/>
+<meta property="og:title" content="The Scriptwriter"/>
 <meta property="og:description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://yashmahtani.github.io/The-TypeWriter/"/>
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="The TypeWriter"/>
+<meta name="twitter:title" content="The Scriptwriter"/>
 <meta name="twitter:description" content="A free, open-source screenplay editor in your browser. No accounts, no installs."/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -506,7 +506,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 <div id="root">
 <div id="topbar">
   <div id="tb-left">
-    <span id="script-title-text">The TypeWriter</span>
+    <span id="script-title-text">The Scriptwriter</span>
     <div id="save-indicator" style="background:#888780;"><div class="si-tip" id="si-tip-text">No file opened yet</div></div>
     <span id="ctx-crumb"></span>
   </div>
@@ -561,7 +561,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <div id="script-scroll" onscroll="checkScrollBack()" onclick="deselLine(event)">
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
-        <div class="setup-brand">The TypeWriter</div>
+        <div class="setup-brand">The Scriptwriter</div>
         <div class="setup-tagline">A free screenplay editor in your browser. No accounts, no installs — just write.</div>
         <div id="resume-card">
           <div class="setup-card" onclick="resumeFromLS()">
@@ -1043,7 +1043,7 @@ function loadSample(){
   $('script-title-text').textContent=S.title;updateSaveIndicator();render();
 }
 function menuNew(){$('file-dd').classList.remove('open');if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';fileHandle=null;$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The TypeWriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';fileHandle=null;$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
@@ -1789,7 +1789,7 @@ async function buildMetadataZip(){
   const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'_metadata');
   folder.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
   /* add a manifest with export info */
-  folder.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The TypeWriter'},null,2));
+  folder.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The Scriptwriter'},null,2));
   return zip.generateAsync({type:'blob'});
 }
 async function downloadMetadata(){
@@ -1814,7 +1814,7 @@ async function exportPDFWithMeta(){
     /* add metadata */
     const meta=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'/metadata');
     meta.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
-    meta.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The TypeWriter'},null,2));
+    meta.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The Scriptwriter'},null,2));
     const blob=await zip.generateAsync({type:'blob'});
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
@@ -1849,8 +1849,17 @@ function renderCharDlgList(name,query){
   listEl.innerHTML=lines.map(d=>{
     const loc=sceneLabel(d.ai,d.si);
     const preview=d.value.length>80?d.value.slice(0,80)+'...':d.value;
-    return`<div class="char-dlg-item" onclick="selLine(${d.ai},${d.si},${d.li});switchTab('edit')" title="${esc(d.value)}"><span class="cdl-loc">${esc(loc)}</span>${d.da?'<em style="color:var(--tx3);font-size:10px;">('+esc(d.da)+')</em> ':''}${esc(preview)}</div>`;
+    return`<div class="char-dlg-item" onclick="jumpToLine(${d.ai},${d.si},${d.li})" title="${esc(d.value)}"><span class="cdl-loc">${esc(loc)}</span>${d.da?'<em style="color:var(--tx3);font-size:10px;">('+esc(d.da)+')</em> ':''}${esc(preview)}</div>`;
   }).join('');
+}
+
+function jumpToLine(ai,si,li){
+  switchTab('edit');
+  selLine(ai,si,li);
+  setTimeout(()=>{
+    const sel=$('script-scroll').querySelector('.sel-barrier,.sel-highlight');
+    if(sel)sel.scrollIntoView({behavior:'smooth',block:'center'});
+  },60);
 }
 
 /* ── Pill hotkey customization ── */

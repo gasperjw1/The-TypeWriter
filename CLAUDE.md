@@ -4,7 +4,7 @@
 Yash Mahtani (yashmahtani@gmail.com)
 
 ## Project Overview
-**The TypeWriter** is a screenplay/script writing application. The main app is `script_maker.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
+**The Scriptwriter** is a screenplay/script writing application. The main app is `script_maker.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
 
 ## Architecture
 
