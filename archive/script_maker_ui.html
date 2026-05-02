@@ -1,0 +1,630 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+#app { display: flex; height: 100vh; min-height: 600px; gap: 0; }
+
+#script-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 0.5px solid var(--color-border-tertiary);
+  overflow: hidden;
+}
+#script-header {
+  padding: 14px 20px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#script-title-display {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+#script-title-display span {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+  margin-left: 8px;
+}
+#script-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 48px;
+  background: var(--color-background-primary);
+  font-family: 'Courier New', monospace;
+}
+#empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  gap: 8px;
+}
+
+.script-line { margin-bottom: 16px; }
+.script-line.act-header { text-align: center; margin: 24px 0 8px; }
+.script-line.act-header .line-text { font-size: 14px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-primary); }
+.script-line.scene-header { margin: 16px 0 8px; }
+.script-line.scene-header .line-text { font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-primary); }
+.script-line.setting-line .line-text { font-size: 13px; text-transform: uppercase; color: var(--color-text-secondary); font-style: italic; }
+.script-line.direction-line .line-text { font-size: 13px; color: var(--color-text-secondary); font-style: italic; }
+.script-line.dialogue-line { margin-left: 80px; max-width: 340px; }
+.script-line.dialogue-line .char-name { font-size: 13px; font-weight: 500; text-align: center; text-transform: uppercase; color: var(--color-text-primary); margin-bottom: 4px; }
+.script-line.dialogue-line .line-text { font-size: 13px; color: var(--color-text-primary); }
+.script-line.action-line { font-size: 13px; color: var(--color-text-primary); }
+.script-line.action-line .char-name { font-weight: 500; font-size: 12px; text-transform: uppercase; color: var(--color-text-secondary); margin-bottom: 2px; }
+
+.line-wrapper {
+  position: relative;
+  padding: 6px 8px;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.line-wrapper:hover { background: var(--color-background-secondary); }
+.line-wrapper:hover .edit-btn { opacity: 1; }
+.edit-btn {
+  opacity: 0;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  padding: 2px 8px;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-primary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: opacity 0.1s;
+}
+.edit-btn:hover { background: var(--color-background-secondary); }
+
+#add-panel {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background-primary);
+  overflow: hidden;
+}
+#add-header {
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+#add-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+.type-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.type-btn {
+  padding: 6px 4px;
+  font-size: 11px;
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-align: center;
+  font-family: var(--font-sans);
+  transition: all 0.1s;
+}
+.type-btn.active {
+  background: var(--color-text-primary);
+  color: var(--color-background-primary);
+  border-color: var(--color-text-primary);
+}
+.type-btn:hover:not(.active) { border-color: var(--color-border-primary); color: var(--color-text-primary); }
+
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; }
+input[type=text], textarea, select {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 7px 10px;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  outline: none;
+  width: 100%;
+  resize: none;
+}
+input[type=text]:focus, textarea:focus, select:focus {
+  border-color: var(--color-border-primary);
+  background: var(--color-background-primary);
+  box-shadow: 0 0 0 2px rgba(128,128,128,0.1);
+}
+textarea { min-height: 80px; line-height: 1.5; }
+
+#add-btn {
+  width: 100%;
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--border-radius-md);
+  background: var(--color-text-primary);
+  color: var(--color-background-primary);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: opacity 0.1s;
+}
+#add-btn:hover { opacity: 0.85; }
+#add-btn:active { opacity: 0.7; }
+
+.divider { height: 0.5px; background: var(--color-border-tertiary); }
+
+#chars-section { }
+#chars-title { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+#chars-list { display: flex; flex-direction: column; gap: 6px; }
+.char-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-md);
+  border: 0.5px solid var(--color-border-tertiary);
+  font-size: 12px;
+}
+.char-pill-name { font-weight: 500; color: var(--color-text-primary); }
+.char-pill-desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+.char-pill-edit {
+  font-size: 11px; color: var(--color-text-secondary);
+  border: none; background: none; cursor: pointer;
+  padding: 2px 6px; border-radius: 4px; font-family: var(--font-sans);
+}
+.char-pill-edit:hover { background: var(--color-background-secondary); }
+
+#setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+  gap: 16px;
+}
+#setup-screen h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+#setup-screen p { font-size: 13px; color: var(--color-text-secondary); text-align: center; max-width: 240px; }
+#setup-input { max-width: 240px; }
+#setup-btn {
+  width: 240px; padding: 10px; font-size: 13px; font-weight: 500;
+  border: none; border-radius: var(--border-radius-md);
+  background: var(--color-text-primary); color: var(--color-background-primary);
+  cursor: pointer; font-family: var(--font-sans);
+}
+#setup-btn:hover { opacity: 0.85; }
+
+.modal-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+.modal {
+  background: var(--color-background-primary);
+  border-radius: var(--border-radius-lg);
+  border: 0.5px solid var(--color-border-secondary);
+  padding: 20px;
+  width: 320px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.modal h3 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.modal-btns { display: flex; gap: 8px; margin-top: 4px; }
+.modal-btns button {
+  flex: 1; padding: 8px; font-size: 13px; border-radius: var(--border-radius-md);
+  cursor: pointer; font-family: var(--font-sans); font-weight: 500;
+}
+.btn-cancel { border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.btn-confirm { border: none; background: var(--color-text-primary); color: var(--color-background-primary); }
+.btn-cancel:hover { background: var(--color-background-tertiary); }
+.btn-confirm:hover { opacity: 0.85; }
+</style>
+
+<div id="app" style="position:relative;">
+
+<div id="script-panel">
+  <div id="script-header">
+    <div id="script-title-display">Untitled Script <span id="line-count"></span></div>
+    <button onclick="exportJSON()" style="font-size:11px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;font-family:var(--font-sans);">Export JSON</button>
+  </div>
+  <div id="script-body">
+    <div id="setup-screen">
+      <h2>Script writer</h2>
+      <p>Give your script a name to get started.</p>
+      <input type="text" id="setup-input" placeholder="My screenplay..." />
+      <button id="setup-btn" onclick="startScript()">Start writing</button>
+    </div>
+    <div id="script-lines" style="display:none;"></div>
+    <div id="empty-state" style="display:none;">
+      <div style="font-size:14px;">No lines yet</div>
+      <div style="font-size:12px;">Add your first line using the panel on the right</div>
+    </div>
+  </div>
+</div>
+
+<div id="add-panel" style="display:none;">
+  <div id="add-header">Add line</div>
+  <div id="add-body">
+    <div class="type-tabs">
+      <button class="type-btn active" onclick="setType('dialogue')">Dialogue</button>
+      <button class="type-btn" onclick="setType('action')">Action</button>
+      <button class="type-btn" onclick="setType('setting')">Setting</button>
+      <button class="type-btn" onclick="setType('direction')">Direction</button>
+      <button class="type-btn" onclick="setType('act')">New act</button>
+      <button class="type-btn" onclick="setType('scene')">New scene</button>
+    </div>
+
+    <div id="char-field" class="field-group">
+      <div class="field-label">Character</div>
+      <input type="text" id="char-input" list="char-datalist" placeholder="Character name..." />
+      <datalist id="char-datalist"></datalist>
+    </div>
+
+    <div id="value-field" class="field-group">
+      <div class="field-label" id="value-label">Dialogue</div>
+      <textarea id="value-input" placeholder="Type the line here..."></textarea>
+    </div>
+
+    <button id="add-btn" onclick="addLine()">Add line</button>
+
+    <div class="divider"></div>
+
+    <div id="chars-section">
+      <div id="chars-title">Characters</div>
+      <div id="chars-list"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-container"></div>
+</div>
+
+<script>
+let state = {
+  scriptName: '',
+  lines: [],
+  characters: [],
+  currLocation: 0,
+  latestAct: 0,
+  latestScene: 0,
+  currentType: 'dialogue'
+};
+
+function startScript() {
+  const name = document.getElementById('setup-input').value.trim();
+  if (!name) return;
+  state.scriptName = name;
+  document.getElementById('script-title-display').innerHTML = name + ' <span id="line-count"></span>';
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('script-lines').style.display = 'block';
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('add-panel').style.display = 'flex';
+  updateEmptyState();
+}
+
+document.getElementById('setup-input').addEventListener('keydown', e => { if (e.key === 'Enter') startScript(); });
+
+function setType(t) {
+  state.currentType = t;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const charField = document.getElementById('char-field');
+  const valueField = document.getElementById('value-field');
+  const valueLabel = document.getElementById('value-label');
+  const valueInput = document.getElementById('value-input');
+
+  if (t === 'act') {
+    charField.style.display = 'none';
+    valueField.style.display = 'none';
+  } else if (t === 'scene') {
+    charField.style.display = 'none';
+    valueField.style.display = 'flex';
+    valueLabel.textContent = 'Scene number';
+    valueInput.placeholder = 'e.g. 1';
+    valueInput.style.minHeight = '40px';
+  } else if (t === 'setting') {
+    charField.style.display = 'none';
+    valueField.style.display = 'flex';
+    valueLabel.textContent = 'Setting description';
+    valueInput.placeholder = 'INT. KITCHEN - DAY';
+    valueInput.style.minHeight = '60px';
+  } else if (t === 'direction') {
+    charField.style.display = 'none';
+    valueField.style.display = 'flex';
+    valueLabel.textContent = 'Stage direction';
+    valueInput.placeholder = 'Lights fade to black...';
+    valueInput.style.minHeight = '60px';
+  } else if (t === 'dialogue') {
+    charField.style.display = 'flex';
+    valueField.style.display = 'flex';
+    valueLabel.textContent = 'Dialogue';
+    valueInput.placeholder = 'Type the line here...';
+    valueInput.style.minHeight = '80px';
+  } else if (t === 'action') {
+    charField.style.display = 'flex';
+    valueField.style.display = 'flex';
+    valueLabel.textContent = 'Action';
+    valueInput.placeholder = 'Describe the action...';
+    valueInput.style.minHeight = '80px';
+  }
+}
+
+function addLine() {
+  const t = state.currentType;
+  const valueInput = document.getElementById('value-input');
+  const charInput = document.getElementById('char-input');
+
+  if (t === 'act') {
+    state.latestAct++;
+    state.latestScene = 1;
+    state.currLocation++;
+    state.lines.push({ type: 'act', value: String(state.latestAct), location: state.currLocation });
+    renderLines();
+    return;
+  }
+
+  const val = valueInput.value.trim();
+  if (!val) { valueInput.focus(); return; }
+
+  if (t === 'scene') {
+    const num = parseInt(val) || (state.latestScene + 1);
+    state.latestScene = num;
+    state.currLocation++;
+    state.lines.push({ type: 'scene', value: String(num), location: state.currLocation });
+    valueInput.value = '';
+    renderLines();
+    return;
+  }
+
+  if (t === 'setting') {
+    state.currLocation++;
+    state.lines.push({ type: 'setting', value: val, location: state.currLocation });
+    valueInput.value = '';
+    renderLines();
+    return;
+  }
+
+  if (t === 'direction') {
+    state.currLocation++;
+    state.lines.push({ type: 'direction', value: val, location: state.currLocation });
+    valueInput.value = '';
+    renderLines();
+    return;
+  }
+
+  const charName = charInput.value.trim().toUpperCase();
+  if (!charName) { charInput.focus(); return; }
+
+  let char = state.characters.find(c => c.name === charName);
+  if (!char) {
+    showNewCharModal(charName, val, t);
+    return;
+  }
+
+  state.currLocation++;
+  state.lines.push({ type: t, value: val, location: state.currLocation, character: { name: char.name, description: char.description } });
+  valueInput.value = '';
+  charInput.value = '';
+  renderLines();
+}
+
+function showNewCharModal(charName, val, t) {
+  const container = document.getElementById('modal-container');
+  container.innerHTML = `
+    <div class="modal-overlay" onclick="">
+      <div class="modal">
+        <h3>New character: ${charName}</h3>
+        <div class="field-group">
+          <div class="field-label">Description</div>
+          <input type="text" id="modal-desc" placeholder="Brief description..." style="font-family:var(--font-sans);font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%;" />
+        </div>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-confirm" onclick="confirmNewChar('${charName}', '${val.replace(/'/g,"\\'")}', '${t}')">Add character</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modal-desc').focus();
+}
+
+function confirmNewChar(name, val, t) {
+  const desc = document.getElementById('modal-desc').value.trim();
+  const char = { name, description: desc };
+  state.characters.push(char);
+  state.currLocation++;
+  state.lines.push({ type: t, value: val, location: state.currLocation, character: { name, description: desc } });
+  document.getElementById('value-input').value = '';
+  document.getElementById('char-input').value = '';
+  closeModal();
+  renderLines();
+  updateCharDatalist();
+}
+
+function closeModal() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function showEditModal(idx) {
+  const line = state.lines[idx];
+  const isCharLine = line.type === 'dialogue' || line.type === 'action';
+  const container = document.getElementById('modal-container');
+  container.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal">
+        <h3>Edit line</h3>
+        ${isCharLine ? `<div class="field-group"><div class="field-label">Character</div><input type="text" id="edit-char" value="${line.character.name}" style="font-family:var(--font-sans);font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%;" /></div>` : ''}
+        <div class="field-group">
+          <div class="field-label">Text</div>
+          <textarea id="edit-val" style="font-family:var(--font-sans);font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%;resize:none;min-height:80px;">${line.value}</textarea>
+        </div>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-confirm" onclick="saveEdit(${idx}, ${isCharLine})">Save</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function saveEdit(idx, isCharLine) {
+  const newVal = document.getElementById('edit-val').value.trim();
+  if (!newVal) return;
+  state.lines[idx].value = newVal;
+  if (isCharLine) {
+    const newChar = document.getElementById('edit-char').value.trim().toUpperCase();
+    state.lines[idx].character.name = newChar;
+  }
+  closeModal();
+  renderLines();
+}
+
+function showEditCharModal(charName) {
+  const char = state.characters.find(c => c.name === charName);
+  if (!char) return;
+  const container = document.getElementById('modal-container');
+  container.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal">
+        <h3>Edit character</h3>
+        <div class="field-group">
+          <div class="field-label">Name</div>
+          <input type="text" id="edit-cname" value="${char.name}" style="font-family:var(--font-sans);font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%;" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Description</div>
+          <input type="text" id="edit-cdesc" value="${char.description}" style="font-family:var(--font-sans);font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%;" />
+        </div>
+        <div class="modal-btns">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-confirm" onclick="saveCharEdit('${charName}')">Save</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function saveCharEdit(oldName) {
+  const newName = document.getElementById('edit-cname').value.trim().toUpperCase();
+  const newDesc = document.getElementById('edit-cdesc').value.trim();
+  const char = state.characters.find(c => c.name === oldName);
+  if (!char) return;
+  char.name = newName;
+  char.description = newDesc;
+  state.lines.forEach(l => {
+    if (l.character && l.character.name === oldName) {
+      l.character.name = newName;
+      l.character.description = newDesc;
+    }
+  });
+  closeModal();
+  renderLines();
+  updateCharDatalist();
+}
+
+function renderLines() {
+  const container = document.getElementById('script-lines');
+  const emptyState = document.getElementById('empty-state');
+
+  if (state.lines.length === 0) {
+    container.innerHTML = '';
+    emptyState.style.display = 'flex';
+    document.getElementById('line-count').textContent = '';
+    return;
+  }
+  emptyState.style.display = 'none';
+  document.getElementById('line-count').textContent = `· ${state.lines.length} line${state.lines.length !== 1 ? 's' : ''}`;
+
+  container.innerHTML = state.lines.map((line, idx) => {
+    if (line.type === 'act') {
+      return `<div class="script-line act-header"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="line-text">Act ${line.value}</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    if (line.type === 'scene') {
+      return `<div class="script-line scene-header"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="line-text">Scene ${line.value}</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    if (line.type === 'setting') {
+      return `<div class="script-line setting-line"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="line-text">${line.value}</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    if (line.type === 'direction') {
+      return `<div class="script-line direction-line"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="line-text">(${line.value})</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    if (line.type === 'dialogue') {
+      return `<div class="script-line dialogue-line"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="char-name">${line.character.name}</div><div class="line-text">${line.value}</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    if (line.type === 'action') {
+      return `<div class="script-line action-line"><div class="line-wrapper" onclick="showEditModal(${idx})"><div class="char-name">${line.character.name}</div><div class="line-text">${line.value}</div><button class="edit-btn">Edit</button></div></div>`;
+    }
+    return '';
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+  renderCharsList();
+}
+
+function renderCharsList() {
+  const list = document.getElementById('chars-list');
+  if (state.characters.length === 0) {
+    list.innerHTML = `<div style="font-size:12px;color:var(--color-text-tertiary);">No characters yet</div>`;
+    return;
+  }
+  list.innerHTML = state.characters.map(c => `
+    <div class="char-pill">
+      <div>
+        <div class="char-pill-name">${c.name}</div>
+        <div class="char-pill-desc">${c.description || 'No description'}</div>
+      </div>
+      <button class="char-pill-edit" onclick="showEditCharModal('${c.name}')">Edit</button>
+    </div>`).join('');
+}
+
+function updateCharDatalist() {
+  const dl = document.getElementById('char-datalist');
+  dl.innerHTML = state.characters.map(c => `<option value="${c.name}">`).join('');
+}
+
+function updateEmptyState() {
+  const emptyState = document.getElementById('empty-state');
+  if (state.lines.length === 0) {
+    emptyState.style.display = 'flex';
+  } else {
+    emptyState.style.display = 'none';
+  }
+}
+
+function exportJSON() {
+  if (!state.scriptName) return;
+  const data = {
+    script_name: state.scriptName.toLowerCase().replace(/ /g,'_').replace(/-/g,'_'),
+    end_location: state.currLocation,
+    latest_info: { Act: state.latestAct, Scene: state.latestScene },
+    characters: state.characters,
+    lines: state.lines
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `raw_script_${data.script_name}.json`;
+  a.click();
+}
+
+document.getElementById('value-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLine(); }
+});
+
+renderCharsList();
+</script>

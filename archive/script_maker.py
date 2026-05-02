@@ -85,7 +85,7 @@ class Lines:
             return
 
         if amt_chars > 1:
-            for c_index in amt_chars - 1:
+            for c_index in range(amt_chars - 1):
                 print(f'{self.characters[c_index].name} | ')
         print(f'{self.characters[amt_chars-1].name}')
 
@@ -146,7 +146,7 @@ class Lines:
                     if done == 1:
                         answered = False
                     elif done == 2:
-                        char.name = new_desc
+                        char.description = new_desc
                         updateDesc = True
                         answered = True
             
