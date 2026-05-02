@@ -720,6 +720,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-item" onclick="exportPDF()">Export to PDF</div>
         <div class="fdd-item" onclick="exportPDFWithMeta()">Export PDF + metadata</div>
         <div class="fdd-sep"></div>
+        <div class="fdd-item" onclick="exportFountain()">Export to Fountain (.fountain)</div>
+        <div class="fdd-item" onclick="importFountain()">Import Fountain file</div>
+        <input type="file" id="fountain-open-in" accept=".fountain,.txt,.spmd" style="display:none" onchange="loadFountainFile(event)"/>
+        <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="downloadMetadata()">Download metadata (.zip)</div>
       </div>
     </div>
@@ -2274,6 +2278,265 @@ async function exportPDFWithMeta(){
     a.download=S.title.toLowerCase().replace(/ /g,'_')+'_export.zip';
     a.click();URL.revokeObjectURL(a.href);
   }catch(e){alert('Failed to create export ZIP: '+e.message);}
+}
+
+/* ── Fountain export/import ── */
+function buildFountain(){
+  let out='';
+  /* Title page */
+  out+='Title: '+S.title+'\n';
+  if(S.author)out+='Author: '+S.author+'\n';
+  out+='Draft date: '+new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})+'\n';
+  out+='\n'; /* blank line separates title page from content */
+
+  S.acts.forEach((act,ai)=>{
+    /* Act section heading */
+    out+='# '+actLabel(ai)+'\n';
+    if(act.description)out+='[['+act.description+']]\n';
+    out+='\n';
+
+    act.scenes.forEach((sc,si)=>{
+      /* Scene section heading */
+      out+='## '+sceneLabel(ai,si)+'\n';
+      if(sc.description)out+='[['+sc.description+']]\n';
+      out+='\n';
+
+      sc.lines.forEach((line,li)=>{
+        if(line.type==='setting'){
+          /* Scene heading — if it starts with INT/EXT, use as-is; otherwise force with . */
+          const v=line.value.trim();
+          const isSlug=/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(v);
+          out+=(isSlug?v.toUpperCase():'.'+v)+'\n\n';
+        }else if(line.type==='direction'){
+          /* Direction → action text with cue notes */
+          let cueText='';
+          if(line.cues){
+            const parts=[];
+            if(line.cues.enters&&line.cues.enters.length)parts.push(line.cues.enters.map(n=>n+' enters').join(', '));
+            if(line.cues.exits&&line.cues.exits.length)parts.push(line.cues.exits.map(n=>n+' exits').join(', '));
+            if(parts.length)cueText=' [['+parts.join('; ')+']]';
+          }
+          out+=line.value+cueText+'\n\n';
+        }else if(line.type==='dialogue'){
+          /* Character name (uppercase) + optional parenthetical + dialogue */
+          out+=line.character.name.toUpperCase()+'\n';
+          if(line.dialogueAction)out+='('+line.dialogueAction+')\n';
+          out+=line.value+'\n\n';
+        }else if(line.type==='action'){
+          /* Action — use ! prefix to force if it might be misread as another element */
+          const v=line.value.trim();
+          const mightMisread=/^[A-Z][A-Z\s\d\.]+$/.test(v)||/^(INT|EXT|EST)[\.\s]/i.test(v);
+          out+=(mightMisread?'!'+v:v)+'\n\n';
+        }
+      });
+    });
+  });
+  return out.trimEnd()+'\n';
+}
+
+function exportFountain(){
+  closeFDD();
+  if(!S.title){alert('Open or create a script first.');return;}
+  const text=buildFountain();
+  const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=S.title.toLowerCase().replace(/ /g,'_')+'.fountain';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+function importFountain(){
+  closeFDD();
+  $('fountain-open-in').click();
+}
+
+function loadFountainFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const text=ev.target.result;
+    parseFountain(text);
+  };
+  reader.readAsText(file);
+  e.target.value=''; /* reset so same file can be re-selected */
+}
+
+function parseFountain(text){
+  /* Parse Fountain plain text into our S data model */
+  const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+
+  let title='Untitled',author='';
+  let acts=[],characters=[];
+  let charSet=new Set();
+  let curAct=null,curScene=null;
+  let i=0;
+
+  /* --- Title page: key/value pairs at the start, ended by first blank line --- */
+  const titlePage={};
+  let inTitlePage=true;
+  while(i<lines.length&&inTitlePage){
+    const ln=lines[i];
+    if(ln.trim()===''){inTitlePage=false;i++;break;}
+    const kv=ln.match(/^(\w[\w\s]*?):\s*(.*)$/);
+    if(kv){titlePage[kv[1].toLowerCase().trim()]=kv[2].trim();i++;}
+    else{inTitlePage=false;break;} /* not a key:value line, no title page */
+  }
+  if(titlePage.title)title=titlePage.title;
+  if(titlePage.author)author=titlePage.author;
+
+  /* Ensure at least one act and scene exist */
+  function ensureActScene(){
+    if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
+    if(!curScene){curScene={name:'',description:'',lines:[]};curAct.scenes.push(curScene);}
+  }
+
+  /* Collect paragraphs (groups of lines separated by blank lines) */
+  const paragraphs=[];
+  let curPara=[];
+  while(i<lines.length){
+    const ln=lines[i];
+    if(ln.trim()===''){
+      if(curPara.length){paragraphs.push(curPara.join('\n'));curPara=[];}
+    }else{
+      curPara.push(ln);
+    }
+    i++;
+  }
+  if(curPara.length)paragraphs.push(curPara.join('\n'));
+
+  /* Process each paragraph */
+  let p=0;
+  while(p<paragraphs.length){
+    const para=paragraphs[p].trim();
+    const paraLines=para.split('\n');
+
+    /* --- Sections (# Act, ## Scene) --- */
+    if(/^#{1,2}\s/.test(paraLines[0])){
+      const level=paraLines[0].startsWith('##')?2:1;
+      let text=paraLines[0].replace(/^#+\s*/,'').trim();
+      /* Strip auto-number prefix: "Act One — Name" → "Name", "Scene Three" → "" */
+      text=text.replace(/^(Act|Scene)\s+\w+(\s*—\s*)?/i,'').trim();
+      /* Check for [[description]] note in same paragraph or next paragraph */
+      let desc='';
+      const noteInPara=paraLines.length>1?paraLines.slice(1).join('\n').match(/^\[\[(.*?)\]\]$/s):null;
+      if(noteInPara){desc=noteInPara[1].trim();}
+      else if(p+1<paragraphs.length){
+        const nextP=paragraphs[p+1].trim();
+        const noteNext=nextP.match(/^\[\[(.*?)\]\]$/s);
+        if(noteNext){desc=noteNext[1].trim();p++;} /* consume the note paragraph */
+      }
+      if(level===1){
+        curAct={name:text,description:desc,scenes:[]};acts.push(curAct);curScene=null;
+      }else{
+        if(!curAct){curAct={name:'',description:'',scenes:[]};acts.push(curAct);}
+        curScene={name:text,description:desc,lines:[]};curAct.scenes.push(curScene);
+      }
+      p++;continue;
+    }
+
+    /* --- Scene Headings (INT, EXT, etc. or forced with .) --- */
+    if(paraLines.length===1){
+      const sl=paraLines[0];
+      const isSlug=/^(INT|EXT|EST|INT\.?\/?EXT|I\/E)[\.\s]/i.test(sl);
+      const isForced=/^\.[\w]/.test(sl);
+      if(isSlug||isForced){
+        ensureActScene();
+        const val=isForced?sl.slice(1).trim():sl.trim();
+        curScene.lines.push({type:'setting',value:val});
+        p++;continue;
+      }
+    }
+
+    /* --- Character + Dialogue block --- */
+    if(paraLines.length>=2){
+      const firstLine=paraLines[0].trim();
+      /* Character: all uppercase (may have (V.O.) etc.), possibly with ^ for dual dialogue */
+      const charMatch=firstLine.match(/^([A-Z][A-Z0-9\s\.\-']+?)(\s*\(.*?\))?\s*(\^)?$/);
+      if(charMatch&&!firstLine.endsWith('TO:')){
+        const charName=charMatch[1].trim();
+        /* Collect parentheticals and dialogue */
+        let dAction='',dText='';
+        let dl=1;
+        while(dl<paraLines.length){
+          const dln=paraLines[dl].trim();
+          if(dln.startsWith('(')&&dln.endsWith(')')&&!dAction){
+            dAction=dln.slice(1,-1);
+          }else{
+            dText+=(dText?'\n':'')+dln;
+          }
+          dl++;
+        }
+        /* Normalize character name to title case for our model */
+        const normalName=charName.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+        if(!charSet.has(normalName)){
+          charSet.add(normalName);
+          characters.push({name:normalName,description:'',archived:false});
+        }
+        ensureActScene();
+        curScene.lines.push({
+          type:'dialogue',
+          value:dText,
+          character:{name:normalName,description:''},
+          dialogueAction:dAction
+        });
+        p++;continue;
+      }
+    }
+
+    /* --- Transitions (uppercase ending in TO:) --- */
+    if(paraLines.length===1&&/^[A-Z\s]+TO:$/.test(paraLines[0].trim())){
+      ensureActScene();
+      curScene.lines.push({type:'direction',value:paraLines[0].trim()});
+      p++;continue;
+    }
+
+    /* --- Forced action (starts with !) --- */
+    if(paraLines[0].startsWith('!')){
+      ensureActScene();
+      curScene.lines.push({type:'action',value:paraLines.map((l,i)=>i===0?l.slice(1):l).join('\n').trim()});
+      p++;continue;
+    }
+
+    /* --- Notes: check for direction cues in [[brackets]] --- */
+    const noteMatch=para.match(/^(.*?)\s*\[\[(.*?)\]\]\s*$/s);
+    if(noteMatch){
+      const desc=noteMatch[1].trim();
+      const noteText=noteMatch[2];
+      /* Try to parse as cues */
+      const enters=[],exits=[];
+      noteText.split(/[;,]/).forEach(part=>{
+        const em=part.trim().match(/^(.+?)\s+enters$/i);
+        const xm=part.trim().match(/^(.+?)\s+exits$/i);
+        if(em)enters.push(em[1].trim());
+        if(xm)exits.push(xm[1].trim());
+      });
+      if(enters.length||exits.length){
+        ensureActScene();
+        curScene.lines.push({type:'direction',value:desc||'Stage direction',cues:{enters,exits}});
+        /* Ensure cue characters exist */
+        [...enters,...exits].forEach(n=>{
+          const norm=n.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+          if(!charSet.has(norm)){charSet.add(norm);characters.push({name:norm,description:'',archived:false});}
+        });
+        p++;continue;
+      }
+    }
+
+    /* --- Default: action --- */
+    ensureActScene();
+    const actionText=para.replace(/^\!/,'').trim();
+    curScene.lines.push({type:'action',value:actionText});
+    p++;
+  }
+
+  /* If no acts were created, wrap everything in a default act */
+  if(!acts.length){acts=[{name:'',description:'',scenes:[{name:'',description:'',lines:[]}]}];}
+
+  /* Load into app */
+  pushUndo();
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;
+  resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
+  showEditor(title);render();
 }
 
 /* ── Character panel inline expansion ── */

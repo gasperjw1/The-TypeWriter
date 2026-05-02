@@ -126,6 +126,9 @@ S = {
 - [x] Competitor comparison landing page with changelog (Session 6)
 - [x] Home navigation from editor via clickable title (Session 6)
 - [x] Cross-page navigation links between app, guide, and compare pages (Session 6)
+- [x] Mobile responsive layout with touch drag-and-drop (Session 7)
+- [x] Fountain export (.fountain plain-text format) (Session 8)
+- [x] Fountain import with round-trip fidelity (Session 8)
 
 ### Remaining (priority order)
 - [ ] FDX export (Final Draft format — industry standard)
