@@ -132,11 +132,11 @@ S = {
 - [x] FDX import — Final Draft .fdx XML parsing with stage play support (Session 8)
 - [x] FDX export — Final Draft .fdx XML generation with TitlePage and Cast (Session 8)
 - [x] Revision tracking with colored revision marks (Session 9)
+- [x] Scene cards / outline view (Session 10)
+- [x] Lockable scene numbers (Session 10)
 
 ### Remaining (priority order)
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
-- [ ] Scene cards / outline view
-- [ ] Lockable scene numbers
 - [ ] Real-time collaboration
 - [ ] Beat board / index card view
 - [ ] Notes and comments on lines/scenes
@@ -239,3 +239,9 @@ S = {
 - **Fountain transition round-trip fix** — Direction lines that don't end with `TO:` (like "FADE TO BLACK.") now export with `>` forced transition prefix and import via `>` prefix detection.
 - **File menu cleanup** — Added FDX export item. Reorganized dropdown into logical groups: saves, opens, PDF exports, format exports (Fountain + FDX), format imports (Fountain + FDX), metadata, and revisions.
 - **Revision tracking** — Manual snapshot-based revision system with industry-standard colored marks. Data model: `S.revisions` array of `{name, colorIdx, timestamp, snapshot}` where snapshot is a frozen copy of acts/characters. Six colors cycle: White, Blue, Pink, Yellow, Green, Goldenrod. `computeRevisionChanges()` compares current state against latest snapshot using `lineFingerprint()` content hashing. Changed lines get a colored left border and `✱` margin indicator. UI: revision color chip + toggle button in top bar, "New Revision" and "Revision History" in File menu, generic modal for history view with clear option. Revision marks toggle on/off. Persisted in localStorage and JSON saves. Survives undo/redo.
+
+### Session 10 — 2026-05-02
+- **Bug fixes from Session 9 audit** — Fixed 7 bugs: removed dead `changedCount` variable; reset `S.revisions` and `revisionChanges` on Fountain/FDX import and sample load; renamed shadowed `esc()` to `xmlEsc()` inside `buildFDXText`; unconditional revisions restore in `doUndo`/`doRedo` (`p.revisions||[]`); moved `closeGenericModal()` into `clearRevisions()` so canceling the confirm dialog doesn't close the history modal.
+- **Scene cards / outline view** — New "Outline" tab in top bar. `renderOutline()` renders scene cards in a responsive CSS Grid layout grouped by act. Each card shows: scene label, optional description, line count, dialogue count, character count, and character name chips. Cards are drag-and-drop reorderable within the same act (desktop HTML5 DnD + mobile touch hold). Clicking a card switches to the Edit tab and smooth-scrolls to that scene. `getSceneCharsList(sc)` extracts unique character names from dialogue, action, and direction cues. Right panel hidden on outline tab. Mobile-responsive grid (2-col on tablet, 1-col on phone).
+- **Outline touch drag** — `outlineTouchStart`/`outlineTouchMove`/`outlineTouchEnd` provide long-press-to-drag on mobile, with ghost element, drag-over highlighting, and haptic feedback. Same reorder logic as desktop.
+- **Lockable scene numbers** — `S.scenesLocked` boolean + `scene.lockedNum` string per scene. `toggleSceneLock()` in File menu: when locking, snapshots current positional numbers as `lockedNum` on each scene; when unlocking, clears all `lockedNum` values. `sceneLabel()` uses `lockedNum` when present instead of `numWord(si+1)`. Scene edit modal shows editable "Locked scene number" field when locked. `updateSceneLockUI()` toggles menu item text between "Lock/Unlock scene numbers". Persisted in `stateJSON`, restored in `loadFromData`/`resumeFromLS`, reset in `doNewScript`/`parseFountain`/`parseFDX`/`loadSample`. Survives undo/redo.

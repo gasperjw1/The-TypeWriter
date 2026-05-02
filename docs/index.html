@@ -223,6 +223,23 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 #view-panel .v-dlg .vcont{font-style:italic;font-weight:400;text-transform:none;color:var(--tx3);font-size:calc(var(--script-font-size)*0.88);}
 #view-panel .v-dlg .vda{font-style:italic;text-align:center;color:var(--tx2);padding:0 25%;font-size:calc(var(--script-font-size)*0.95);}
 #view-panel .v-dlg .vt{padding:0 15%;}
+#outline-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
+.outline-act-header{font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx2);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
+.outline-act-header:first-child{margin-top:0;}
+.outline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px;}
+.outline-card{background:var(--bg2);border:1px solid var(--bd3);border-radius:8px;padding:14px;cursor:grab;transition:box-shadow .15s,border-color .15s;position:relative;}
+.outline-card:hover{border-color:var(--tx3);box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.outline-card:active{cursor:grabbing;}
+.outline-card.drag-over{border-color:var(--accent,#4A90D9);box-shadow:0 0 0 2px rgba(74,144,217,.3);}
+.outline-card-title{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.outline-card-desc{font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.outline-card-stats{display:flex;gap:10px;font-size:11px;color:var(--tx3);margin-bottom:8px;}
+.outline-card-stat{display:flex;align-items:center;gap:3px;}
+.outline-card-chars{display:flex;flex-wrap:wrap;gap:4px;}
+.outline-card-char{font-size:10px;background:var(--bg3);color:var(--tx2);padding:1px 6px;border-radius:3px;white-space:nowrap;}
+.outline-empty{text-align:center;color:var(--tx3);padding:48px 0;font-size:14px;}
+@media(max-width:768px){.outline-grid{grid-template-columns:1fr 1fr;gap:10px;}.outline-card{padding:10px;}}
+@media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
 #summaries-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 #settings-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 .psec-title{font-size:15px;font-weight:500;color:var(--tx1);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
@@ -710,6 +727,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <div class="tab active" onclick="switchTab('edit')">Edit script</div>
     <div class="tab" onclick="switchTab('summaries')">Summaries</div>
     <div class="tab" onclick="switchTab('view')">View</div>
+    <div class="tab" onclick="switchTab('outline')">Outline</div>
     <div class="tab" onclick="switchTab('settings')">Settings</div>
     <div class="tab" onclick="switchTab('guide')">Guide</div>
     <div id="file-menu-wrap">
@@ -737,6 +755,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="createRevision()">New revision</div>
         <div class="fdd-item" onclick="closeFDD();openRevisionHistory()">Revision history</div>
+        <div class="fdd-sep"></div>
+        <div class="fdd-item" id="scene-lock-item" onclick="toggleSceneLock()">Lock scene numbers</div>
       </div>
     </div>
   </div>
@@ -806,6 +826,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="script-content"></div>
     </div>
     <div id="view-panel"></div>
+    <div id="outline-panel"></div>
     <div id="summaries-panel"></div>
     <div id="settings-panel">
       <div class="psec-title">Formatting</div>
@@ -1095,7 +1116,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </div>
 
 <script>
-let S={title:'',author:'',acts:[],characters:[],revisions:[]};
+let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};
 let activeTab='edit',cType='setting',pendingPill=null,pendingPillKey=null;
 let insertAfter=null,undoStack=[],undoCursor=-1,dragSrc=null;
 let hasFilename=false,lastSavedJSON='';
@@ -1134,7 +1155,7 @@ function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);retu
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
-function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[]});}
+function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false});}
 function cloneState(){return JSON.parse(stateJSON());}
 
 function updateSaveIndicator(){
@@ -1161,7 +1182,7 @@ function doUndo(){
   if(undoCursor<0)return;
   if(undoCursor===undoStack.length-1){undoStack.push(cloneState());if(undoStack.length>51)undoStack.shift();undoCursor=undoStack.length-2;}
   const p=undoStack[undoCursor];
-  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));
+  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));S.scenesLocked=p.scenesLocked||false;
   undoCursor--;
   updateUndoRedoBtns();updateSaveIndicator();computeRevisionChanges();render();
 }
@@ -1169,7 +1190,7 @@ function doRedo(){
   if(undoCursor>=undoStack.length-2)return;
   undoCursor+=2;
   const p=undoStack[undoCursor];
-  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));
+  S.acts=JSON.parse(JSON.stringify(p.acts));S.characters=JSON.parse(JSON.stringify(p.characters));S.revisions=JSON.parse(JSON.stringify(p.revisions||[]));S.scenesLocked=p.scenesLocked||false;
   undoCursor--;
   updateUndoRedoBtns();updateSaveIndicator();computeRevisionChanges();render();
 }
@@ -1181,7 +1202,7 @@ function currentAct(){return S.acts.length?S.acts[S.acts.length-1]:null;}
 function currentScene(){const a=currentAct();return a&&a.scenes.length?a.scenes[a.scenes.length-1]:null;}
 function numWord(n){const w=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty'];return n>=1&&n<=20?w[n-1]:String(n);}
 function actLabel(ai){const a=S.acts[ai];if(!a)return'';const num='Act '+numWord(ai+1);return a.name?num+' — '+a.name:num;}
-function sceneLabel(ai,si){const sc=S.acts[ai]?.scenes[si];if(!sc)return'';const num='Scene '+numWord(si+1);return sc.name?num+' — '+sc.name:num;}
+function sceneLabel(ai,si){const sc=S.acts[ai]?.scenes[si];if(!sc)return'';const num=sc.lockedNum?'Scene '+sc.lockedNum:'Scene '+numWord(si+1);return sc.name?num+' — '+sc.name:num;}
 function findChar(n){return S.characters.find(c=>c.name===n.toUpperCase()&&!c.archived)||null;}
 function findCharAny(n){return S.characters.find(c=>c.name===n.toUpperCase())||null;}
 function getOrCreate(name,desc=''){let c=findChar(name);if(!c){c={name:name.toUpperCase(),description:desc,archived:false};S.characters.push(c);}return c;}
@@ -1248,16 +1269,18 @@ function scrollToSelected(){const scrl=$('script-scroll'),sel=scrl.querySelector
 
 function switchTab(t){
   activeTab=t;
-  document.querySelectorAll('.tab').forEach(el=>{el.classList.remove('active');const tx=el.textContent.toLowerCase();if((t==='edit'&&tx.includes('edit'))||(t==='summaries'&&tx.includes('summ'))||(t==='view'&&tx.startsWith('view'))||(t==='settings'&&tx.includes('sett'))||(t==='guide'&&tx.includes('guide')))el.classList.add('active');});
+  document.querySelectorAll('.tab').forEach(el=>{el.classList.remove('active');const tx=el.textContent.toLowerCase();if((t==='edit'&&tx.includes('edit'))||(t==='summaries'&&tx.includes('summ'))||(t==='view'&&tx.startsWith('view'))||(t==='outline'&&tx.includes('outl'))||(t==='settings'&&tx.includes('sett'))||(t==='guide'&&tx.includes('guide')))el.classList.add('active');});
   $('script-scroll').style.display=t==='edit'?'flex':'none';
   $('script-scroll').style.flexDirection='column';
   $('view-panel').style.display=t==='view'?'block':'none';
+  $('outline-panel').style.display=t==='outline'?'block':'none';
   $('summaries-panel').style.display=t==='summaries'?'block':'none';
   $('settings-panel').style.display=t==='settings'?'block':'none';
   $('guide-panel').style.display=t==='guide'?'block':'none';
   $('input-bar').style.display=(t==='edit'&&S.title)?'block':'none';
-  $('right-panel-wrap').style.display=(t==='settings'||t==='guide')?'none':(S.title?'flex':'none');
+  $('right-panel-wrap').style.display=(t==='settings'||t==='guide'||t==='outline')?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
+  if(t==='outline')renderOutline();
   if(t==='summaries')renderSummaries();
   if(t==='settings')renderHotkeySettings();
   closeFDD();
@@ -1300,12 +1323,12 @@ function loadFile(e){
   reader.readAsText(file);e.target.value='';
 }
 function loadFromData(data){
-  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];
+  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
   resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
-  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
   resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
@@ -1369,12 +1392,12 @@ const SAMPLE_SCRIPT={
 };
 function loadSample(){
   const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
-  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];revisionChanges={};
+  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];S.scenesLocked=false;revisionChanges={};
   resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
 }
 function menuNew(){closeFDD();if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
 function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[]};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
@@ -1662,7 +1685,7 @@ function render(){
 <div class="act-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'act',${ai})">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
-  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();
+  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();
 }
 
 function renderScene(act,ai,sc,si){
@@ -1704,6 +1727,125 @@ function renderView(){
   let h=`<div class="v-title">${esc(S.title)}</div>`;
   S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${esc(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join(' · '):'';h+=`<div class="v-direction">(${esc(l.value)})${cues?` <span style="font-size:calc(var(--script-font-size)*0.9);color:var(--tx3);">${esc(cues)}</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${esc(l.dialogueAction)})</div>`:''}<div class="vt">${esc(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">${esc(l.value)}</div>`;});});});
   p.innerHTML=h;
+}
+
+/* ── Outline / Scene Cards ── */
+function getSceneCharsList(sc){
+  const chars=new Set();
+  sc.lines.forEach(l=>{
+    if(l.type==='dialogue'&&l.character)chars.add(l.character.name);
+    if(l.type==='action'&&l.character)chars.add(l.character.name);
+    if(l.cues){(l.cues.enters||[]).forEach(n=>chars.add(n));(l.cues.exits||[]).forEach(n=>chars.add(n));}
+  });
+  return Array.from(chars).sort();
+}
+function renderOutline(){
+  const p=$('outline-panel');
+  if(!S.acts.length){p.innerHTML='<div class="outline-empty">No acts yet. Create a script to see scene cards here.</div>';return;}
+  let h='';
+  S.acts.forEach((act,ai)=>{
+    h+=`<div class="outline-act-header">${esc(actLabel(ai))}</div>`;
+    if(!act.scenes.length){h+=`<div style="font-size:12px;color:var(--tx3);margin-bottom:16px;">No scenes in this act.</div>`;return;}
+    h+=`<div class="outline-grid" data-act="${ai}">`;
+    act.scenes.forEach((sc,si)=>{
+      const label=sceneLabel(ai,si);
+      const chars=getSceneCharsList(sc);
+      const lineCount=sc.lines.length;
+      const dlgCount=sc.lines.filter(l=>l.type==='dialogue').length;
+      h+=`<div class="outline-card" draggable="true" data-ai="${ai}" data-si="${si}" onclick="outlineCardClick(${ai},${si})" ondragstart="outlineDragStart(event,${ai},${si})" ondragover="outlineDragOver(event,${ai},${si})" ondragleave="outlineDragLeave(event)" ondrop="outlineDrop(event,${ai},${si})" ondragend="outlineDragEnd(event)" ontouchstart="outlineTouchStart(event)">`;
+      h+=`<div class="outline-card-title">${esc(label)}</div>`;
+      if(sc.description)h+=`<div class="outline-card-desc">${esc(sc.description)}</div>`;
+      h+=`<div class="outline-card-stats">`;
+      h+=`<span class="outline-card-stat"><strong>${lineCount}</strong>&nbsp;line${lineCount!==1?'s':''}</span>`;
+      h+=`<span class="outline-card-stat"><strong>${dlgCount}</strong>&nbsp;dlg</span>`;
+      h+=`<span class="outline-card-stat"><strong>${chars.length}</strong>&nbsp;char${chars.length!==1?'s':''}</span>`;
+      h+=`</div>`;
+      if(chars.length){
+        h+=`<div class="outline-card-chars">`;
+        chars.forEach(n=>{h+=`<span class="outline-card-char">${esc(n)}</span>`;});
+        h+=`</div>`;
+      }
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  });
+  p.innerHTML=h;
+}
+
+let outlineDragSrc=null;
+function outlineDragStart(e,ai,si){outlineDragSrc={ai,si};e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');e.currentTarget.style.opacity='0.5';}
+function outlineDragOver(e,ai,si){if(!outlineDragSrc||outlineDragSrc.ai!==ai)return;e.preventDefault();e.currentTarget.classList.add('drag-over');}
+function outlineDragLeave(e){e.currentTarget.classList.remove('drag-over');}
+function outlineDrop(e,ai,si){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!outlineDragSrc||outlineDragSrc.ai!==ai)return;
+  const from=outlineDragSrc.si,to=si;
+  if(from===to){outlineDragSrc=null;return;}
+  pushUndo();
+  const act=S.acts[ai];
+  const item=act.scenes.splice(from,1)[0];
+  act.scenes.splice(to,0,item);
+  outlineDragSrc=null;
+  autoSave();renderOutline();
+}
+function outlineDragEnd(e){e.currentTarget.style.opacity='';outlineDragSrc=null;document.querySelectorAll('.outline-card.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+function outlineCardClick(ai,si){switchTab('edit');setTimeout(()=>{scrollToScene(ai,si);},50);}
+
+/* Outline touch drag for mobile */
+let outlineTouchDrag=null;
+function outlineTouchStart(e){
+  if(window.innerWidth>768)return;
+  const card=e.target.closest('.outline-card');
+  if(!card)return;
+  const touch=e.touches[0];
+  const startX=touch.clientX,startY=touch.clientY;
+  let holdTimer=null,moved=false;
+  function onMove(ev){const t=ev.touches[0];if(Math.abs(t.clientX-startX)>8||Math.abs(t.clientY-startY)>8){moved=true;clearTimeout(holdTimer);cleanup();}}
+  function cleanup(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);document.removeEventListener('touchcancel',onEnd);}
+  function onEnd(){clearTimeout(holdTimer);cleanup();}
+  document.addEventListener('touchmove',onMove,{passive:true});
+  document.addEventListener('touchend',onEnd,{once:true});
+  document.addEventListener('touchcancel',onEnd,{once:true});
+  holdTimer=setTimeout(()=>{
+    cleanup();if(moved)return;
+    if(navigator.vibrate)navigator.vibrate(30);
+    e.preventDefault();
+    const ai=parseInt(card.dataset.ai),si=parseInt(card.dataset.si);
+    card.style.opacity='.4';
+    const ghost=document.createElement('div');
+    ghost.className='touch-drag-ghost';
+    ghost.textContent=sceneLabel(ai,si);
+    ghost.style.left=(startX-40)+'px';ghost.style.top=(startY-30)+'px';
+    document.body.appendChild(ghost);
+    outlineTouchDrag={ai,si,ghost,srcCard:card,lastOver:null};
+    document.addEventListener('touchmove',outlineTouchMove,{passive:false});
+    document.addEventListener('touchend',outlineTouchEnd,{once:true});
+    document.addEventListener('touchcancel',outlineTouchEnd,{once:true});
+  },250);
+}
+function outlineTouchMove(e){
+  if(!outlineTouchDrag)return;e.preventDefault();
+  const touch=e.touches[0];
+  outlineTouchDrag.ghost.style.left=(touch.clientX-40)+'px';
+  outlineTouchDrag.ghost.style.top=(touch.clientY-30)+'px';
+  outlineTouchDrag.ghost.style.display='none';
+  const el=document.elementFromPoint(touch.clientX,touch.clientY);
+  outlineTouchDrag.ghost.style.display='';
+  if(outlineTouchDrag.lastOver)outlineTouchDrag.lastOver.classList.remove('drag-over');
+  if(!el)return;
+  const target=el.closest('.outline-card');
+  if(target&&parseInt(target.dataset.ai)===outlineTouchDrag.ai){target.classList.add('drag-over');outlineTouchDrag.lastOver=target;}
+}
+function outlineTouchEnd(e){
+  if(!outlineTouchDrag)return;
+  document.removeEventListener('touchmove',outlineTouchMove);
+  const{ai,si,ghost,srcCard,lastOver}=outlineTouchDrag;
+  ghost.remove();srcCard.style.opacity='';
+  if(lastOver){lastOver.classList.remove('drag-over');
+    const targetSi=parseInt(lastOver.dataset.si);
+    if(targetSi!==si){pushUndo();const act=S.acts[ai];const item=act.scenes.splice(si,1)[0];act.scenes.splice(targetSi,0,item);autoSave();renderOutline();}
+  }
+  outlineTouchDrag=null;
 }
 
 function renderSummaries(){
@@ -1944,8 +2086,8 @@ function openSceneModal(aiArg,isFirst){const ai=aiArg!==undefined?aiArg:S.acts.l
 function confirmScene(){const el=$('ms-n');if(!el)return;const ai=parseInt(el.dataset.ai);const n=el.value.trim();const d=$('ms-d').value.trim();pushUndo();S.acts[ai].scenes.push({name:n,description:d,lines:[]});closeModal();autoSave();activatePillByType('setting');render();}
 function openEditAct(ai){const a=S.acts[ai];openModal(`<h3>Edit ${esc(actLabel(ai))}</h3><div class="mf"><label>Act name <em>(optional)</em></label><input class="minput" id="ea-n" value="${esc(a.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ea-d" value="${esc(a.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveActEdit(${ai})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('ea-n');if(el)el.focus();},50);}
 function saveActEdit(ai){const n=$('ea-n').value.trim();const d=$('ea-d').value.trim();pushUndo();S.acts[ai].name=n;S.acts[ai].description=d;closeModal();autoSave();render();}
-function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3><div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('es-n');if(el)el.focus();},50);}
-function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').value.trim();pushUndo();S.acts[ai].scenes[si].name=n;S.acts[ai].scenes[si].description=d;closeModal();autoSave();render();}
+function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];const lockField=S.scenesLocked?`<div class="mf"><label>Locked scene number</label><input class="minput" id="es-ln" value="${esc(sc.lockedNum||numWord(si+1))}"/></div>`:'';openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3>${lockField}<div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$(S.scenesLocked?'es-ln':'es-n');if(el)el.focus();},50);}
+function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').value.trim();pushUndo();S.acts[ai].scenes[si].name=n;S.acts[ai].scenes[si].description=d;if(S.scenesLocked){const lnEl=$('es-ln');if(lnEl){const ln=lnEl.value.trim();if(ln)S.acts[ai].scenes[si].lockedNum=ln;}}closeModal();autoSave();render();}
 
 /* Edit line — direction gets full cue editor in modal */
 function openEditLine(ai,si,li){
@@ -2571,7 +2713,7 @@ function parseFountain(text){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;
   revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
@@ -2796,7 +2938,7 @@ function parseFDX(xmlText){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;
   revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
@@ -2970,6 +3112,27 @@ function clearRevisions(){
   autoSave();render();
   updateRevisionUI();
   closeGenericModal();
+}
+
+/* ── Lockable Scene Numbers ── */
+function toggleSceneLock(){
+  closeFDD();
+  pushUndo();
+  if(S.scenesLocked){
+    /* Unlock: clear all lockedNum values */
+    S.acts.forEach(a=>a.scenes.forEach(sc=>{delete sc.lockedNum;}));
+    S.scenesLocked=false;
+  }else{
+    /* Lock: snapshot current positional numbers */
+    S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>{sc.lockedNum=numWord(si+1);}));
+    S.scenesLocked=true;
+  }
+  autoSave();render();
+}
+
+function updateSceneLockUI(){
+  const el=$('scene-lock-item');
+  if(el)el.textContent=S.scenesLocked?'Unlock scene numbers':'Lock scene numbers';
 }
 
 function toggleRevMarks(){

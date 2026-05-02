@@ -22,6 +22,7 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 - Direction cues that track character entrances and exits per scene with visual toggle chips
 - Automatic `(cont.)` detection for consecutive dialogue from the same character
 - Auto-numbered acts and scenes ("Act One", "Scene Three") with optional custom names
+- Lockable scene numbers for production drafts — lock to freeze numbering, edit locked numbers inline, numbers persist through reordering
 
 **Editing**
 - Inline editing — double-click any line to edit in place, or use the Edit button
@@ -35,6 +36,7 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 - Collapsible side panel with table of contents and expandable character list
 - Click a character to see their full description and searchable dialogue history; click any dialogue line to jump to it in the editor
 - Summaries tab with script statistics
+- Outline tab with scene cards — visual corkboard showing each scene as a card with stats (line count, dialogue count, characters), drag-and-drop reordering within acts, click to jump to scene in editor
 - Read-only View tab with act/scene separators for distraction-free reading
 - Settings tab for font size, indicator styles, line-type colors, theme override, and pill hotkey customization
 
@@ -87,8 +89,6 @@ The entire app is a single HTML file with one external dependency (JSZip via CDN
 See [TODO.md](TODO.md) for the full list. Up next:
 
 - Auto-formatting for screenplay conventions
-- Scene cards / outline view
-- Lockable scene numbers for production drafts
 - Notes and comments on lines and scenes
 - Real-time collaboration
 
