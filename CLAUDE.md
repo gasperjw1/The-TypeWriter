@@ -130,9 +130,9 @@ S = {
 - [x] Fountain export (.fountain plain-text format) (Session 8)
 - [x] Fountain import with round-trip fidelity (Session 8)
 - [x] FDX import — Final Draft .fdx XML parsing with stage play support (Session 8)
+- [x] FDX export — Final Draft .fdx XML generation with TitlePage and Cast (Session 8)
 
 ### Remaining (priority order)
-- [ ] FDX export (Final Draft format — industry standard)
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
 - [ ] Real-time collaboration
 - [ ] Revision tracking / version history
@@ -215,3 +215,18 @@ S = {
 - **Home navigation** — Made the "The Scriptwriter" title in the top bar clickable via `goHome()`. Separate from `menuNew()` — the modal says "Return to home?" with context about closing the current script. Buttons: "Discard & go home" / "Save & go home". Added hover highlight style on the title.
 - **Cross-page navigation** — Added "Compare editors" link next to "Feature guide" on the app's setup screen. Added cross-links in the guide page footer (→ compare) and compare page footer (→ guide). Updated `sync.sh` to rewrite both `docs/guide.html` and `docs/compare.html` links when syncing.
 - **Updated `sync.sh`** — Now rewrites both `href="docs/guide.html"` and `href="docs/compare.html"` to relative paths in `docs/index.html`.
+
+### Session 7 — 2026-05-02
+- **Mobile responsive layout** — Full editing on mobile with touch-friendly UI: hamburger menu, slide-over side panel, bottom-sheet file menu, virtual keyboard handling, and responsive modals/inputs.
+- **Touch drag-and-drop** — Native touch event handling (`touchstart`/`touchmove`/`touchend`) for reordering acts, scenes, and lines on mobile devices. Same validation rules as desktop drag-and-drop.
+
+### Session 8 — 2026-05-02
+- **Fountain export** — `buildFountainText()` generates Fountain plain-text screenplay format from the S data model. Handles all line types: settings as scene headings (with `INT/EXT` auto-detection or `.` forced prefix), direction as transitions (with `>` forced prefix for non-`TO:` endings and `[[cue]]` notation for enter/exit cues), dialogue with character names in uppercase and parentheticals, and action with `!` prefix for lines that might be misread. Act/scene sections use `#`/`##` headings with `[[description]]` notes. Title page with Title/Author/Draft date.
+- **Fountain import** — `parseFountain()` parses Fountain files into the S data model. Handles title page key/value pairs, `#`/`##` sections (with auto-number prefix stripping), scene headings (`INT/EXT` auto-detect + `.` forced), character/dialogue blocks (uppercase name + parenthetical + text), transitions (`TO:` auto-detect + `>` forced), forced action (`!` prefix), direction cues in `[[brackets]]`, and `[[description]]` notes for act/scene metadata.
+- **Fountain round-trip fidelity** — Act/scene descriptions exported as `[[note]]` lines (not appended to headings) and re-imported via lookahead parsing. Auto-number prefixes ("Act One", "Scene Three") stripped on import so they regenerate from position. Forced transition `>` prefix for direction lines that don't end with `TO:`.
+- **FDX import** — `parseFDX()` parses Final Draft XML using the browser's native `DOMParser`. Handles both screenplay and stage play formats: `Act Break`, `Scene Heading`, `Character`, `Parenthetical`, `Dialogue`, `Action`, `Transition`, `DualDialogue`, and `General` paragraph types. Extracts title/author from `TitlePage` section (with positional fallback for standard `Type="Action"` paragraphs). Populates characters from `Cast > Member` elements. Character names normalized to title case.
+- **FDX title page fix** — Standard FDX files use `Type="Action"` for all title page paragraphs. Original parser only matched explicit `Type="title"` or empty types. Fixed with positional extraction: first non-empty paragraph = title, paragraph after "written by" = author.
+- **FDX export** — `buildFDXText()` generates Final Draft XML from the S data model. Maps line types to FDX paragraph types: setting → Scene Heading, action → Action, dialogue → Character + Parenthetical + Dialogue, direction → Transition. Builds `TitlePage` section (title, "written by", author) and `Cast` section from active characters. Multi-act scripts emit `Act Break` paragraphs. XML entities properly escaped.
+- **File menu reorganization** — Added "Export to Final Draft (.fdx)" menu item. Reorganized file dropdown to group exports together (PDF, Fountain, FDX) separately from imports (Fountain, FDX) with separator dividers.
+- **Live browser testing** — All parsers tested in Chrome's real DOMParser via code injection into example.com, using sample FDX/Fountain files from the `rsdoiel/fdx` GitHub repository. Verified: FDX→FDX round-trip (perfect), Fountain→Fountain round-trip (perfect), FDX→Fountain→FDX cross-format round-trip (perfect).
+- **Portability complete** — All Priority 1 (Portability) items in TODO.md are now done: Fountain export, Fountain import, FDX import, FDX export. Scripts can be freely exchanged between The Scriptwriter, Final Draft, Highland, Beat, Fade In, and any other editor supporting Fountain or FDX formats.

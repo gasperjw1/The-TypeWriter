@@ -721,6 +721,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-item" onclick="exportPDFWithMeta()">Export PDF + metadata</div>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="exportFountain()">Export to Fountain (.fountain)</div>
+        <div class="fdd-item" onclick="exportFDX()">Export to Final Draft (.fdx)</div>
+        <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="importFountain()">Import Fountain file</div>
         <input type="file" id="fountain-open-in" accept=".fountain,.txt,.spmd" style="display:none" onchange="loadFountainFile(event)"/>
         <div class="fdd-item" onclick="importFDX()">Import Final Draft (.fdx)</div>
@@ -2772,6 +2774,102 @@ function parseFDX(xmlText){
   S.title=title;S.author=author;S.acts=acts;S.characters=characters;
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
+}
+
+/* ── FDX (Final Draft) export ── */
+function buildFDXText(){
+  /* Generate Final Draft XML from our S data model */
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  let xml='<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n';
+  xml+='<FinalDraft DocumentType="Script" Template="No" Version="3">\n';
+
+  /* Content */
+  xml+='  <Content>\n';
+  S.acts.forEach((act,ai)=>{
+    /* Act Break for multi-act scripts (skip for single unnamed act) */
+    if(S.acts.length>1||act.name){
+      xml+='    <Paragraph Type="Act Break">\n';
+      xml+='      <Text>'+esc(actLabel(ai).toUpperCase())+'</Text>\n';
+      xml+='    </Paragraph>\n';
+    }
+    act.scenes.forEach((sc,si)=>{
+      sc.lines.forEach(line=>{
+        switch(line.type){
+          case 'setting':
+            xml+='    <Paragraph Type="Scene Heading">\n';
+            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='    </Paragraph>\n';
+            break;
+          case 'action':
+            xml+='    <Paragraph Type="Action">\n';
+            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='    </Paragraph>\n';
+            break;
+          case 'dialogue':
+            xml+='    <Paragraph Type="Character">\n';
+            xml+='      <Text>'+esc(line.character.name.toUpperCase())+'</Text>\n';
+            xml+='    </Paragraph>\n';
+            if(line.dialogueAction){
+              xml+='    <Paragraph Type="Parenthetical">\n';
+              xml+='      <Text>('+esc(line.dialogueAction)+')</Text>\n';
+              xml+='    </Paragraph>\n';
+            }
+            xml+='    <Paragraph Type="Dialogue">\n';
+            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='    </Paragraph>\n';
+            break;
+          case 'direction':
+            xml+='    <Paragraph Type="Transition">\n';
+            xml+='      <Text>'+esc(line.value)+'</Text>\n';
+            xml+='    </Paragraph>\n';
+            break;
+        }
+      });
+    });
+  });
+  xml+='  </Content>\n';
+
+  /* Title page */
+  xml+='  <TitlePage>\n';
+  xml+='    <Content>\n';
+  xml+='      <Paragraph Type="Action">\n';
+  xml+='        <Text>'+esc(S.title||'Untitled')+'</Text>\n';
+  xml+='      </Paragraph>\n';
+  if(S.author){
+    xml+='      <Paragraph Type="Action">\n';
+    xml+='        <Text>written by</Text>\n';
+    xml+='      </Paragraph>\n';
+    xml+='      <Paragraph Type="Action">\n';
+    xml+='        <Text>'+esc(S.author)+'</Text>\n';
+    xml+='      </Paragraph>\n';
+  }
+  xml+='    </Content>\n';
+  xml+='  </TitlePage>\n';
+
+  /* Cast */
+  const activeChars=S.characters.filter(c=>!c.archived);
+  if(activeChars.length){
+    xml+='  <Cast>\n';
+    activeChars.forEach(c=>{
+      xml+='    <Member Character="'+esc(c.name.toUpperCase())+'" Actor=""/>\n';
+    });
+    xml+='  </Cast>\n';
+  }
+
+  xml+='</FinalDraft>\n';
+  return xml;
+}
+
+function exportFDX(){
+  closeFDD();
+  const xml=buildFDXText();
+  const blob=new Blob([xml],{type:'application/xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.fdx';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 /* ── Character panel inline expansion ── */

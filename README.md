@@ -12,7 +12,7 @@ Scripts auto-save to your browser's localStorage and can be linked to a file on 
 
 ## Quick start
 
-Open `script_maker.html` in any modern browser. That's it. You can start a new script, open a saved JSON file, or try the built-in sample script.
+Open `script_maker.html` in any modern browser. That's it. You can start a new script, open a saved JSON file, import a Fountain or Final Draft (.fdx) file, or try the built-in sample script.
 
 ## Features
 
@@ -37,12 +37,15 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 - Read-only View tab with act/scene separators for distraction-free reading
 - Settings tab for font size, indicator styles, line-type colors, theme override, and pill hotkey customization
 
-**File handling**
+**File handling & portability**
 - localStorage auto-persistence — your work is saved in the browser automatically
 - File System Access API — link to a file on disk and overwrite on each save (no repeated downloads)
 - Fallback JSON download for browsers without File System Access API
 - Visual save indicator: gray (no file), blue (browser-only), green (linked to disk file)
 - PDF export with title page, character list, table of contents, and formatted script pages
+- Fountain export/import — the open plain-text screenplay format used by Highland, Beat, and others
+- Final Draft (FDX) export/import — the industry-standard XML format for screenplay interchange
+- Full round-trip fidelity across formats: FDX → Fountain → FDX preserves all content
 - Metadata ZIP download — exports the raw JSON and a manifest for re-importing later
 - PDF + metadata export — bundles the print-ready PDF with metadata in a single ZIP
 
@@ -82,11 +85,11 @@ The entire app is a single HTML file with one external dependency (JSZip via CDN
 
 See [TODO.md](TODO.md) for the full list. Up next:
 
-- FDX export (Final Draft format)
 - Auto-formatting for screenplay conventions
-- Beat board / index card view
-- Notes and comments on lines and scenes
+- Scene cards / outline view
 - Revision tracking / version history
+- Notes and comments on lines and scenes
+- Real-time collaboration
 
 ## License
 

@@ -27,7 +27,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 - [x] **Fountain export** — Export scripts to the Fountain (.fountain) plain-text screenplay format. Fountain is the open standard used by Beat, Highland, and many other editors. Makes scripts portable and future-proof. *(Session 8)*
 - [x] **Fountain import** — Parse .fountain files and load them into the app's data model. Support scene headings, characters, dialogue, action, transitions, notes, and sections. *(Session 8)*
-- [ ] **FDX export** — Export to Final Draft (.fdx) XML format, the industry standard for screenplay interchange. WriterDuet, Arc Studio, Beat, and WriterSolo all support this.
+- [x] **FDX export** — Export to Final Draft (.fdx) XML format, the industry standard for screenplay interchange. WriterDuet, Arc Studio, Beat, and WriterSolo all support this. *(Session 8)*
 - [x] **FDX import** — Import Final Draft (.fdx) files, mapping elements to the app's line types. Handles both screenplay and stage play templates including Act Break, DualDialogue, Parenthetical, and Cast sections. *(Session 8)*
 
 ### To Do — Writing Experience (Priority 2)
