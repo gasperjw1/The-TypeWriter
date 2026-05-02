@@ -12,6 +12,28 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Scriptwriter"/>
 <meta name="twitter:description" content="A free, open-source screenplay editor in your browser. No accounts, no installs."/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "The Scriptwriter",
+  "description": "A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing.",
+  "url": "https://yashmahtani.github.io/The-TypeWriter/",
+  "applicationCategory": "Multimedia",
+  "operatingSystem": "Any (browser-based)",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Yash Mahtani"
+  },
+  "softwareVersion": "1.0",
+  "license": "https://github.com/gasperjw1/The-TypeWriter"
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -52,7 +74,8 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 /* ── Topbar ── */
 #topbar{display:flex;align-items:center;border-bottom:var(--panel-border);flex-shrink:0;min-height:44px;}
 #tb-left{display:flex;align-items:center;gap:8px;padding:0 14px;flex:1;min-width:0;overflow:hidden;}
-#script-title-text{font-size:13px;font-weight:500;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+#script-title-text{font-size:13px;font-weight:500;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;cursor:pointer;border-radius:4px;padding:2px 6px;margin:-2px -6px;transition:background .15s;}
+#script-title-text:hover{background:var(--bg3);}
 #ctx-crumb{font-size:11px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #save-indicator{width:8px;height:8px;border-radius:50%;flex-shrink:0;position:relative;cursor:default;}
 .si-tip{display:none;position:fixed;background:var(--bg1);border:1px solid var(--bd2);border-radius:var(--rm);padding:5px 10px;font-size:11px;color:var(--tx2);white-space:nowrap;z-index:1000;box-shadow:0 3px 12px rgba(0,0,0,.15);}
@@ -506,7 +529,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 <div id="root">
 <div id="topbar">
   <div id="tb-left">
-    <span id="script-title-text">The Scriptwriter</span>
+    <span id="script-title-text" onclick="goHome()" title="Home">The Scriptwriter</span>
     <div id="save-indicator" style="background:#888780;"><div class="si-tip" id="si-tip-text">No file opened yet</div></div>
     <span id="ctx-crumb"></span>
   </div>
@@ -563,7 +586,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
         <div class="setup-brand">The Scriptwriter</div>
-        <div class="setup-tagline">A free screenplay editor in your browser. No accounts, no installs — just write.<br><a href="docs/guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a></div>
+        <div class="setup-tagline">A free screenplay editor in your browser. No accounts, no installs — just write.<br><a href="guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a></div>
         <div id="resume-card">
           <div class="setup-card" onclick="resumeFromLS()">
             <div class="setup-card-icon">▶</div>
@@ -1149,6 +1172,7 @@ function loadSample(){
   $('script-title-text').textContent=S.title;updateSaveIndicator();render();
 }
 function menuNew(){$('file-dd').classList.remove('open');if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
+function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
 function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';fileHandle=null;$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}

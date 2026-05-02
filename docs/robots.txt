@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yashmahtani.github.io/The-TypeWriter/sitemap.xml
