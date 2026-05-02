@@ -3,7 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Script Maker</title>
+<title>The TypeWriter — Free Screenplay Editor</title>
+<meta name="description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<meta property="og:title" content="The TypeWriter"/>
+<meta property="og:description" content="A free, open-source screenplay editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://yashmahtani.github.io/The-TypeWriter/"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="The TypeWriter"/>
+<meta name="twitter:description" content="A free, open-source screenplay editor in your browser. No accounts, no installs."/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -56,16 +64,22 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 #script-body{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;border-right:var(--panel-border);}
 #script-scroll{flex:1;overflow-y:auto;padding:24px 40px 16px;position:relative;}
 
-/* Setup */
-#setup-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;}
-#setup-screen h2{font-size:20px;font-weight:500;}
-#setup-screen p{font-size:13px;color:var(--tx2);text-align:center;max-width:300px;}
-#setup-cards{display:flex;gap:16px;}
-.setup-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 28px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;min-width:140px;}
+/* Setup / Landing */
+#setup-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;padding:0 24px;}
+.setup-brand{font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--tx1);}
+.setup-tagline{font-size:15px;color:var(--tx2);text-align:center;max-width:360px;line-height:1.5;margin-bottom:20px;}
+#setup-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+.setup-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 24px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;min-width:130px;max-width:160px;}
 .setup-card:hover{border-color:var(--bd1);background:var(--bg1);}
-.setup-card-icon{font-size:24px;color:var(--tx2);}
+.setup-card-icon{font-size:22px;color:var(--tx2);}
 .setup-card-label{font-size:13px;font-weight:500;color:var(--tx1);}
-.setup-card-sub{font-size:11px;color:var(--tx2);text-align:center;}
+.setup-card-sub{font-size:11px;color:var(--tx3);text-align:center;line-height:1.4;}
+#resume-card{display:none;width:100%;max-width:440px;}
+#resume-card .setup-card{width:100%;max-width:100%;flex-direction:row;gap:12px;padding:14px 20px;align-items:center;}
+#resume-card .setup-card-icon{font-size:16px;}
+#resume-card .setup-card-label{font-size:13px;}
+#resume-card .setup-card-sub{text-align:left;font-size:11px;}
+.setup-divider{font-size:11px;color:var(--tx3);margin:8px 0 4px;text-transform:uppercase;letter-spacing:1px;}
 #new-title-wrap{display:none;flex-direction:column;align-items:center;gap:10px;}
 .setup-input{width:260px;font-family:var(--sans);font-size:13px;padding:8px 12px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);outline:none;}
 .setup-input:focus{border-color:var(--bd1);background:var(--bg1);}
@@ -406,7 +420,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 <div id="root">
 <div id="topbar">
   <div id="tb-left">
-    <span id="script-title-text">Script writer</span>
+    <span id="script-title-text">The TypeWriter</span>
     <div id="save-indicator" style="background:#888780;"><div class="si-tip" id="si-tip-text">No file opened yet</div></div>
     <span id="ctx-crumb"></span>
   </div>
@@ -440,8 +454,14 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <div id="script-scroll" onscroll="checkScrollBack()" onclick="deselLine(event)">
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
-        <h2>Script writer</h2>
-        <p>Create a new script or open an existing one to get started.</p>
+        <div class="setup-brand">The TypeWriter</div>
+        <div class="setup-tagline">A free screenplay editor in your browser. No accounts, no installs — just write.</div>
+        <div id="resume-card">
+          <div class="setup-card" onclick="resumeFromLS()">
+            <div class="setup-card-icon">▶</div>
+            <div><div class="setup-card-label" id="resume-title">Resume</div><div class="setup-card-sub">Pick up where you left off</div></div>
+          </div>
+        </div>
         <div id="setup-cards">
           <div class="setup-card" onclick="showNewTitleInput()">
             <div class="setup-card-icon">✦</div>
@@ -451,7 +471,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <div class="setup-card" onclick="menuOpen()">
             <div class="setup-card-icon">⊞</div>
             <div class="setup-card-label">Open file</div>
-            <div class="setup-card-sub">Load a saved JSON script</div>
+            <div class="setup-card-sub">Load a JSON file</div>
+          </div>
+          <div class="setup-card" onclick="loadSample()">
+            <div class="setup-card-icon">▤</div>
+            <div class="setup-card-label">Try a sample</div>
+            <div class="setup-card-sub">Explore with a demo script</div>
           </div>
         </div>
         <div id="new-title-wrap">
@@ -612,6 +637,14 @@ let ghostMatch='',cddHideTimer=null;
 let modalCues={enters:[],exits:[]};
 let autosaveEnabled=true;
 
+const LS_SCRIPT_KEY='tw_script';
+const LS_SETTINGS_KEY='tw_settings';
+function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
+function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
+function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed}));}catch(e){}}
+function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
+
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
@@ -621,13 +654,13 @@ function cloneState(){return JSON.parse(stateJSON());}
 function updateSaveIndicator(){
   const dot=$('save-indicator'),tip=$('si-tip-text');
   if(!S.title){dot.style.background='#888780';tip.textContent='No file opened yet';return;}
-  if(!hasFilename){dot.style.background='#EF9F27';tip.textContent='Not yet saved — use File options → Save';return;}
+  if(!hasFilename){dot.style.background='#378ADD';tip.textContent='Saved locally in browser — use File options → Save to download';return;}
   const unsaved=stateJSON()!==lastSavedJSON;
   dot.style.background=unsaved?'#E24B4A':'#4CAF50';
-  tip.textContent=unsaved?'Unsaved changes since last save':'All changes saved';
+  tip.textContent=unsaved?'Unsaved changes since last file download':'All changes saved';
 }
-function autoSave(){if(!hasFilename||!autosaveEnabled)return;lastSavedJSON=stateJSON();updateSaveIndicator();triggerDownload(S.title,lastSavedJSON);}
-function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';}
+function autoSave(){if(S.title)lsSaveScript();if(!hasFilename||!autosaveEnabled)return;lastSavedJSON=stateJSON();updateSaveIndicator();triggerDownload(S.title,lastSavedJSON);}
+function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
 function triggerDownload(title,json){const b=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json';a.click();}
 function pushUndo(){
   undoStack.splice(undoCursor+1);
@@ -682,9 +715,9 @@ function isCont(scene,li){
 }
 function nextPillAfter(t){if(t==='setting')return'direction';if(t==='direction')return'dialogue';return'dialogue';}
 
-function setFontSize(v){document.documentElement.style.setProperty('--script-font-size',v+'px');$('font-preview').style.fontSize=v+'px';$('font-size-sel').value=v;}
-function setIndicator(mode){indicatorMode=mode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));$('opt-'+mode).classList.add('selected');const c=indicatorColors[mode];if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',c);else document.documentElement.style.setProperty('--highlight-color',c);render();}
-function setIndicatorColor(mode,val){indicatorColors[mode]=val;if(mode===indicatorMode){if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',val);else document.documentElement.style.setProperty('--highlight-color',val);render();}}
+function setFontSize(v){document.documentElement.style.setProperty('--script-font-size',v+'px');$('font-preview').style.fontSize=v+'px';$('font-size-sel').value=v;lsSaveSettings();}
+function setIndicator(mode){indicatorMode=mode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));$('opt-'+mode).classList.add('selected');const c=indicatorColors[mode];if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',c);else document.documentElement.style.setProperty('--highlight-color',c);lsSaveSettings();render();}
+function setIndicatorColor(mode,val){indicatorColors[mode]=val;if(mode===indicatorMode){if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',val);else document.documentElement.style.setProperty('--highlight-color',val);render();}lsSaveSettings();}
 
 function checkScrollBack(){
   const scrl=$('script-scroll'),btn=$('scroll-back-btn');
@@ -710,7 +743,7 @@ function switchTab(t){
   if(t==='summaries')renderSummaries();
   $('file-dd').classList.remove('open');
 }
-function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}}
+function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
 
 function toggleFileDd(){$('file-dd').classList.toggle('open');}
 document.addEventListener('click',e=>{if(!$('file-menu-wrap').contains(e.target))$('file-dd').classList.remove('open');});
@@ -721,15 +754,88 @@ function menuOpen(){$('file-dd').classList.remove('open');$('file-open-in').clic
 function loadFile(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=true;lastSavedJSON=stateJSON();$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=S.title;updateSaveIndicator();render();}catch(err){alert('Could not parse file.');}};
+  reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=S.title;updateSaveIndicator();render();}catch(err){alert('Could not parse file.');}};
   reader.readAsText(file);e.target.value='';
 }
+function resumeFromLS(){
+  const raw=lsLoadScript();if(!raw)return;
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=S.title;updateSaveIndicator();render();}catch(err){alert('Could not restore script.');}
+}
+const SAMPLE_SCRIPT={
+  title:'The Last Cigarette',
+  author:'Sample Script',
+  characters:[
+    {name:'MARLOWE',description:'Private detective, world-weary, sharp tongue',archived:false},
+    {name:'VIVIAN',description:'Mysterious client, elegant, hiding something',archived:false},
+    {name:'EDDIE',description:'Bartender at The Blue Door, knows everyone',archived:false},
+    {name:'SANTOS',description:'Hired muscle, few words, quick hands',archived:false}
+  ],
+  acts:[
+    {name:'The Setup',description:'Marlowe takes a case that smells like trouble.',scenes:[
+      {name:'The Office',description:'A slow night turns interesting.',lines:[
+        {type:'setting',value:'INT. MARLOWE\'S OFFICE — NIGHT'},
+        {type:'direction',value:'Rain streaks down the frosted glass door. A desk lamp casts the only light.',cues:{enters:['MARLOWE'],exits:[]}},
+        {type:'action',value:'MARLOWE sits behind his desk, nursing a glass of bourbon. An ashtray overflows beside a stack of unpaid bills.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Three days without a case. The rain\'s got more ambition than my phone.'},
+        {type:'action',value:'A sharp knock at the door. MARLOWE doesn\'t move.'},
+        {type:'direction',value:'The door opens without invitation.',cues:{enters:['VIVIAN'],exits:[]}},
+        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'Mr. Marlowe? I was told you find things.',dialogueAction:'stepping in from the rain'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Depends on what\'s lost.'},
+        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'My husband. He disappeared two weeks ago. The police stopped looking after one.',dialogueAction:'sitting without being asked'},
+        {type:'action',value:'She slides a photograph across the desk. MARLOWE studies it, then her.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'I charge fifty a day plus expenses. And I don\'t promise happy endings.'},
+        {type:'dialogue',character:{name:'VIVIAN',description:'Mysterious client, elegant, hiding something'},value:'I\'m not looking for happy. I\'m looking for the truth.'}
+      ]},
+      {name:'The Blue Door',description:'Marlowe follows his first lead.',lines:[
+        {type:'setting',value:'INT. THE BLUE DOOR BAR — LATER THAT NIGHT'},
+        {type:'direction',value:'A jazz trio plays in the corner. Smoke curls under amber lights.',cues:{enters:['MARLOWE','EDDIE'],exits:[]}},
+        {type:'action',value:'MARLOWE slides onto a barstool. EDDIE polishes a glass without looking up.'},
+        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'Marlowe. Bourbon?'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Make it a double. And make it come with information.'},
+        {type:'action',value:'MARLOWE places the photograph on the bar.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Richard Loomis. His wife says he vanished. You know him?'},
+        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'Used to come in Thursdays. Gin and tonic, two limes. Stopped showing about two weeks back.',dialogueAction:'glancing at the photo'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'He meet anyone here? Anyone unusual?'},
+        {type:'dialogue',character:{name:'EDDIE',description:'Bartender at The Blue Door, knows everyone'},value:'There was a guy. Big. Didn\'t order anything. They talked in the back booth maybe twenty minutes, then Loomis left in a hurry.',dialogueAction:'leaning in, lowering his voice'},
+        {type:'action',value:'MARLOWE finishes his bourbon and drops a bill on the bar.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'If the big guy shows up again, you never saw me.'}
+      ]}
+    ]},
+    {name:'The Confrontation',description:'The truth catches up.',scenes:[
+      {name:'The Alley',description:'Marlowe finds more than he bargained for.',lines:[
+        {type:'setting',value:'EXT. ALLEY BEHIND THE BLUE DOOR — CONTINUOUS'},
+        {type:'direction',value:'Rain hammers the pavement. A single streetlight flickers at the far end.',cues:{enters:['MARLOWE'],exits:[]}},
+        {type:'action',value:'MARLOWE turns up his collar and heads for his car. A shadow detaches from the wall behind him.'},
+        {type:'direction',value:'Heavy footsteps on wet concrete.',cues:{enters:['SANTOS'],exits:[]}},
+        {type:'dialogue',character:{name:'SANTOS',description:'Hired muscle, few words, quick hands'},value:'You\'re asking questions about Loomis.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'That\'s what people pay me for.',dialogueAction:'turning slowly'},
+        {type:'dialogue',character:{name:'SANTOS',description:'Hired muscle, few words, quick hands'},value:'People should be more careful with their money.'},
+        {type:'action',value:'SANTOS cracks his knuckles. MARLOWE takes a step back, hand drifting toward his coat pocket.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Let me guess — you\'re the welcoming committee. Loomis get the same introduction?'},
+        {type:'action',value:'SANTOS lunges. MARLOWE sidesteps and catches him with an elbow to the jaw. SANTOS staggers but doesn\'t go down.'},
+        {type:'direction',value:'A car horn blares from the street. Headlights sweep across the alley.',cues:{enters:[],exits:['SANTOS']}},
+        {type:'action',value:'SANTOS glares at MARLOWE, then vanishes into the dark.'},
+        {type:'dialogue',character:{name:'MARLOWE',description:'Private detective, world-weary, sharp tongue'},value:'Nice chat.\n(beat)\nI need a bigger bourbon.'}
+      ]}
+    ]}
+  ]
+};
+function loadSample(){
+  const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
+  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;
+  undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};
+  hasFilename=false;lastSavedJSON='';lsSaveScript();
+  $('undo-btn').disabled=true;$('redo-btn').disabled=true;
+  $('setup-screen').style.display='none';$('script-content').style.display='block';
+  $('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';
+  $('script-title-text').textContent=S.title;updateSaveIndicator();render();
+}
 function menuNew(){$('file-dd').classList.remove('open');if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
-function doNewScript(){S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='Script writer';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[]};undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};hasFilename=false;lastSavedJSON='';$('undo-btn').disabled=true;$('redo-btn').disabled=true;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The TypeWriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
-window.addEventListener('beforeunload',e=>{if(S.title&&stateJSON()!==lastSavedJSON){e.preventDefault();e.returnValue='';}});
-function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=t;$('setup-input').value='';updateSaveIndicator();openActModal(true);}
+window.addEventListener('beforeunload',e=>{if(S.title&&hasFilename&&stateJSON()!==lastSavedJSON){e.preventDefault();e.returnValue='';}});
+function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=t;$('setup-input').value='';lsSaveScript();updateSaveIndicator();openActModal(true);}
 $('setup-input').addEventListener('keydown',e=>{if(e.key==='Enter')startScript();});
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();if(editingLine)saveInlineEdit();menuSave();return;}
@@ -1339,6 +1445,19 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 }
 
 updateInputMode();switchTab('edit');updateSaveIndicator();
+
+(function initFromLS(){
+  const saved=lsLoadScript();
+  if(saved){try{const d=JSON.parse(saved);if(d.title){$('resume-title').textContent='Resume: '+d.title;$('resume-card').style.display='block';}}catch(e){}}
+  const sets=lsLoadSettings();
+  if(sets){
+    if(typeof sets.autosaveEnabled==='boolean'){autosaveEnabled=sets.autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');if(btn)btn.classList.toggle('on',autosaveEnabled);if(desc)desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';}
+    if(sets.indicatorMode){indicatorMode=sets.indicatorMode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));const opt=$('opt-'+indicatorMode);if(opt){opt.classList.add('selected');opt.querySelector('input[type=radio]').checked=true;}}
+    if(sets.indicatorColors)indicatorColors=sets.indicatorColors;
+    if(sets.fontSize){document.documentElement.style.setProperty('--script-font-size',sets.fontSize);const sel=$('font-size-sel');if(sel)sel.value=parseInt(sets.fontSize);const prev=$('font-preview');if(prev)prev.style.fontSize=sets.fontSize;}
+    if(typeof sets.rpCollapsed==='boolean')rpCollapsed=sets.rpCollapsed;
+  }
+})();
 </script>
 </body>
 </html>

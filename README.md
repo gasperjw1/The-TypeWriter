@@ -10,7 +10,7 @@ Scripts are saved as lightweight JSON files on your machine. When you're ready t
 
 ## Quick start
 
-Open `script_maker_setup_fix.html` in any modern browser. That's it.
+Open `script_maker.html` in any modern browser. That's it.
 
 You can also try it live at the [GitHub Pages demo](https://yashmahtani.github.io/The-TypeWriter/) if one is configured via the `docs/` folder.
 
@@ -46,7 +46,7 @@ You can also try it live at the [GitHub Pages demo](https://yashmahtani.github.i
 
 ```
 The-TypeWriter/
-  script_maker_setup_fix.html   # The app (open this)
+  script_maker.html   # The app (open this)
   docs/index.html               # GitHub Pages entry point
   TODO.md                       # Feature roadmap
   CLAUDE.md                     # Dev notes and project memory

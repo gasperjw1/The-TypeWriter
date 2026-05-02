@@ -4,12 +4,12 @@
 Yash Mahtani (yashmahtani@gmail.com)
 
 ## Project Overview
-**The TypeWriter** is a screenplay/script writing application. The main app is `script_maker_setup_fix.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
+**The TypeWriter** is a screenplay/script writing application. The main app is `script_maker.html` at the repo root — a single-file, zero-dependency web app. The project evolved from a Python CLI (`script_maker.py`) through several web UI iterations, all now in `archive/`.
 
 ## Architecture
 
 ### Files
-- `script_maker_setup_fix.html` — **Latest version (current)**. Standalone full-HTML version (with `<!DOCTYPE html>`, `<head>`, `<body>`) that includes its own CSS variable definitions and dark mode media query. Has all features from v10 plus: PDF export, author field, autosave toggle, resizable right panel, smart tooltip positioning (fixed/viewport-clamped), direction cue editing in modal, deselect-line-on-click, parenthetical handling in dialogue, inline editing, 50-entry cursor-based undo/redo with Redo button, auto-numbered acts/scenes, standalone character creation, and rich pill tooltips.
+- `script_maker.html` — **Latest version (current)**. Standalone full-HTML version (with `<!DOCTYPE html>`, `<head>`, `<body>`) that includes its own CSS variable definitions and dark mode media query. Has all features from v10 plus: PDF export, author field, autosave toggle, resizable right panel, smart tooltip positioning (fixed/viewport-clamped), direction cue editing in modal, deselect-line-on-click, parenthetical handling in dialogue, inline editing, 50-entry cursor-based undo/redo with Redo button, auto-numbered acts/scenes, standalone character creation, and rich pill tooltips.
 - `TODO.md` — Feature roadmap tracking completed work and remaining gaps identified from competitor analysis.
 - `CLAUDE.md` — This project memory file.
 - `archive/` — Older versions and the original CLI, kept for reference:
