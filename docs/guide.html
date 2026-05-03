@@ -80,20 +80,45 @@ a:hover{text-decoration:underline;}
   <h2>Writing</h2>
 
   <div class="feature">
+    <h3>Two input modes <span class="badge">Choose at setup</span></h3>
+    <p>When you create a new script, you choose between two ways to write:</p>
+    <ul>
+      <li><strong>Smart input</strong> — type naturally in a single textbox. The app auto-detects the line type from your text. Type <code>HELEN: Good morning</code> for dialogue, <code>[ENTER HELEN]</code> for a cue, or anything else for a stage direction.</li>
+      <li><strong>Manual pills</strong> — select a line type pill (Cue, Dialogue, or Stage Direction) before typing each line. Gives you explicit control.</li>
+    </ul>
+    <p style="margin-top:6px;">You can switch between modes any time in <strong>Settings &rarr; Input</strong>.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Smart input details</h3>
+    <p>In smart input mode, the app detects your line type as you type and shows it as a colored pill below the textbox. The patterns it recognizes:</p>
+    <ul>
+      <li><strong>Dialogue</strong> — <code>NAME: text</code> or <code>NAME (action): text</code>. You can also type a character name in ALL CAPS, press Enter, then type the dialogue text on the next line.</li>
+      <li><strong>Cue</strong> — <code>[ENTER NAME]</code> or <code>[EXIT NAME]</code></li>
+      <li><strong>Stage direction</strong> — anything else</li>
+    </ul>
+    <p style="margin-top:6px;">If you misspell a character name, the app suggests the closest match: "Did you mean HELEN?" You can accept or ignore the suggestion.</p>
+  </div>
+
+  <div class="feature">
     <h3>Line type pills &amp; shortcuts <span class="badge">Keyboard</span></h3>
-    <p>Every line you write is one of four types — <strong>Setting</strong>, <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
+    <p>In manual pills mode, every line you write is one of three types — <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
     <ul>
       <li>Press <span class="key">`</span> (backtick) then <span class="key">1</span> → Dialogue</li>
       <li>Press <span class="key">`</span> then <span class="key">2</span> → Stage Direction</li>
-      <li>Press <span class="key">`</span> then <span class="key">3</span> → Setting</li>
-      <li>Press <span class="key">`</span> then <span class="key">4</span> → Cue</li>
+      <li>Press <span class="key">`</span> then <span class="key">3</span> → Cue</li>
     </ul>
     <p style="margin-top:8px;">These keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them to any key you like. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
   </div>
 
   <div class="feature">
     <h3>Smart auto-advance</h3>
-    <p>After you submit a line, the pill automatically advances to the next likely type. Setting advances to Cue, Cue advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
+    <p>In manual pills mode, after you submit a line, the pill automatically advances to the next likely type. Cue advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Scene settings</h3>
+    <p>Each scene has a <strong>setting</strong> field (e.g., "A dimly lit parlor. Evening.") that you fill in when creating or editing a scene. It appears in italic below the scene header. Click it to edit. The setting is exported in PDF, Fountain, and FDX formats.</p>
   </div>
 
   <div class="feature">
@@ -129,19 +154,19 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Inline editing</h3>
-    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Setting and Stage Direction lines, you get a simple text area. For Dialogue, you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
+    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Stage Direction lines, you get a simple text area. For Dialogue, you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
     <p style="margin-top:6px;">Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
   </div>
 
   <div class="feature">
     <h3>Find &amp; Replace <span class="badge">Ctrl+F</span></h3>
-    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Setting, Cue, Dialogue, Stage Dir.) to limit which line types are searched.</p>
+    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Cue, Dialogue, Stage Dir.) to limit which line types are searched.</p>
     <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong> (or <span class="key">Enter</span>/<span class="key">Shift+Enter</span>). Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and parentheticals, not the character name.</p>
   </div>
 
   <div class="feature">
     <h3>Drag &amp; drop</h3>
-    <p>Acts, scenes, and individual lines can be reordered by dragging. The app validates line moves against character presence — if you try to move a direction line with entrance cues to a position where the character is already present, you'll get a warning with the option to proceed (which removes the invalid cues) or cancel.</p>
+    <p>Acts, scenes, and individual lines can be reordered by dragging (long-press to drag on mobile/touch devices). The app validates line moves against character presence — if you try to move a cue line to a position where the character's presence state conflicts, you'll get a warning with the option to proceed or cancel.</p>
   </div>
 
   <div class="feature">
@@ -176,6 +201,33 @@ a:hover{text-decoration:underline;}
   </div>
 </div>
 
+<!-- ─── OUTLINE & ORGANIZATION ─── -->
+<div class="section">
+  <h2>Outline &amp; organization</h2>
+
+  <div class="feature">
+    <h3>Scene cards / Outline tab</h3>
+    <p>The <strong>Outline</strong> tab in the top bar shows your script as a visual corkboard. Each scene appears as a card showing:</p>
+    <ul>
+      <li>Scene label and setting</li>
+      <li>Line count, dialogue count, and character count</li>
+      <li>Character name chips for quick reference</li>
+    </ul>
+    <p style="margin-top:6px;">Cards are grouped by act. <strong>Drag to reorder</strong> scenes within the same act (long-press on mobile). <strong>Click any card</strong> to jump to that scene in the editor.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Lockable scene numbers</h3>
+    <p>Scene numbers normally adjust automatically when you reorder scenes. For production drafts where scene numbers must stay fixed, use <strong>File &rarr; Lock scene numbers</strong>. This snapshots the current numbers so they persist even if you rearrange scenes. You can edit individual locked numbers in the scene edit modal. Use <strong>File &rarr; Unlock scene numbers</strong> to return to auto-numbering.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Revision tracking <span class="badge">Production</span></h3>
+    <p>Use <strong>File &rarr; New Revision</strong> to create a named snapshot of your script. After creating a revision, any lines you change will be marked with a colored left border and a ✱ margin indicator. The app cycles through industry-standard revision colors: white, blue, pink, yellow, green, goldenrod.</p>
+    <p style="margin-top:6px;">Toggle revision marks on/off with the color chip in the top bar. View revision history and clear old revisions from <strong>File &rarr; Revision History</strong>.</p>
+  </div>
+</div>
+
 <!-- ─── SAVING & EXPORT ─── -->
 <div class="section">
   <h2>Saving &amp; export</h2>
@@ -205,6 +257,36 @@ a:hover{text-decoration:underline;}
     <h3>Resume from browser</h3>
     <p>When you return to The Scriptwriter and your last script is in local storage, a <strong>Resume</strong> card appears on the start screen so you can pick up right where you left off.</p>
   </div>
+
+  <div class="feature">
+    <h3>Fountain export &amp; import</h3>
+    <p><a href="https://fountain.io" target="_blank">Fountain</a> is an open plain-text format used by Highland, Beat, and other writing apps. Use <strong>File &rarr; Export to Fountain</strong> to save your script as a <code>.fountain</code> file, or <strong>File &rarr; Import from Fountain</strong> to open one. Round-trip fidelity is preserved — export and re-import produces the same script.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Final Draft (FDX) export &amp; import</h3>
+    <p>FDX is the industry-standard XML format used by Final Draft. Use <strong>File &rarr; Export to Final Draft</strong> or <strong>File &rarr; Import from Final Draft</strong>. Both stage play and screenplay FDX files are supported on import.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Save nudge</h3>
+    <p>The first time you create a new script, a toast appears in the corner offering to save your script to a file on your computer. This is the recommended approach — your script will be a real file you can find in Finder or Explorer. If you dismiss the toast, you can always save later from <strong>File &rarr; Save</strong>.</p>
+  </div>
+</div>
+
+<!-- ─── OFFLINE & INSTALL ─── -->
+<div class="section">
+  <h2>Offline &amp; install</h2>
+
+  <div class="feature">
+    <h3>Install as a desktop app</h3>
+    <p>The Scriptwriter is a Progressive Web App (PWA). In Chrome, click the install icon in the address bar (or <strong>Menu &rarr; Install The Scriptwriter</strong>). Once installed, it runs in its own standalone window — no tabs, no address bar, no browser distractions.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Works offline</h3>
+    <p>After your first visit, the entire app is cached locally. You can write, edit, save, and export scripts with no internet connection. Everything works the same — localStorage, disk file saving, PDF export, the works.</p>
+  </div>
 </div>
 
 <!-- ─── SETTINGS ─── -->
@@ -213,12 +295,12 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Pill hotkey customization</h3>
-    <p>Under <strong>Settings &rarr; Keyboard shortcuts</strong>, you can remap the key for each line-type pill. Click the input field next to a pill type, then press any key to assign it. If two pills would end up with the same key, they automatically swap. Click <strong>Reset to defaults</strong> to go back to 1/2/3/4. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
+    <p>Under <strong>Settings &rarr; Keyboard shortcuts</strong>, you can remap the key for each line-type pill. Click the input field next to a pill type, then press any key to assign it. If two pills would end up with the same key, they automatically swap. Click <strong>Reset to defaults</strong> to go back to 1/2/3. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
   </div>
 
   <div class="feature">
     <h3>Line-type colors</h3>
-    <p>Each line type (Setting, Cue, Dialogue, Stage Direction) has a configurable accent color that tints the left border and background in the editor. You can change the color with a color picker or disable the tint entirely with the toggle. These are purely visual — they don't affect the exported PDF.</p>
+    <p>Each line type (Cue, Dialogue, Stage Direction) has a configurable accent color that tints the left border and background in the editor. You can change the color with a color picker or disable the tint entirely with the toggle. These are purely visual — they don't affect the exported PDF.</p>
   </div>
 
   <div class="feature">
