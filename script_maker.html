@@ -4,14 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>The Scriptwriter — Free Stage Play Editor</title>
-<meta name="description" content="A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<meta name="description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing."/>
 <meta property="og:title" content="The Scriptwriter"/>
-<meta property="og:description" content="A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing."/>
+<meta property="og:description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing."/>
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://yashmahtani.github.io/The-TypeWriter/"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Scriptwriter"/>
-<meta name="twitter:description" content="A free, open-source stage play editor in your browser. No accounts, no installs."/>
+<meta name="twitter:description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts."/>
 <meta name="theme-color" content="#1a1a18"/>
 <link rel="manifest" href="docs/manifest.json"/>
 <link rel="icon" type="image/png" sizes="192x192" href="docs/icon-192.png"/>
@@ -21,7 +21,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "The Scriptwriter",
-  "description": "A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs — just open and start writing.",
+  "description": "A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing.",
   "url": "https://yashmahtani.github.io/The-TypeWriter/",
   "applicationCategory": "Multimedia",
   "operatingSystem": "Any (browser-based)",
@@ -467,6 +467,18 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .im-card-label{font-size:12px;font-weight:500;color:var(--tx1);}
 .im-card-desc{font-size:10px;color:var(--tx3);line-height:1.4;}
 
+/* ── Save nudge toast ── */
+#save-nudge{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rl);padding:16px 20px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,0.15);z-index:9999;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;display:flex;flex-direction:column;gap:10px;}
+#save-nudge.visible{opacity:1;transform:translateY(0);}
+.sn-icon{font-size:20px;}
+.sn-text{font-size:12px;color:var(--tx2);line-height:1.5;}
+.sn-text strong{color:var(--tx1);font-size:13px;}
+.sn-btns{display:flex;gap:8px;}
+.sn-yes{padding:6px 14px;border:none;border-radius:var(--rm);background:#378ADD;color:#fff;font-size:12px;cursor:pointer;font-weight:500;}
+.sn-yes:hover{background:#2a6fb8;}
+.sn-no{padding:6px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:transparent;color:var(--tx3);font-size:12px;cursor:pointer;}
+.sn-no:hover{border-color:var(--bd1);color:var(--tx2);}
+
 /* ── Right panel ── */
 #right-panel-wrap{display:flex;flex-direction:column;border-left:var(--panel-border);background:var(--bg1);flex-shrink:0;position:relative;}
 #rp-resize-handle{position:absolute;left:0;top:0;bottom:0;width:5px;cursor:col-resize;z-index:10;background:transparent;}
@@ -834,7 +846,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
         <div class="setup-brand">The Scriptwriter</div>
-        <div class="setup-tagline">A free stage play editor in your browser. No accounts, no installs — just write.<br><a href="docs/guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="docs/compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a></div>
+        <div class="setup-tagline">A free stage play editor. Your scripts save to real files on your computer — no cloud, no accounts.<br>Install as a desktop app for distraction-free writing offline.<br><a href="docs/guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="docs/compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a></div>
         <div id="resume-card">
           <div class="setup-card" onclick="resumeFromLS()">
             <div class="setup-card-icon">▶</div>
@@ -850,7 +862,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <div class="setup-card" onclick="menuOpen()">
             <div class="setup-card-icon">⊞</div>
             <div class="setup-card-label">Open file</div>
-            <div class="setup-card-sub">Load a JSON file</div>
+            <div class="setup-card-sub">Load a saved script from disk</div>
           </div>
           <div class="setup-card" onclick="loadSample()">
             <div class="setup-card-icon">▤</div>
@@ -1130,8 +1142,8 @@ function cloneState(){return JSON.parse(stateJSON());}
 function updateSaveIndicator(){
   const dot=$('save-indicator'),tip=$('si-tip-text');
   if(!S.title){dot.style.background='#888780';tip.textContent='No file opened yet';return;}
-  if(fileHandle){dot.style.background='#4CAF50';tip.textContent='Saved to '+fileHandle.name;return;}
-  dot.style.background='#378ADD';tip.textContent='Saved in browser — use File options → Save to file to persist on disk';
+  if(fileHandle){dot.style.background='#4CAF50';tip.textContent='Saved to disk: '+fileHandle.name;return;}
+  dot.style.background='#378ADD';tip.textContent='Saved in browser only — click File → Save to keep a copy on your computer';
 }
 async function writeToFileHandle(json){
   if(!fileHandle)return;
@@ -1376,7 +1388,19 @@ function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
-function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-input').value='';showEditor(t);lsSaveScript();openActModal(true);}
+function startScript(){const t=$('setup-input').value.trim();if(!t)return;S.title=t;$('setup-input').value='';showEditor(t);lsSaveScript();openActModal(true);if(window.showSaveFilePicker)setTimeout(showSaveNudge,800);}
+function showSaveNudge(){
+  try{if(localStorage.getItem('tw_save_nudge_dismissed'))return;}catch(e){}
+  const n=document.createElement('div');n.id='save-nudge';
+  n.innerHTML=`<div class="sn-icon">💾</div><div class="sn-text"><strong>Save to a file on disk?</strong><br>Your script is safe in the browser, but you can also save it as a file you can see and manage yourself.</div><div class="sn-btns"><button class="sn-yes" onclick="acceptSaveNudge()">Choose a location</button><button class="sn-no" onclick="dismissSaveNudge()">Later</button></div>`;
+  document.body.appendChild(n);requestAnimationFrame(()=>n.classList.add('visible'));
+}
+async function acceptSaveNudge(){
+  dismissSaveNudge();
+  try{fileHandle=await showSaveFilePicker({suggestedName:'raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',types:[{description:'JSON',accept:{'application/json':['.json']}}]});
+  hasFilename=true;lastSavedJSON=stateJSON();await writeToFileHandle(lastSavedJSON);updateSaveIndicator();}catch(e){if(e.name!=='AbortError')console.warn(e);}
+}
+function dismissSaveNudge(){try{localStorage.setItem('tw_save_nudge_dismissed','1');}catch(e){}const n=$('save-nudge');if(n){n.classList.remove('visible');setTimeout(()=>n.remove(),300);}}
 $('setup-input').addEventListener('keydown',e=>{if(e.key==='Enter')startScript();});
 
 /* ── Find / Replace ── */
