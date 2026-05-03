@@ -135,6 +135,11 @@ S = {
 - [x] Revision tracking with colored revision marks (Session 9)
 - [x] Scene cards / outline view (Session 10)
 - [x] Lockable scene numbers (Session 10)
+- [x] Setting promoted from line type to scene attribute (Session 13)
+- [x] Smart input mode with auto line-type detection (Session 14)
+- [x] Levenshtein fuzzy character name matching (Session 14)
+- [x] Multi-line dialogue support in auto-detect mode (Session 14)
+- [x] PWA offline support — installable web app with service worker (Session 14)
 
 ### Remaining (priority order)
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
@@ -270,3 +275,14 @@ S = {
 - **Import/export updates** — Fountain export emits `scene.setting` as a Fountain scene heading before any lines. Fountain import stores the first scene heading in `scene.setting` (subsequent ones become legacy lines). FDX export emits `scene.setting` as a `Scene Heading` paragraph. FDX import stores `Scene Heading` paragraphs in `scene.setting` instead of as lines.
 - **Removed Setting from UI** — Setting pill, Setting color swatch in Settings, Setting hotkey in keyboard shortcuts, Setting chip in find/replace filters all removed. `pillHotkeys` reduced to 3 keys (default: 1=Dialogue, 2=Stage Dir., 3=Cue). `ltColors`/`ltEnabled`/`applyLTColors` no longer include setting. `findFilters` no longer includes setting.
 - **Sample script migrated** — All three scenes in the sample script now use `scene.setting` instead of setting lines.
+
+### Session 14 — 2026-05-02
+- **Bug fixes (3)** — Fixed Cue tooltip shortcut mismatch (`` ` 4`` → `` ` 3``). Fixed stale CSS comment referencing removed Summaries/Guide panels. Fixed modal drag/resize conflict by restricting `cursor:move` and mousedown handler to `.mbox h3` only, so the browser's native `resize:both` handle works.
+- **Smart input mode** — New `inputMode` state: `'pills'` (manual pill selection, default) or `'auto'` (unified textbox with auto line-type detection). Users choose at script creation via two cards on the setup screen. Changeable any time in Settings. `applyInputMode()` toggles visibility of pills vs unified textarea. Persisted in localStorage.
+- **Auto-detect engine** — `detectLineType(text)` uses three regex patterns: `DLG_RE` for colon-style dialogue (`NAME: text` or `NAME (action): text`), `CUE_RE` for bracket cues (`[ENTER/EXIT NAME]`), `MLDLG_NAME_RE` for multi-line dialogue (uppercase name on first line). Returns `{type, parsed}` with extracted fields. Falls back to `'action'` (stage direction) for unrecognized patterns.
+- **Multi-line dialogue** — `dialogue-partial` intermediate type: when the user types an uppercase name and presses Enter, the system recognizes it as a character name but doesn't submit — it lets the textarea insert a newline so the user can type dialogue action or text on subsequent lines. `autoKey` checks for `dialogue-partial` and suppresses submission on Enter.
+- **Fuzzy character name matching** — `levenshtein(a,b)` implements edit distance. `fuzzyCharMatch(name)` checks if a typed name is close to an existing character (threshold: 2 edits for names ≤5 chars, 3 for longer). On match, shows a suggestion bar: "Did you mean HELEN?" with accept/ignore options.
+- **Auto-detect UI** — `#auto-ta` unified textarea with `onAutoInput()` handler. `#auto-detect-bar` shows detected type as a colored pill (Cue/Dialogue/Stage Dir.) with a hint. `#auto-suggest` shows fuzzy match suggestions. `submitAutoLine()` handles submission, character creation prompts, and line insertion.
+- **FADE TO BLACK fix** — Removed `.` from `MLDLG_NAME_RE` and added word-count guard (`split(/\s+/).length<=3`) to prevent all-caps stage directions with periods from false-matching as dialogue character names.
+- **PWA offline support** — Progressive Web App with service worker. New files in `docs/`: `manifest.json` (standalone display, dark theme), `sw.js` (cache-first strategy caching index.html, icons, and JSZip CDN), `icon.svg`/`icon-192.png`/`icon-512.png` (gold pen nib with S lettermark). Added `<meta name="theme-color">`, `<link rel="manifest">`, `<link rel="icon">`, `<link rel="apple-touch-icon">`, and SW registration script to `script_maker.html`. Updated `sync.sh` with rewrite rules for manifest/icon/SW paths.
+- **Updated README.md** — Added smart input mode, PWA offline support, and PWA files to project structure.
