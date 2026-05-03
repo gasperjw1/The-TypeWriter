@@ -277,6 +277,32 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .outline-empty{text-align:center;color:var(--tx3);padding:48px 0;font-size:14px;}
 @media(max-width:768px){.outline-grid{grid-template-columns:1fr 1fr;gap:10px;}.outline-card{padding:10px;}}
 @media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
+
+/* ── Print styles ── */
+@media print{
+  body{background:#fff !important;color:#000 !important;}
+  #top-bar,#input-bar,#right-panel-wrap,#mob-panel-backdrop,#mob-fdd-backdrop,.outline-toolbar,#save-nudge{display:none !important;}
+  #main-area{display:block !important;}
+  #view-panel{display:block !important;padding:0 !important;max-width:100% !important;overflow:visible !important;color:#000 !important;}
+  #view-panel *{color:#000 !important;}
+  #view-panel .v-title{font-size:18pt !important;}
+  #view-panel .v-author{font-size:12pt !important;color:#333 !important;}
+  #view-panel .v-act{border-top:1.5pt solid #000 !important;margin-top:24pt !important;}
+  #view-panel .v-scene{border-top:0.5pt solid #666 !important;}
+  #view-panel .v-setting,#view-panel .v-direction,#view-panel .v-action{color:#333 !important;}
+  .view-print-btn{display:none !important;}
+}
+.view-print-btn{display:inline-block;font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;margin-bottom:20px;float:right;}
+.view-print-btn:hover{border-color:var(--bd1);color:var(--tx1);}
+
+/* Keyboard shortcuts reference modal */
+.kb-ref-grid{display:grid;grid-template-columns:1fr auto;gap:0;font-size:12px;font-family:var(--sans);}
+.kb-ref-section{grid-column:1/-1;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);padding:10px 0 4px;border-bottom:1px solid var(--bd3);margin-top:4px;}
+.kb-ref-section:first-child{margin-top:0;padding-top:0;}
+.kb-ref-action{padding:5px 0;color:var(--tx1);border-bottom:1px solid var(--bd3,transparent);}
+.kb-ref-keys{padding:5px 0;text-align:right;border-bottom:1px solid var(--bd3,transparent);white-space:nowrap;}
+.kb-ref-key{display:inline-block;background:var(--bg2);border:1px solid var(--bd2);border-radius:3px;padding:1px 6px;font-size:11px;font-family:'Courier New',monospace;color:var(--tx2);margin-left:2px;}
+
 #settings-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 .psec-title{font-size:15px;font-weight:500;color:var(--tx1);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
 .setting-row{margin-bottom:20px;}
@@ -840,6 +866,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <button class="tb-btn" id="rev-toggle" style="display:none;font-size:11px;padding:2px 6px;" onclick="toggleRevMarks()" title="Toggle revision marks">✱</button>
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
+    <button class="tb-btn" onclick="openKBRef()" title="Keyboard shortcuts" style="font-size:13px;margin-left:2px;">?</button>
   </div>
   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
 </div>
@@ -1011,6 +1038,11 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <button class="hk-reset" style="margin-top:8px;" onclick="resetHotkeys()">Reset to defaults</button>
       </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
+      <div class="setting-row">
+        <div class="setting-label">Keyboard shortcuts</div>
+        <div class="setting-desc">View all keyboard shortcuts available in the editor.</div>
+        <button onclick="openKBRef()" style="margin-top:8px;font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">View shortcuts</button>
+      </div>
       <div class="setting-row">
         <div class="setting-label">Feature guide</div>
         <div class="setting-desc">Covers pill shortcuts, cues, inline editing, find &amp; replace, saving, drag-and-drop, and more.</div>
@@ -1543,6 +1575,7 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();if(editingLine)saveInlineEdit();doUndo();return;}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||((e.key==='z'||e.key==='Z')&&e.shiftKey))){e.preventDefault();if(editingLine)saveInlineEdit();doRedo();return;}
   if(editingLine)return;
+  if(e.key==='?'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const tag=document.activeElement?.tagName;if(tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'){e.preventDefault();openKBRef();return;}}
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){inputMode==='auto'?submitAutoLine():submitLine();return;}
   if(e.key==='`'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();pendingPillKey=true;return;}
   if(pendingPillKey){const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}}
@@ -2009,7 +2042,8 @@ ${sc.setting?`<div class="scene-setting" onclick="openEditScene(${ai},${si})">${
 
 function renderView(){
   const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
-  let h=`<div class="v-title">${esc(S.title)}</div>`;
+  let h=`<button class="view-print-btn" onclick="window.print()">Print</button>`;
+  h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
   S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${esc(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${esc(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${esc(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${esc(l.dialogueAction)})</div>`:''}<div class="vt">${esc(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${esc(l.value)})</div>`;});});});
   p.innerHTML=h;
@@ -3541,6 +3575,45 @@ function openGenericModal(innerHtml){
 function closeGenericModal(){
   const o=document.getElementById('generic-modal-overlay');
   if(o)o.style.display='none';
+}
+
+/* ── Keyboard shortcuts reference ── */
+function openKBRef(){
+  const mod=navigator.platform.indexOf('Mac')>-1?'Cmd':'Ctrl';
+  const k=(label)=>`<span class="kb-ref-key">${label}</span>`;
+  const row=(action,keys)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${keys}</div>`;
+  const sec=(title)=>`<div class="kb-ref-section">${title}</div>`;
+  /* Build pill hotkey labels */
+  const hk=typeof pillHotkeys!=='undefined'?pillHotkeys:{dialogue:'1',action:'2',direction:'3'};
+  let h=`<h3 style="margin:0 0 14px;font-size:15px;color:var(--tx1);">Keyboard Shortcuts</h3>`;
+  h+=`<div class="kb-ref-grid">`;
+  h+=sec('General');
+  h+=row('Save',k(mod)+' + '+k('S'));
+  h+=row('Undo',k(mod)+' + '+k('Z'));
+  h+=row('Redo',k(mod)+' + '+k('Shift')+' + '+k('Z'));
+  h+=row('Find &amp; Replace',k(mod)+' + '+k('F'));
+  h+=row('Submit line',k(mod)+' + '+k('Enter'));
+  h+=row('Close dialog / find bar',k('Esc'));
+  h+=sec('Line-type pills');
+  h+=row('Activate Dialogue',k('`')+' then '+k(hk.dialogue));
+  h+=row('Activate Stage Direction',k('`')+' then '+k(hk.action));
+  h+=row('Activate Cue',k('`')+' then '+k(hk.direction));
+  h+=sec('Inline editing');
+  h+=row('Start editing a line','Double-click or Edit button');
+  h+=row('Save edit',k('Enter'));
+  h+=row('Cancel edit',k('Esc'));
+  h+=row('Tab through dialogue fields',k('Tab'));
+  h+=sec('Find bar');
+  h+=row('Next match',k('Enter'));
+  h+=row('Previous match',k('Shift')+' + '+k('Enter'));
+  h+=row('Close',k('Esc'));
+  h+=sec('Navigation');
+  h+=row('Select a line','Click on it');
+  h+=row('Deselect','Click selected line again');
+  h+=row('Jump from character panel','Click a dialogue line');
+  h+=`</div>`;
+  h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
+  openGenericModal(h);
 }
 
 /* ── Character panel inline expansion ── */

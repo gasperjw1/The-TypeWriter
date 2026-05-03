@@ -57,11 +57,11 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 ## Other Improvements (identified during development)
 
-- [ ] **Keyboard shortcuts reference** — An in-app help panel listing all keyboard shortcuts (pill selection, undo/redo, submit, etc.)
+- [x] **Keyboard shortcuts reference** — An in-app help panel listing all keyboard shortcuts (pill selection, undo/redo, submit, etc.) *(Session 15)*
 - [ ] **Multi-line setting support** — Allow Shift+Enter for multi-line setting/action text in the input bar (currently Enter always submits)
 - [ ] **Scene reordering across acts** — Drag-and-drop currently only works within the same act for scenes. Cross-act scene moves would be useful.
 - [ ] **Line moving across scenes** — Same limitation as above for individual lines.
-- [ ] **Print-friendly View tab** — Add print CSS or a dedicated print button to the View tab for quick paper output without PDF export.
+- [x] **Print-friendly View tab** — Add print CSS or a dedicated print button to the View tab for quick paper output without PDF export. *(Session 15)*
 - [ ] **Plugin / extension system** — Allow user scripts (JavaScript) to process the script data. Beat supports this on macOS.
 - [ ] **Document styles** — Customizable page layout (fonts, margins) for the exported screenplay. Beat supports this.
 - [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.

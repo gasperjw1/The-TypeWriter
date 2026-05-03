@@ -149,11 +149,11 @@ S = {
 - [ ] Cloud sync / account-based storage
 
 ### Other Improvements
-- [ ] Keyboard shortcuts reference panel
+- [x] Keyboard shortcuts reference panel (Session 15)
 - [ ] Multi-line setting/action support (Shift+Enter)
 - [ ] Cross-act scene reordering
 - [ ] Cross-scene line moving
-- [ ] Print-friendly View tab
+- [x] Print-friendly View tab (Session 15)
 
 ## Conversation History
 
@@ -286,3 +286,7 @@ S = {
 - **FADE TO BLACK fix** — Removed `.` from `MLDLG_NAME_RE` and added word-count guard (`split(/\s+/).length<=3`) to prevent all-caps stage directions with periods from false-matching as dialogue character names.
 - **PWA offline support** — Progressive Web App with service worker. New files in `docs/`: `manifest.json` (standalone display, dark theme), `sw.js` (cache-first strategy caching index.html, icons, and JSZip CDN), `icon.svg`/`icon-192.png`/`icon-512.png` (gold pen nib with S lettermark). Added `<meta name="theme-color">`, `<link rel="manifest">`, `<link rel="icon">`, `<link rel="apple-touch-icon">`, and SW registration script to `script_maker.html`. Updated `sync.sh` with rewrite rules for manifest/icon/SW paths.
 - **Updated README.md** — Added smart input mode, PWA offline support, and PWA files to project structure.
+
+### Session 15 — 2026-05-02
+- **Print-friendly View tab** — Added `@media print` CSS block that hides all chrome (top bar, input bar, side panel, save nudge, outline toolbar) and formats View tab content with black-on-white styling. Added `.view-print-btn` Print button at the top of `renderView()` output (hidden in print). Act/scene separators styled for print with proper borders. Users can press Ctrl+P from the View tab for clean paper output.
+- **Keyboard shortcuts reference panel** — `openKBRef()` builds a comprehensive shortcut reference in a generic modal. Grid layout with sections: General (save, undo/redo, find, submit, escape), Line-type pills (dynamically reads `pillHotkeys` for current bindings), Inline editing (enter/escape/tab), Find bar (next/prev/close), Navigation (select/deselect/jump). Added `?` button in top bar next to Undo/Redo. Added `?` keyboard shortcut (when no input focused). Added "View shortcuts" button in Settings → Help section. CSS classes: `.kb-ref-grid`, `.kb-ref-section`, `.kb-ref-action`, `.kb-ref-keys`, `.kb-ref-key`.
