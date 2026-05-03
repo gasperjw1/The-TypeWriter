@@ -12,6 +12,10 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Scriptwriter"/>
 <meta name="twitter:description" content="A free, open-source stage play editor in your browser. No accounts, no installs."/>
+<meta name="theme-color" content="#1a1a18"/>
+<link rel="manifest" href="docs/manifest.json"/>
+<link rel="icon" type="image/png" sizes="192x192" href="docs/icon-192.png"/>
+<link rel="apple-touch-icon" href="docs/icon-192.png"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -3622,5 +3626,10 @@ document.querySelectorAll('#file-dd .fdd-item').forEach(item=>{
 <div id="mob-panel-backdrop" onclick="closeMobilePanel()"></div>
 <div id="mob-fdd-backdrop" onclick="toggleFileDd()"></div>
 
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('docs/sw.js',{scope:'.'}).catch(()=>{});
+}
+</script>
 </body>
 </html>

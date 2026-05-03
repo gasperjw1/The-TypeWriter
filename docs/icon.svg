@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1a1a18"/>
+  <!-- Quill/pen nib shape -->
+  <g transform="translate(256,256)">
+    <!-- Pen body -->
+    <path d="M-20,120 L0,-140 L20,120 Q10,140 0,145 Q-10,140 -20,120Z" fill="#EF9F27" opacity="0.9"/>
+    <!-- Pen tip -->
+    <path d="M-6,120 L0,160 L6,120Z" fill="#fff"/>
+    <!-- Center line -->
+    <line x1="0" y1="-100" x2="0" y2="110" stroke="#1a1a18" stroke-width="3" opacity="0.3"/>
+    <!-- Ink drop -->
+    <circle cx="0" cy="175" r="8" fill="#378ADD" opacity="0.8"/>
+  </g>
+  <!-- "S" lettermark -->
+  <text x="256" y="290" text-anchor="middle" font-family="Georgia,serif" font-size="180" font-weight="700" fill="#fff" opacity="0.15">S</text>
+</svg>

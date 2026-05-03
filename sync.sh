@@ -11,4 +11,10 @@ cp script_maker.html docs/index.html
 sed -i '' 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|' docs/index.html 2>/dev/null \
   || sed -i 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|' docs/index.html
 
+# Rewrite PWA paths for the docs context (manifest, icons, SW are in same dir)
+sed -i '' 's|href="docs/manifest.json"|href="manifest.json"|;s|href="docs/icon-192.png"|href="icon-192.png"|' docs/index.html 2>/dev/null \
+  || sed -i 's|href="docs/manifest.json"|href="manifest.json"|;s|href="docs/icon-192.png"|href="icon-192.png"|' docs/index.html
+sed -i '' "s|register('docs/sw.js'|register('sw.js'|" docs/index.html 2>/dev/null \
+  || sed -i "s|register('docs/sw.js'|register('sw.js'|" docs/index.html
+
 echo "✓ docs/index.html synced with script_maker.html"
