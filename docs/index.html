@@ -2111,7 +2111,7 @@ function renderView(){
   const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
   const tb=(f,label)=>`<button class="vf-btn${viewFormat===f?' vf-active':''}" onclick="setViewFormat('${f}')">${label}</button>`;
   let h=`<div class="vf-bar">${tb('stageplay','Stage Play')}${tb('fountain','Fountain')}${tb('fdx','FDX')}<button class="view-print-btn" onclick="window.print()" style="margin-left:auto;">Print</button></div>`;
-  if(viewFormat==='fountain'){h+=`<pre class="vf-pre">${esc(buildFountainText())}</pre>`;p.innerHTML=h;return;}
+  if(viewFormat==='fountain'){h+=`<pre class="vf-pre">${esc(buildFountain())}</pre>`;p.innerHTML=h;return;}
   if(viewFormat==='fdx'){h+=`<pre class="vf-pre">${esc(buildFDXText())}</pre>`;p.innerHTML=h;return;}
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
@@ -3700,6 +3700,7 @@ function openKBRef(){
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
   openGenericModal(h);
 }
+function resetHotkeys(){pillHotkeys={dialogue:'1',action:'2',direction:'3'};updatePillLabels();lsSaveSettings();}
 function startHkCaptureInModal(el,type){
   el.textContent='...';el.style.background='var(--tx1)';el.style.color='var(--bg1)';
   const handler=e=>{
