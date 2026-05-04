@@ -221,6 +221,36 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .l-dlg-inline .dl-inline-paren{font-style:italic;color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);}
 .l-dlg-inline .dl-inline-text{color:var(--tx1);}
 
+/* ── Notes ── */
+.note-icon{display:inline-block;cursor:pointer;font-size:12px;opacity:0.5;margin-left:6px;vertical-align:middle;transition:opacity .15s;}
+.note-icon:hover,.note-icon.has-notes{opacity:1;}
+.note-icon.has-notes{color:#EF9F27;}
+.notes-panel{background:var(--bg2);border:1px solid var(--bd3);border-radius:6px;padding:10px 12px;margin:6px 0 4px 24px;font-size:12px;font-family:var(--sans);}
+.notes-panel .note-item{padding:6px 0;border-bottom:1px solid var(--bd3);display:flex;flex-direction:column;gap:4px;}
+.notes-panel .note-item:last-child{border-bottom:none;}
+.notes-panel .note-text{color:var(--tx1);line-height:1.4;white-space:pre-wrap;}
+.notes-panel .note-text.resolved{text-decoration:line-through;opacity:0.5;}
+.notes-panel .note-meta{font-size:10px;color:var(--tx3);display:flex;align-items:center;gap:8px;}
+.notes-panel .note-actions{display:flex;gap:6px;margin-top:2px;}
+.notes-panel .note-actions button{font-size:10px;padding:2px 6px;border:1px solid var(--bd2);border-radius:3px;background:transparent;color:var(--tx2);cursor:pointer;}
+.notes-panel .note-actions button:hover{background:var(--bg3);color:var(--tx1);}
+.notes-panel .note-add{margin-top:6px;display:flex;gap:6px;}
+.notes-panel .note-add textarea{flex:1;font-size:11px;padding:4px 6px;border:1px solid var(--bd2);border-radius:4px;background:var(--bg1);color:var(--tx1);resize:vertical;min-height:28px;font-family:var(--sans);line-height:1.4;}
+.notes-panel .note-add button{font-size:10px;padding:4px 8px;border:1px solid var(--bd2);border-radius:4px;background:var(--bg3);color:var(--tx1);cursor:pointer;white-space:nowrap;align-self:flex-end;}
+.scene-note-icon,.act-note-icon{cursor:pointer;font-size:12px;opacity:0.5;margin-left:6px;}
+.scene-note-icon:hover,.act-note-icon:hover,.scene-note-icon.has-notes,.act-note-icon.has-notes{opacity:1;color:#EF9F27;}
+/* Right panel notes section */
+.rp-notes-list{max-height:300px;overflow-y:auto;font-size:11px;}
+.rp-note-entry{padding:6px 8px;border-bottom:1px solid var(--bd3);cursor:pointer;transition:background .1s;}
+.rp-note-entry:hover{background:var(--bg3);}
+.rp-note-entry:last-child{border-bottom:none;}
+.rp-note-loc{font-size:10px;color:var(--tx3);margin-bottom:2px;}
+.rp-note-text{color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-note-text.resolved{text-decoration:line-through;opacity:0.5;}
+.rp-note-filters{display:flex;gap:4px;margin:6px 0;}
+.rp-note-filters button{font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:3px;background:transparent;color:var(--tx2);cursor:pointer;}
+.rp-note-filters button.active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
+
 /* Panels */
 /* ── View tab — stage play format ── */
 #view-panel{display:none;flex:1;overflow-y:auto;padding:40px 80px;max-width:var(--script-max-width,720px);margin:0 auto;}
@@ -872,6 +902,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   <div id="tb-right">
     <span id="rev-chip" style="display:none;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--bd2);border-radius:12px;font-size:11px;color:var(--tx2);cursor:pointer;margin-right:4px;" onclick="openRevisionHistory()" title="View revision history"><span class="rev-chip-dot" style="width:8px;height:8px;border-radius:50%;"></span><span class="rev-chip-label"></span></span>
     <button class="tb-btn" id="rev-toggle" style="display:none;font-size:11px;padding:2px 6px;" onclick="toggleRevMarks()" title="Toggle revision marks">✱</button>
+    <button class="tb-btn" id="notes-toggle" style="font-size:12px;padding:2px 6px;" onclick="toggleShowNotes()" title="Toggle notes visibility">📝</button>
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
     <button class="tb-btn" onclick="openKBRef()" title="Keyboard shortcuts" style="font-size:13px;margin-left:2px;">?</button>
@@ -1185,6 +1216,17 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <div id="char-list-rp"></div>
           <button class="rp-add-char-btn" onclick="openNewCharStandalone()">+ New character</button>
         </div>
+        <div class="rp-section">
+          <div class="rp-label" onclick="toggleRPNotes()" style="cursor:pointer"><span id="rp-notes-toggle">▶</span> <span>Notes</span> <span id="rp-notes-count" style="font-size:10px;color:var(--tx3);margin-left:4px;"></span></div>
+          <div id="rp-notes" style="display:none">
+            <div class="rp-note-filters">
+              <button class="active" onclick="setNoteFilter('all')">All</button>
+              <button onclick="setNoteFilter('open')">Open</button>
+              <button onclick="setNoteFilter('resolved')">Resolved</button>
+            </div>
+            <div id="rp-notes-list" class="rp-notes-list"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1215,6 +1257,8 @@ let inputMode='pills'; /* 'pills' = manual pill selection, 'auto' = unified text
 let lineAlign={charName:'center',dialogue:'left',stagedir:'left',cue:'left'}; /* per-element alignment */
 let dlgFormat='stacked'; /* 'stacked' = name above text, 'inline' = NAME: text */
 let viewFormat='stageplay'; /* 'stageplay' | 'fountain' | 'fdx' */
+let showNotes=true; /* toggle note visibility */
+let noteIdCounter=1; /* incrementing ID for new notes */
 let charPanelExpanded={};
 let showRevMarks=true;
 const REV_COLORS=[
@@ -1232,7 +1276,7 @@ const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -1432,12 +1476,12 @@ function migrateSettingLines(){
 }
 function loadFromData(data){
   S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
-  migrateSettingLines();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
+  migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
   try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
-  migrateSettingLines();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
+  migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Garden Party',
@@ -2065,10 +2109,11 @@ function render(){
     const el=confirmState[ek]==='e'?'Confirm edit?':'Edit',dl=confirmState[dk]==='d'?'Confirm delete?':'Delete';
     const ec=confirmState[ek]==='e'?'rbtn ce':'rbtn',dc=confirmState[dk]==='d'?'rbtn cd':'rbtn';
     return`<div class="act-block" draggable="true" ondragstart="DS(event,'act',${ai})" ondragover="DO(event,'act',${ai})" ondrop="DP(event,'act',${ai})" ondragend="DE()">
-<div class="act-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'act',${ai})">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
+<div class="act-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'act',${ai})">⠿</span><div style="flex:1;min-width:0"><div class="act-name-disp">${esc(actLabel(ai))}${noteIconHtml('act',ai,null,null,act.notes)}</div>${act.description?`<div class="act-subdesc">${esc(act.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditAct(${ai}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delAct(${ai}))">${dl}</button></div></div>
+${isNotePanelOpen('act',ai,null,null)?renderNotesPanel('act',ai,null,null):''}
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
-  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();
+  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();renderRPNotes();
 }
 
 function renderScene(act,ai,sc,si){
@@ -2096,12 +2141,16 @@ function renderScene(act,ai,sc,si){
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
     else if(line.type==='dialogue'){if(dlgFormat==='inline')inner=`<div class="l-dialogue l-dlg-inline"><span class="dl-inline-name">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</span>${line.dialogueAction?` <span class="dl-inline-paren">(${hl(line.dialogueAction,'dialogueAction')})</span>`:''} <span class="dl-inline-text">${hl(line.value,'value')}</span></div>`;else inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;}
     else if(line.type==='action')inner=`<div class="l-action">(${hl(line.value,'value')})</div>`;
+    const lineNoteIcon=noteIconHtml('line',ai,si,li,line.notes);
+    const lineNotesOpen=isNotePanelOpen('line',ai,si,li);
+    const lineNotesHtml=lineNotesOpen?renderNotesPanel('line',ai,si,li):'';
     return`<div class="line-item ${selClass} ${revClass}" style="${revStyle}" onclick="selLine(${ai},${si},${li})" ondblclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})" draggable="true" ondragstart="DS(event,'line',${ai},${si},${li})" ondragover="DO(event,'line',${ai},${si},${li})" ondrop="DP(event,'line',${ai},${si},${li})" ondragend="DE()">
-<span class="line-drag-handle drag-handle" ontouchstart="touchDS(event,'line',${ai},${si},${li})">⠿</span>${inner}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
-</div>${isSel&&indicatorMode==='barrier'?'<div class="insert-bar on"></div>':''}`;
+<span class="line-drag-handle drag-handle" ontouchstart="touchDS(event,'line',${ai},${si},${li})">⠿</span>${inner}${lineNoteIcon}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
+</div>${lineNotesHtml}${isSel&&indicatorMode==='barrier'?'<div class="insert-bar on"></div>':''}`;
   }).join('');
   return`<div class="scene-block" draggable="true" ondragstart="DS(event,'scene',${ai},${si})" ondragover="DO(event,'scene',${ai},${si})" ondrop="DP(event,'scene',${ai},${si})" ondragend="DE()">
-<div class="scene-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'scene',${ai},${si})">⠿</span><div style="flex:1;min-width:0"><div class="scene-name-disp">${esc(sceneLabel(ai,si))}${charSum}</div>${sc.description?`<div class="scene-subdesc">${esc(sc.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditScene(${ai},${si}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delScene(${ai},${si}))">${dl}</button></div></div>
+<div class="scene-hdr"><span class="drag-handle" ontouchstart="touchDS(event,'scene',${ai},${si})">⠿</span><div style="flex:1;min-width:0"><div class="scene-name-disp">${esc(sceneLabel(ai,si))}${noteIconHtml('scene',ai,si,null,sc.notes)}${charSum}</div>${sc.description?`<div class="scene-subdesc">${esc(sc.description)}</div>`:''}</div><div class="row-btns"><button class="${ec}" onclick="editBtn('${ek}',()=>openEditScene(${ai},${si}))">${el}</button><button class="${dc}" onclick="delBtn('${dk}',()=>delScene(${ai},${si}))">${dl}</button></div></div>
+${isNotePanelOpen('scene',ai,si,null)?renderNotesPanel('scene',ai,si,null):''}
 ${sc.setting?`<div class="scene-setting" onclick="openEditScene(${ai},${si})">${esc(sc.setting)}</div>`:''}
 <div class="lines-wrap">${lines||`<div class="scene-empty">No lines yet</div>`}</div></div>`;
 }
@@ -2115,7 +2164,7 @@ function renderView(){
   if(viewFormat==='fdx'){h+=`<pre class="vf-pre">${esc(buildFDXText())}</pre>`;p.innerHTML=h;return;}
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;});});});
+  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
   p.innerHTML=h;
 }
 
@@ -2942,6 +2991,11 @@ function buildFountain(){
           const mightMisread=/^[A-Z][A-Z\s\d\.]+$/.test(v)||/^(INT|EXT|EST)[\.\s]/i.test(v);
           out+=(mightMisread?'!'+v:v)+'\n\n';
         }
+        /* Export line notes as Fountain [[note]] */
+        if(line.notes&&line.notes.length){
+          line.notes.forEach(n=>{if(!n.resolved)out+='[[note: '+n.text+']]\n';});
+          out+='\n';
+        }
       });
     });
   });
@@ -3765,6 +3819,132 @@ function updatePillLabels(){
   });
 }
 
+/* ── Notes system ── */
+function recalcNoteIdCounter(){
+  let max=0;
+  S.acts.forEach(a=>{(a.notes||[]).forEach(n=>{if(n.id>max)max=n.id;});a.scenes.forEach(sc=>{(sc.notes||[]).forEach(n=>{if(n.id>max)max=n.id;});sc.lines.forEach(l=>{(l.notes||[]).forEach(n=>{if(n.id>max)max=n.id;});});});});
+  noteIdCounter=max+1;
+}
+function toggleShowNotes(){showNotes=!showNotes;const btn=$('notes-toggle');if(btn)btn.style.opacity=showNotes?'1':'0.4';lsSaveSettings();render();}
+function getNotesArr(target){if(!target.notes)target.notes=[];return target.notes;}
+function getNoteTarget(scope,ai,si,li){
+  if(scope==='act')return S.acts[ai];
+  if(scope==='scene')return S.acts[ai].scenes[si];
+  return S.acts[ai].scenes[si].lines[li];
+}
+function addNote(scope,ai,si,li){
+  const taId='note-add-ta-'+scope+'-'+ai+'-'+(si??'')+'-'+(li??'');
+  const ta=document.getElementById(taId);if(!ta||!ta.value.trim())return;
+  pushUndo();
+  const target=getNoteTarget(scope,ai,si,li);
+  const notes=getNotesArr(target);
+  notes.push({id:noteIdCounter++,text:ta.value.trim(),timestamp:Date.now(),resolved:false});
+  autoSave();render();renderRPNotes();
+}
+function editNote(scope,ai,si,li,noteId){
+  const target=getNoteTarget(scope,ai,si,li);
+  const note=(target.notes||[]).find(n=>n.id===noteId);if(!note)return;
+  const newText=prompt('Edit note:',note.text);
+  if(newText===null||newText.trim()===note.text)return;
+  pushUndo();note.text=newText.trim();autoSave();render();renderRPNotes();
+}
+function resolveNote(scope,ai,si,li,noteId){
+  pushUndo();
+  const target=getNoteTarget(scope,ai,si,li);
+  const note=(target.notes||[]).find(n=>n.id===noteId);if(!note)return;
+  note.resolved=!note.resolved;autoSave();render();renderRPNotes();
+}
+function deleteNote(scope,ai,si,li,noteId){
+  pushUndo();
+  const target=getNoteTarget(scope,ai,si,li);
+  target.notes=(target.notes||[]).filter(n=>n.id!==noteId);
+  autoSave();render();renderRPNotes();
+}
+function renderNotesPanel(scope,ai,si,li){
+  const target=getNoteTarget(scope,ai,si,li);
+  const notes=target.notes||[];
+  const taId='note-add-ta-'+scope+'-'+ai+'-'+(si??'')+'-'+(li??'');
+  let h='<div class="notes-panel" onclick="event.stopPropagation()">';
+  notes.forEach(n=>{
+    const cls=n.resolved?'note-text resolved':'note-text';
+    const ts=new Date(n.timestamp).toLocaleDateString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    h+=`<div class="note-item"><div class="${cls}">${escBr(n.text)}</div><div class="note-meta"><span>${ts}</span>${n.resolved?'<span style="color:#4CAF50">✓ Resolved</span>':''}</div><div class="note-actions"><button onclick="event.stopPropagation();resolveNote('${scope}',${ai},${si??'null'},${li??'null'},${n.id})">${n.resolved?'Reopen':'Resolve'}</button><button onclick="event.stopPropagation();editNote('${scope}',${ai},${si??'null'},${li??'null'},${n.id})">Edit</button><button onclick="event.stopPropagation();deleteNote('${scope}',${ai},${si??'null'},${li??'null'},${n.id})">Delete</button></div></div>`;
+  });
+  h+=`<div class="note-add"><textarea id="${taId}" placeholder="Add a note..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addNote('${scope}',${ai},${si??'null'},${li??'null'});}"></textarea><button onclick="addNote('${scope}',${ai},${si??'null'},${li??'null'})">Add</button></div></div>`;
+  return h;
+}
+function noteIconHtml(scope,ai,si,li,notes){
+  if(!showNotes)return '';
+  const hasNotes=notes&&notes.length>0;
+  const cls='note-icon'+(hasNotes?' has-notes':'');
+  return`<span class="${cls}" onclick="event.stopPropagation();toggleNotePanel('${scope}',${ai},${si??'null'},${li??'null'})" title="${hasNotes?notes.length+' note(s)':'Add note'}">🗒</span>`;
+}
+let openNotePanels={};
+function toggleNotePanel(scope,ai,si,li){
+  const key=scope+'-'+ai+'-'+(si??'')+'-'+(li??'');
+  openNotePanels[key]=!openNotePanels[key];render();
+}
+function isNotePanelOpen(scope,ai,si,li){
+  const key=scope+'-'+ai+'-'+(si??'')+'-'+(li??'');
+  return openNotePanels[key]||false;
+}
+/* Right panel notes */
+let noteFilter='all';
+function setNoteFilter(f){
+  noteFilter=f;
+  document.querySelectorAll('.rp-note-filters button').forEach(b=>b.classList.remove('active'));
+  const btns=document.querySelectorAll('.rp-note-filters button');
+  if(f==='all'&&btns[0])btns[0].classList.add('active');
+  if(f==='open'&&btns[1])btns[1].classList.add('active');
+  if(f==='resolved'&&btns[2])btns[2].classList.add('active');
+  renderRPNotes();
+}
+function toggleRPNotes(){
+  const el=$('rp-notes'),tog=$('rp-notes-toggle');
+  if(!el)return;
+  const vis=el.style.display==='none';
+  el.style.display=vis?'block':'none';
+  if(tog)tog.textContent=vis?'▼':'▶';
+  if(vis)renderRPNotes();
+}
+function getAllNotes(){
+  const all=[];
+  S.acts.forEach((a,ai)=>{
+    (a.notes||[]).forEach(n=>all.push({...n,scope:'act',ai,si:null,li:null,loc:actLabel(ai)}));
+    a.scenes.forEach((sc,si)=>{
+      (sc.notes||[]).forEach(n=>all.push({...n,scope:'scene',ai,si,li:null,loc:sceneLabel(ai,si)}));
+      sc.lines.forEach((l,li)=>{
+        (l.notes||[]).forEach(n=>all.push({...n,scope:'line',ai,si,li,loc:sceneLabel(ai,si)+' → line '+(li+1)}));
+      });
+    });
+  });
+  return all;
+}
+function renderRPNotes(){
+  const list=$('rp-notes-list'),countEl=$('rp-notes-count');
+  if(!list)return;
+  const all=getAllNotes();
+  if(countEl)countEl.textContent=all.length?'('+all.length+')':'';
+  const filtered=noteFilter==='all'?all:noteFilter==='open'?all.filter(n=>!n.resolved):all.filter(n=>n.resolved);
+  if(!filtered.length){list.innerHTML='<div style="color:var(--tx3);padding:8px;font-size:11px;">No notes yet.</div>';return;}
+  list.innerHTML=filtered.map(n=>{
+    const cls='rp-note-text'+(n.resolved?' resolved':'');
+    return`<div class="rp-note-entry" onclick="jumpToNote('${n.scope}',${n.ai},${n.si},${n.li})"><div class="rp-note-loc">${esc(n.loc)}</div><div class="${cls}">${esc(n.text)}</div></div>`;
+  }).join('');
+}
+function jumpToNote(scope,ai,si,li){
+  switchTab('edit');
+  if(scope==='line'&&li!==null)selLine(ai,si,li);
+  else if(scope==='scene')selLine(ai,si,0);
+  else selLine(ai,0,0);
+  openNotePanels[scope+'-'+ai+'-'+(si??'')+'-'+(li??'')]=true;
+  render();
+  setTimeout(()=>{
+    const el=document.querySelector('.notes-panel');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+  },50);
+}
+
 updateInputMode();switchTab('edit');updateSaveIndicator();
 
 (function initFromLS(){
@@ -3781,6 +3961,7 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.editorWidth){document.documentElement.style.setProperty('--script-max-width',sets.editorWidth);const sel=$('editor-width-sel');if(sel)sel.value=sets.editorWidth;}
     if(sets.lineAlign){lineAlign=Object.assign(lineAlign,sets.lineAlign);applyLineAlign();}
     if(sets.dlgFormat){dlgFormat=sets.dlgFormat;const sel=$('dlg-format-sel');if(sel)sel.value=dlgFormat;}
+    if(typeof sets.showNotes!=='undefined'){showNotes=sets.showNotes;const nb=$('notes-toggle');if(nb)nb.style.opacity=showNotes?'1':'0.4';}
     if(typeof sets.rpCollapsed==='boolean')rpCollapsed=sets.rpCollapsed;
     if(sets.themeMode){themeMode=sets.themeMode;setTheme(themeMode);}
     if(sets.ltColors){ltColors={...ltColors,...sets.ltColors};['direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
