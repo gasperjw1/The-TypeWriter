@@ -39,26 +39,41 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 ### To Do — Scene Card Upgrades (Priority 2b)
 
-- [ ] **Editable synopsis on cards** — Add a synopsis/notes field per scene, editable inline on the card. Every major competitor (Scrivener, Final Draft, Arc Studio) centers their corkboard around this.
-- [ ] **Color coding / labels** — Color-dot or left-border accent per scene, selectable from a palette, with optional custom label names (e.g., "A-Plot", "B-Plot", "Flashback"). Provides instant visual structure mapping.
-- [ ] **Status markers** — Per-scene status badge (Outline / Draft / Revised / Final) for tracking progress at a glance. Inspired by Scrivener's status labels.
-- [ ] **Card size toggle** — Compact (title + color only) vs expanded (synopsis + stats + characters) view for the outline grid.
+- [x] **Editable synopsis on cards** — Add a synopsis/notes field per scene, editable inline on the card. Every major competitor (Scrivener, Final Draft, Arc Studio) centers their corkboard around this. *(Session 15)*
+- [x] **Color coding** — Color-dot and left-border accent per scene, selectable from a palette. Provides instant visual structure mapping. *(Session 15)*
+- [ ] **Color labels** — Custom label names for colors (e.g., "A-Plot", "B-Plot", "Flashback"). Let users name what each color means and filter/sort by label. Turns color dots into a real structural analysis tool.
+- [x] **Status markers** — Per-scene status badge (Outline / Draft / Revised / Final) for tracking progress at a glance. Inspired by Scrivener's status labels. *(Session 15)*
+- [x] **Card size toggle** — Compact (title + color only) vs expanded (synopsis + stats + characters) view for the outline grid. *(Session 15)*
 - [ ] **Beat board mode** — Free-form cards not tied to scenes, for brainstorming story beats before committing to script structure. Larger feature inspired by Final Draft and Arc Studio.
 
-### To Do — Collaboration & Storage (Priority 3)
+### To Do — High-Impact Writing Experience (Priority 3)
 
-- [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet.
-- [ ] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders.
-- [ ] **Cloud sync / account-based storage** — Save scripts to a server with user accounts so work persists across devices.
+- [ ] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar (currently Enter always submits). Removes friction for longer stage directions and monologues.
+- [ ] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Every professional tool has this (Final Draft ScriptNotes, WriterDuet inline comments, Arc Studio margin notes).
+- [ ] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration.
+- [ ] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
 
-### To Do — Statistics & Analysis (Priority 4)
+### To Do — Unique Differentiators (Priority 4)
+
+No lightweight stage play editor does these. Building them would set The Scriptwriter apart from every competitor.
+
+- [ ] **Character relationship mapping** — Visual showing which characters share scenes, or a co-appearance matrix. Leverages our existing character panel (already the best of any editor) to help playwrights track ensemble dynamics.
+- [ ] **Pacing visualization** — Bar chart or timeline showing scene lengths in the outline view. Writers obsess over pacing but no lightweight editor visualizes it.
+- [ ] **Rehearsal sides export** — Extract one character's lines + cues for table reads. Specific to stage plays and something no competitor does well.
+
+### To Do — Collaboration & Storage (Priority 5)
+
+- [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet. (Deprioritized — massive backend effort, not our differentiator.)
+- [ ] **Cloud sync / account-based storage** — Save scripts to a server with user accounts so work persists across devices. (Deprioritized — our value is "your files, your machine, no accounts.")
+
+### To Do — Statistics & Analysis (Priority 6)
 
 - [ ] **Screenplay analytics** — Detailed statistics: average scene length, longest scene, locations, times of day, INT vs EXT breakdown, dialogue-to-action ratio. Beat offers these natively.
 
 ## Other Improvements (identified during development)
 
 - [x] **Keyboard shortcuts reference** — An in-app help panel listing all keyboard shortcuts (pill selection, undo/redo, submit, etc.) *(Session 15)*
-- [ ] **Multi-line setting support** — Allow Shift+Enter for multi-line setting/action text in the input bar (currently Enter always submits)
+- [ ] **Multi-line setting support** — *(Promoted to Priority 3 as "Multi-line input")*
 - [ ] **Scene reordering across acts** — Drag-and-drop currently only works within the same act for scenes. Cross-act scene moves would be useful.
 - [ ] **Line moving across scenes** — Same limitation as above for individual lines.
 - [x] **Print-friendly View tab** — Add print CSS or a dedicated print button to the View tab for quick paper output without PDF export. *(Session 15)*

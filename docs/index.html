@@ -1073,7 +1073,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div id="auto-suggest"></div>
         <div id="auto-detect-bar"><span class="ad-hint" id="ad-hint">Type to begin</span></div>
         <!-- Setting / Stage Direction (pills mode) -->
-        <textarea id="simple-ta" placeholder="Type a line..." rows="1" style="display:none" onkeydown="lastFieldKey(event)"></textarea>
+        <textarea id="simple-ta" placeholder="Type a line..." rows="1" style="display:none" oninput="as(this)" onkeydown="lastFieldKey(event)"></textarea>
         <!-- Dialogue: left col (char name + dlg action) | right col (spoken text) -->
         <div id="dlg-box">
           <div id="dlg-left">
@@ -1089,15 +1089,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
               </div>
             </div>
             <!-- Dialogue action below character name -->
-            <textarea id="dlg-act-ta" placeholder="Dialogue action (optional)..." rows="1" onkeydown="midFieldKey(event,'dlg-act-ta','dlg-text-ta')"></textarea>
+            <textarea id="dlg-act-ta" placeholder="Dialogue action (optional)..." rows="1" oninput="as(this)" onkeydown="midFieldKey(event,'dlg-act-ta','dlg-text-ta')"></textarea>
           </div>
           <div id="dlg-right">
-            <textarea id="dlg-text-ta" placeholder="Spoken line..." rows="1" onkeydown="lastFieldKey(event)"></textarea>
+            <textarea id="dlg-text-ta" placeholder="Spoken line..." rows="1" oninput="as(this)" onkeydown="lastFieldKey(event)"></textarea>
           </div>
         </div>
         <!-- Cue with entrances/exits -->
         <div id="direction-box">
-          <textarea id="dir-desc-ta" placeholder="Cue description..." rows="1" onkeydown="lastFieldKey(event)"></textarea>
+          <textarea id="dir-desc-ta" placeholder="Cue description..." rows="1" oninput="as(this)" onkeydown="lastFieldKey(event)"></textarea>
           <div id="dir-cues-area">
             <div><div class="cue-label">In scene — toggle exit</div><div class="cue-list" id="in-scene-list"></div></div>
             <div style="margin-top:6px"><div class="cue-label">Not in scene — toggle entrance</div><div class="cue-list" id="out-scene-list"></div></div>
@@ -1188,6 +1188,7 @@ function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);retu
 
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escBr(s){return esc(s).replace(/\n/g,'<br>');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false});}
 function cloneState(){return JSON.parse(stateJSON());}
@@ -1478,17 +1479,17 @@ function buildFindMatches(){
   })));
 }
 function highlightText(text,ai,si,li,field){
-  if(!findQuery)return esc(text);
+  if(!findQuery)return escBr(text);
   const q=findQuery.toLowerCase(),low=text.toLowerCase();
   let result='',last=0,pos;
   while((pos=low.indexOf(q,last))!==-1){
-    result+=esc(text.slice(last,pos));
+    result+=escBr(text.slice(last,pos));
     const mIdx=findMatches.findIndex(m=>m.ai===ai&&m.si===si&&m.li===li&&m.field===field&&m.pos===pos);
     const cls=mIdx===findIdx?'find-hl-active':'find-hl';
-    result+=`<span class="${cls}" data-find="${mIdx}">${esc(text.slice(pos,pos+findQuery.length))}</span>`;
+    result+=`<span class="${cls}" data-find="${mIdx}">${escBr(text.slice(pos,pos+findQuery.length))}</span>`;
     last=pos+findQuery.length;
   }
-  result+=esc(text.slice(last));
+  result+=escBr(text.slice(last));
   return result;
 }
 function updateFindCount(){
@@ -1594,7 +1595,7 @@ function updateInputMode(){
 }
 
 function charKeyDown(e){if(e.key==='Tab'){e.preventDefault();if(ghostMatch){$('dlg-char-ta').value=ghostMatch;ghostMatch='';$('char-ghost').textContent='';$('dlg-char-dd').style.display='none';}$('dlg-text-ta').focus();return;}if(e.key==='Enter'){e.preventDefault();$('dlg-text-ta').focus();}}
-function midFieldKey(e,f,t){if(e.key==='Enter'){e.preventDefault();$(t).focus();}}
+function midFieldKey(e,f,t){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$(t).focus();}}
 function lastFieldKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submitLine();}}
 
 function onCI(){
@@ -1977,7 +1978,7 @@ function saveInlineEdit(){
 function cancelInlineEdit(){if(!editingLine)return;editingLine=null;render();}
 function ieKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveInlineEdit();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieCharKey(e){if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();const da=document.getElementById('ie-da');if(da)da.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
-function ieMidKey(e){if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();const v=document.getElementById('ie-val');if(v)v.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
+function ieMidKey(e){if((e.key==='Tab'||e.key==='Enter')&&!e.shiftKey){e.preventDefault();const v=document.getElementById('ie-val');if(v)v.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieBlur(){if(ieBlurTimer)clearTimeout(ieBlurTimer);ieBlurTimer=setTimeout(()=>{const a=document.activeElement;if(a&&(a.id==='ie-val'||a.id==='ie-char'||a.id==='ie-da'))return;saveInlineEdit();},200);}
 function ieFocus(){if(ieBlurTimer){clearTimeout(ieBlurTimer);ieBlurTimer=null;}}
 function ieAutosize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
@@ -2025,7 +2026,7 @@ function renderScene(act,ai,sc,si){
     const revStyle=revInfo?`--rev-color:${revInfo.color};background:${revInfo.bg};`:'';
     const cont=isCont(sc,li);
     let inner='';
-    const hl=(text,field)=>findQuery?highlightText(text,ai,si,li,field):esc(text);
+    const hl=(text,field)=>findQuery?highlightText(text,ai,si,li,field):escBr(text);
     if(line.type==='setting')inner=`<div class="l-setting">${hl(line.value,'value')}</div>`;
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
     else if(line.type==='dialogue')inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;
@@ -2045,7 +2046,7 @@ function renderView(){
   let h=`<button class="view-print-btn" onclick="window.print()">Print</button>`;
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${esc(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${esc(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${esc(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${esc(l.dialogueAction)})</div>`:''}<div class="vt">${esc(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${esc(l.value)})</div>`;});});});
+  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;});});});
   p.innerHTML=h;
 }
 
@@ -2628,6 +2629,7 @@ function exportPDF(){
 function buildPDFHTML(){
   const title=S.title||'Untitled';
   const esc2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const esc2Br=s=>esc2(s).replace(/\n/g,'<br>');
 
   /* ── Stage play PDF styles ── */
   let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/>
@@ -2725,11 +2727,11 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
     if(a.description)html+=`<div class="s-act-desc">${esc2(a.description)}</div>`;
     a.scenes.forEach((sc,si)=>{
       html+=`<div class="s-scene">${esc2(sceneLabel(ai,si))}</div>`;
-      if(sc.setting)html+=`<div class="s-setting">${esc2(sc.setting)}</div>`;
-      if(sc.description)html+=`<div class="s-setting"><em>${esc2(sc.description)}</em></div>`;
+      if(sc.setting)html+=`<div class="s-setting">${esc2Br(sc.setting)}</div>`;
+      if(sc.description)html+=`<div class="s-setting"><em>${esc2Br(sc.description)}</em></div>`;
       sc.lines.forEach((l,li)=>{
         const cont=isCont(sc,li);
-        if(l.type==='setting'){html+=`<div class="s-setting">${esc2(l.value)}</div>`;}
+        if(l.type==='setting'){html+=`<div class="s-setting">${esc2Br(l.value)}</div>`;}
         else if(l.type==='direction'){
           let cueStr='';
           if(l.cues&&((l.cues.enters||[]).length||(l.cues.exits||[]).length)){
@@ -2737,13 +2739,13 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
             const exits=(l.cues.exits||[]).map(n=>n+' exits').join(', ');
             cueStr=` <span class="cue-note">[${esc2([enters,exits].filter(Boolean).join('; '))}]</span>`;
           }
-          html+=`<div class="s-direction">(${esc2(l.value)})${cueStr}</div>`;
+          html+=`<div class="s-direction">(${esc2Br(l.value)})${cueStr}</div>`;
         }
-        else if(l.type==='action'){html+=`<div class="s-action">(${esc2(l.value)})</div>`;}
+        else if(l.type==='action'){html+=`<div class="s-action">(${esc2Br(l.value)})</div>`;}
         else if(l.type==='dialogue'){
           html+=`<div class="s-dlg">`;
           html+=`<div class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</div>`;
-          if(l.dialogueAction)html+=`<div class="dlg-paren">(${esc2(l.dialogueAction)})</div>`;
+          if(l.dialogueAction)html+=`<div class="dlg-paren">(${esc2Br(l.dialogueAction)})</div>`;
           const parts=l.value.split('\n');
           const rendered=parts.map(p=>{
             const m=p.match(/^\(.*\)$/);
@@ -3592,7 +3594,8 @@ function openKBRef(){
   h+=row('Undo',k(mod)+' + '+k('Z'));
   h+=row('Redo',k(mod)+' + '+k('Shift')+' + '+k('Z'));
   h+=row('Find &amp; Replace',k(mod)+' + '+k('F'));
-  h+=row('Submit line',k(mod)+' + '+k('Enter'));
+  h+=row('Submit line',k('Enter')+' or '+k(mod)+' + '+k('Enter'));
+  h+=row('New line in input',k('Shift')+' + '+k('Enter'));
   h+=row('Close dialog / find bar',k('Esc'));
   h+=sec('Line-type pills');
   h+=row('Activate Dialogue',k('`')+' then '+k(hk.dialogue));
