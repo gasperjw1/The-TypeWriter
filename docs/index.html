@@ -43,7 +43,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --ins-color:#378ADD;--highlight-color:rgba(128,128,128,0.13);
-  --pill-active-bg:#2C2C2A;--pill-active-fg:#fff;--script-font-size:13px;
+  --pill-active-bg:#2C2C2A;--pill-active-fg:#fff;--script-font-size:13px;--script-font-family:'Courier New',monospace;--script-line-height:1.6;--script-max-width:100%;--align-char-name:center;--align-dialogue:left;--align-stagedir:left;--align-cue:left;
   --panel-border:1px solid #d0d0d0;
   --bg1:#fff;--bg2:#f5f5f3;--bg3:#eeece8;
   --tx1:#1a1a18;--tx2:#666663;--tx3:#999997;
@@ -135,12 +135,12 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 #scroll-back-btn button:hover{background:var(--bg2);}
 
 /* Script blocks */
-.act-block{margin-bottom:24px;}
+.act-block{margin-bottom:24px;max-width:var(--script-max-width);margin-left:auto;margin-right:auto;}
 .act-hdr{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--rm);background:var(--bg2);border:1px solid var(--bd3);margin-bottom:8px;cursor:grab;}
 .drag-handle{color:var(--bd2);font-size:11px;user-select:none;opacity:0;transition:opacity .15s;}
 .act-hdr:hover .drag-handle,.scene-hdr:hover .drag-handle{opacity:.5;}
 .line-drag-handle{display:none;}
-.act-name-disp{font-size:var(--script-font-size);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
+.act-name-disp{font-size:var(--script-font-size);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--tx1);font-family:var(--script-font-family);flex:1;}
 .act-subdesc{font-size:11px;color:var(--tx2);}
 .row-btns{display:flex;gap:3px;flex-shrink:0;opacity:0;transition:opacity .15s;}
 .act-hdr:hover .row-btns,.scene-hdr:hover .row-btns{opacity:1;}
@@ -151,9 +151,9 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 .scenes-wrap{display:flex;flex-direction:column;gap:8px;}
 .scene-block{border:1px solid var(--bd3);border-radius:var(--rl);}
 .scene-hdr{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg2);border-bottom:1px solid var(--bd3);border-radius:var(--rl) var(--rl) 0 0;}
-.scene-name-disp{font-size:var(--script-font-size);font-weight:500;color:var(--tx1);font-family:'Courier New',monospace;flex:1;}
+.scene-name-disp{font-size:var(--script-font-size);font-weight:500;color:var(--tx1);font-family:var(--script-font-family);flex:1;}
 .scene-subdesc{font-size:11px;color:var(--tx2);}
-.scene-setting{font-style:italic;color:var(--tx2);font-size:var(--script-font-size);font-family:'Courier New',monospace;padding:6px 12px 2px;border-bottom:1px solid var(--bd3);background:var(--bg2);cursor:pointer;}
+.scene-setting{font-style:italic;color:var(--tx2);font-size:var(--script-font-size);font-family:var(--script-font-family);padding:6px 12px 2px;border-bottom:1px solid var(--bd3);background:var(--bg2);cursor:pointer;}
 .scene-setting:hover{background:var(--bg3);}
 .lines-wrap{padding:4px 0;}
 .scene-empty{padding:6px 12px;font-size:11px;color:var(--tx3);}
@@ -174,12 +174,12 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 /* Inline editing */
 .line-item.inline-editing{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rm);padding:6px 12px;margin:4px 0;cursor:default;}
 .line-item.inline-editing:hover{background:var(--bg2);}
-.ie-ta,.ie-input{font-family:'Courier New',monospace;font-size:var(--script-font-size);background:transparent;color:var(--tx1);border:none;outline:none;width:100%;resize:none;line-height:1.6;display:block;}
+.ie-ta,.ie-input{font-family:var(--script-font-family);font-size:var(--script-font-size);background:transparent;color:var(--tx1);border:none;outline:none;width:100%;resize:none;line-height:var(--script-line-height);display:block;}
 .ie-ta{min-height:24px;max-height:160px;overflow-y:auto;}
 .ie-setting{text-transform:uppercase;}
 .ie-direction{font-style:italic;color:var(--tx2);}
 .ie-dlg-char{text-align:center;text-transform:uppercase;font-weight:500;letter-spacing:.04em;}
-select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rm);width:auto;max-width:200px;margin:0 auto;display:block;text-align:center;text-transform:uppercase;font-weight:500;letter-spacing:.04em;font-family:'Courier New',monospace;font-size:var(--script-font-size);color:var(--tx1);}
+select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rm);width:auto;max-width:200px;margin:0 auto;display:block;text-align:center;text-transform:uppercase;font-weight:500;letter-spacing:.04em;font-family:var(--script-font-family);font-size:var(--script-font-size);color:var(--tx1);}
 .ie-dlg-action{text-align:center;font-style:italic;color:var(--tx2);padding:2px 25%;border:none;border-bottom:0.5px dashed var(--bd3);}
 .ie-dlg-action::placeholder{color:var(--tx3);font-style:italic;}
 .ie-dlg-text{padding:0 20%;}
@@ -194,51 +194,65 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 :root{--lt-setting:#1D9E75;--lt-direction:#EF9F27;--lt-action:#D85A30;--lt-dialogue:#378ADD;
 --lt-setting-bg:rgba(29,158,117,0.06);--lt-direction-bg:rgba(239,159,39,0.05);--lt-action-bg:rgba(216,90,48,0.04);--lt-dialogue-bg:rgba(55,138,221,0.04);}
 @media(prefers-color-scheme:dark){:root{--lt-setting-bg:rgba(29,158,117,0.08);--lt-direction-bg:rgba(239,159,39,0.07);--lt-action-bg:rgba(216,90,48,0.07);--lt-dialogue-bg:rgba(55,138,221,0.07);}}
-.l-setting,.l-direction,.l-action,.l-dialogue{font-family:'Courier New',monospace;font-size:var(--script-font-size);padding:6px 10px;margin:3px 0;border-radius:4px;line-height:1.6;}
+.l-setting,.l-direction,.l-action,.l-dialogue{font-family:var(--script-font-family);font-size:var(--script-font-size);padding:6px 10px;margin:3px 0;border-radius:4px;line-height:var(--script-line-height);}
 
 /* Setting — italic stage environment description */
 .l-setting{font-style:italic;color:var(--tx2);border-left:3px solid var(--lt-setting);background:var(--lt-setting-bg);}
 
 /* Cue — italic, with enter/exit annotations */
-.l-direction{font-style:italic;color:var(--tx2);border-left:3px solid var(--lt-direction);background:var(--lt-direction-bg);}
+.l-direction{font-style:italic;color:var(--tx2);border-left:3px solid var(--lt-direction);background:var(--lt-direction-bg);text-align:var(--align-cue);}
 .lcues{font-size:calc(var(--script-font-size)*0.88);color:var(--tx3);margin-top:3px;font-style:normal;}
 .lcues .enter{color:#3B6D11;font-weight:500;}
 .lcues .exit{color:#A32D2D;font-weight:500;}
 @media(prefers-color-scheme:dark){.lcues .enter{color:#97C459;}.lcues .exit{color:#F09595;}}
 
 /* Stage Direction — italic, in parentheses */
-.l-action{font-style:italic;color:var(--tx2);border-left:3px solid var(--lt-action);background:var(--lt-action-bg);}
+.l-action{font-style:italic;color:var(--tx2);border-left:3px solid var(--lt-action);background:var(--lt-action-bg);text-align:var(--align-stagedir);}
 
 /* Dialogue — character centered uppercase, text indented */
 .l-dialogue{padding:8px 10px;border-left:3px solid var(--lt-dialogue);background:var(--lt-dialogue-bg);}
-.l-dialogue .dl-char-line{text-align:center;text-transform:uppercase;font-weight:700;color:var(--tx1);letter-spacing:.06em;font-size:var(--script-font-size);margin-bottom:2px;}
+.l-dialogue .dl-char-line{text-align:var(--align-char-name);text-transform:uppercase;font-weight:700;color:var(--tx1);letter-spacing:.06em;font-size:var(--script-font-size);margin-bottom:2px;}
 .l-dialogue .dl-cont{font-weight:400;font-style:italic;text-transform:none;font-size:calc(var(--script-font-size)*0.88);color:var(--tx3);}
-.l-dialogue .dl-paren{text-align:center;font-style:italic;color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);}
-.l-dialogue .dl-text{padding:0 24px;color:var(--tx1);line-height:1.5;}
+.l-dialogue .dl-paren{text-align:var(--align-char-name);font-style:italic;color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);}
+.l-dialogue .dl-text{padding:0 24px;color:var(--tx1);line-height:1.5;text-align:var(--align-dialogue);}
+/* Inline dialogue format */
+.l-dlg-inline{text-align:var(--align-dialogue);}
+.l-dlg-inline .dl-inline-name{text-transform:uppercase;font-weight:700;letter-spacing:.06em;color:var(--tx1);}
+.l-dlg-inline .dl-inline-paren{font-style:italic;color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);}
+.l-dlg-inline .dl-inline-text{color:var(--tx1);}
 
 /* Panels */
 /* ── View tab — stage play format ── */
-#view-panel{display:none;flex:1;overflow-y:auto;padding:40px 80px;max-width:720px;margin:0 auto;}
-#view-panel .v-title{font-size:20px;font-weight:700;text-align:center;font-family:'Courier New',monospace;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}
-#view-panel .v-author{font-size:var(--script-font-size);text-align:center;font-family:'Courier New',monospace;margin-bottom:32px;color:var(--tx2);}
+#view-panel{display:none;flex:1;overflow-y:auto;padding:40px 80px;max-width:var(--script-max-width,720px);margin:0 auto;}
+.vf-bar{display:flex;gap:6px;align-items:center;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--bd3);}
+.vf-btn{background:var(--bg2);border:1px solid var(--bd2);border-radius:4px;padding:4px 12px;font-size:11px;color:var(--tx2);cursor:pointer;font-family:inherit;}
+.vf-btn:hover{background:var(--bg3);}
+.vf-btn.vf-active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
+.vf-pre{font-family:var(--script-font-family);font-size:var(--script-font-size);white-space:pre-wrap;word-wrap:break-word;line-height:1.5;color:var(--tx1);background:var(--bg2);border:1px solid var(--bd3);border-radius:6px;padding:20px;overflow-x:auto;}
+#view-panel .v-title{font-size:20px;font-weight:700;text-align:center;font-family:var(--script-font-family);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}
+#view-panel .v-author{font-size:var(--script-font-size);text-align:center;font-family:var(--script-font-family);margin-bottom:32px;color:var(--tx2);}
 /* Act/scene headings: centered, uppercase, underlined */
-#view-panel .v-act{text-align:center;font-size:var(--script-font-size);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:'Courier New',monospace;margin:32px 0 8px;padding-top:24px;border-top:2px solid var(--bd2);text-decoration:underline;text-underline-offset:4px;}
+#view-panel .v-act{text-align:center;font-size:var(--script-font-size);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-family:var(--script-font-family);margin:32px 0 8px;padding-top:24px;border-top:2px solid var(--bd2);text-decoration:underline;text-underline-offset:4px;}
 #view-panel .v-act:first-child{border-top:none;padding-top:0;}
-#view-panel .v-scene{font-size:var(--script-font-size);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'Courier New',monospace;margin:24px 0 8px;text-align:center;padding-top:16px;border-top:1px solid var(--bd3);}
+#view-panel .v-scene{font-size:var(--script-font-size);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:var(--script-font-family);margin:24px 0 8px;text-align:center;padding-top:16px;border-top:1px solid var(--bd3);}
 #view-panel .v-act+.v-scene{border-top:none;padding-top:0;}
 /* Setting: italic, indented — describes the stage environment */
-#view-panel .v-setting{font-size:var(--script-font-size);font-family:'Courier New',monospace;font-style:italic;color:var(--tx2);margin:12px 0 8px;padding:0 0 0 40px;}
+#view-panel .v-setting{font-size:var(--script-font-size);font-family:var(--script-font-family);font-style:italic;color:var(--tx2);margin:12px 0 8px;padding:0 0 0 40px;}
 /* Cue: indented, italic, with cue annotations */
-#view-panel .v-direction{font-size:var(--script-font-size);font-style:italic;color:var(--tx2);font-family:'Courier New',monospace;margin:8px 0;text-align:left;padding:0 0 0 40px;}
+#view-panel .v-direction{font-size:var(--script-font-size);font-style:italic;color:var(--tx2);font-family:var(--script-font-family);margin:8px 0;text-align:var(--align-cue);padding:0 0 0 40px;}
 #view-panel .v-direction .v-cue-note{font-style:normal;font-size:calc(var(--script-font-size)*0.88);color:var(--tx3);margin-left:6px;}
 /* Stage direction: indented, italic — physical action/business */
-#view-panel .v-action{font-size:var(--script-font-size);font-family:'Courier New',monospace;font-style:italic;color:var(--tx2);margin:8px 0;text-align:left;padding:0 0 0 40px;}
+#view-panel .v-action{font-size:var(--script-font-size);font-family:var(--script-font-family);font-style:italic;color:var(--tx2);margin:8px 0;text-align:var(--align-stagedir);padding:0 0 0 40px;}
 /* Dialogue block: character centered uppercase, text left-aligned with indent */
-#view-panel .v-dlg{font-family:'Courier New',monospace;margin:12px 0;font-size:var(--script-font-size);padding:0;}
-#view-panel .v-dlg .vc{font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.06em;font-size:var(--script-font-size);}
+#view-panel .v-dlg{font-family:var(--script-font-family);margin:12px 0;font-size:var(--script-font-size);padding:0;}
+#view-panel .v-dlg .vc{font-weight:700;text-align:var(--align-char-name);text-transform:uppercase;letter-spacing:.06em;font-size:var(--script-font-size);}
 #view-panel .v-dlg .vcont{font-style:italic;font-weight:400;text-transform:none;color:var(--tx3);font-size:calc(var(--script-font-size)*0.88);}
-#view-panel .v-dlg .vda{font-style:italic;text-align:center;color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);margin:2px 0;}
-#view-panel .v-dlg .vt{padding:0 40px;line-height:1.5;}
+#view-panel .v-dlg .vda{font-style:italic;text-align:var(--align-char-name);color:var(--tx2);font-size:calc(var(--script-font-size)*0.95);margin:2px 0;}
+#view-panel .v-dlg .vt{padding:0 40px;line-height:1.5;text-align:var(--align-dialogue);}
+#view-panel .v-dlg-inline{text-align:var(--align-dialogue);padding:0 40px;}
+#view-panel .v-dlg-inline .vc{font-size:var(--script-font-size);text-align:unset;display:inline;}
+#view-panel .v-dlg-inline .vda{font-size:calc(var(--script-font-size)*0.95);text-align:unset;display:inline;margin:0;}
+#view-panel .v-dlg-inline .vt{padding:0;display:inline;}
 #outline-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 .outline-act-header{font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx2);margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
 .outline-act-header:first-child{margin-top:0;}
@@ -290,9 +304,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #view-panel .v-act{border-top:1.5pt solid #000 !important;margin-top:24pt !important;}
   #view-panel .v-scene{border-top:0.5pt solid #666 !important;}
   #view-panel .v-setting,#view-panel .v-direction,#view-panel .v-action{color:#333 !important;}
-  .view-print-btn{display:none !important;}
+  .view-print-btn,.vf-bar{display:none !important;}
 }
-.view-print-btn{display:inline-block;font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;margin-bottom:20px;float:right;}
+.view-print-btn{display:inline-block;font-size:11px;padding:4px 12px;border:1px solid var(--bd2);border-radius:4px;background:var(--bg2);color:var(--tx2);cursor:pointer;}
 .view-print-btn:hover{border-color:var(--bd1);color:var(--tx1);}
 
 /* Keyboard shortcuts reference modal */
@@ -302,6 +316,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .kb-ref-action{padding:5px 0;color:var(--tx1);border-bottom:1px solid var(--bd3,transparent);}
 .kb-ref-keys{padding:5px 0;text-align:right;border-bottom:1px solid var(--bd3,transparent);white-space:nowrap;}
 .kb-ref-key{display:inline-block;background:var(--bg2);border:1px solid var(--bd2);border-radius:3px;padding:1px 6px;font-size:11px;font-family:'Courier New',monospace;color:var(--tx2);margin-left:2px;}
+.kb-hk-capture{cursor:pointer;border-color:var(--accent,#378ADD);transition:background .15s,color .15s;}
+.kb-hk-capture:hover{background:var(--accent,#378ADD);color:#fff;}
 
 #settings-panel{display:none;flex:1;overflow-y:auto;padding:32px 48px;}
 .psec-title{font-size:15px;font-weight:500;color:var(--tx1);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd3);}
@@ -316,7 +332,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .color-select,.size-select{font-size:12px;padding:4px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg1);color:var(--tx1);font-family:var(--sans);cursor:pointer;}
 .font-size-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
 .font-size-row label{font-size:12px;color:var(--tx2);}
-.font-preview{font-family:'Courier New',monospace;color:var(--tx2);font-size:var(--script-font-size);border:1px solid var(--bd3);border-radius:var(--rm);padding:4px 10px;min-width:120px;}
+.font-preview{font-family:var(--script-font-family);color:var(--tx2);font-size:var(--script-font-size);border:1px solid var(--bd3);border-radius:var(--rm);padding:4px 10px;min-width:120px;}
 .setting-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--bd3);border-radius:var(--rm);background:var(--bg2);}
 .setting-toggle-label{font-size:13px;color:var(--tx1);}
 .setting-toggle-desc{font-size:11px;color:var(--tx2);margin-top:2px;}
@@ -492,7 +508,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 #sub-btn:hover{opacity:.85;}
 
 /* ── Auto-detect input mode ── */
-#auto-ta{width:100%;padding:10px 12px;font-family:'Courier New',monospace;font-size:var(--script-font-size);border:none;background:transparent;color:var(--tx1);resize:none;outline:none;line-height:1.6;min-height:42px;max-height:160px;overflow-y:auto;display:none;}
+#auto-ta{width:100%;padding:10px 12px;font-family:var(--script-font-family);font-size:var(--script-font-size);border:none;background:transparent;color:var(--tx1);resize:none;outline:none;line-height:var(--script-line-height);min-height:42px;max-height:160px;overflow-y:auto;display:none;}
 #auto-detect-bar{display:none;align-items:center;gap:6px;padding:4px 12px;border-top:1px solid var(--bd3);font-size:11px;color:var(--tx3);}
 #auto-detect-bar.visible{display:flex;}
 .ad-pill{font-size:10px;padding:2px 10px;border-radius:12px;font-weight:500;font-family:var(--sans);border:1px solid transparent;cursor:pointer;transition:all .15s;}
@@ -638,12 +654,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .char-chip-toggle.open{transform:rotate(90deg);}
 
 /* Hotkey settings */
-.hk-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--bd3);border-radius:var(--rm);background:var(--bg2);margin-bottom:6px;}
-.hk-name{font-size:13px;font-weight:500;color:var(--tx1);min-width:80px;}
-.hk-key-wrap{display:flex;align-items:center;gap:6px;flex:1;}
-.hk-prefix{font-size:12px;color:var(--tx2);}
-.hk-input{width:48px;text-align:center;font-family:'Courier New',monospace;font-size:14px;padding:4px 6px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg1);color:var(--tx1);outline:none;cursor:pointer;}
-.hk-input:focus{border-color:var(--tx1);box-shadow:0 0 0 2px rgba(55,138,221,0.2);}
 .hk-reset{font-size:11px;padding:3px 8px;border:1px solid var(--bd3);border-radius:var(--rm);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);}
 .hk-reset:hover{background:var(--bg2);color:var(--tx1);}
 
@@ -785,8 +795,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   .setup-card{padding:16px 18px;min-width:110px;}
 
   /* ── Settings: hotkey rows stack ── */
-  .hk-row{flex-wrap:wrap;gap:6px;}
-  .hk-name{min-width:unset;}
 
   /* ── Line-type color rows ── */
   .lt-row{flex-wrap:wrap;gap:6px;}
@@ -966,14 +974,59 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         </div>
       </div>
       <div class="setting-row">
-        <div class="setting-label">Edit view font size</div>
-        <div class="setting-desc">Controls font size in the editor and view tabs (up to 48px).</div>
-        <div class="font-size-row">
-          <label>Size:</label>
+        <div class="setting-label">Font</div>
+        <div class="setting-desc">Script body typeface and size.</div>
+        <div class="font-size-row" style="flex-wrap:wrap;gap:8px;">
+          <select class="size-select" id="font-family-sel" onchange="setFontFamily(this.value)" style="min-width:140px;">
+            <option value="'Courier New',monospace">Courier New</option>
+            <option value="'Courier Prime',Courier,monospace">Courier Prime</option>
+            <option value="'Times New Roman',serif">Times New Roman</option>
+            <option value="Georgia,serif">Georgia</option>
+            <option value="system-ui,sans-serif">System Sans</option>
+          </select>
           <select class="size-select" id="font-size-sel" onchange="setFontSize(this.value)">
             <option value="11">11px</option><option value="12">12px</option><option value="13" selected>13px</option><option value="14">14px</option><option value="15">15px</option><option value="16">16px</option><option value="18">18px</option><option value="20">20px</option><option value="24">24px</option><option value="28">28px</option><option value="32">32px</option><option value="36">36px</option><option value="40">40px</option><option value="44">44px</option><option value="48">48px</option>
           </select>
-          <div class="font-preview" id="font-preview">A dimly lit parlor. Evening.</div>
+        </div>
+        <div class="font-preview" id="font-preview" style="margin-top:6px;">A dimly lit parlor. Evening.</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Line spacing</div>
+        <div class="setting-desc">Vertical spacing between lines in the editor.</div>
+        <div class="font-size-row">
+          <select class="size-select" id="line-spacing-sel" onchange="setLineSpacing(this.value)">
+            <option value="1.3">Compact</option>
+            <option value="1.6" selected>Normal</option>
+            <option value="2.0">Relaxed</option>
+            <option value="2.4">Double</option>
+          </select>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Editor width</div>
+        <div class="setting-desc">Maximum width of the script content area.</div>
+        <div class="font-size-row">
+          <select class="size-select" id="editor-width-sel" onchange="setEditorWidth(this.value)">
+            <option value="560px">Narrow</option>
+            <option value="720px">Medium</option>
+            <option value="960px">Wide</option>
+            <option value="100%"selected>Full</option>
+          </select>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Text alignment</div>
+        <div class="setting-desc">Per-line-type horizontal alignment in the editor and View tab.</div>
+        <div id="align-settings" style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;margin-top:8px;font-size:12px;"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Dialogue format</div>
+        <div class="setting-desc">How character names and dialogue text are displayed.</div>
+        <div class="font-size-row">
+          <select class="size-select" id="dlg-format-sel" onchange="setDlgFormat(this.value)">
+            <option value="stacked" selected>Stacked (name above text)</option>
+            <option value="inline">Inline (NAME: text)</option>
+          </select>
         </div>
       </div>
       <div class="setting-row">
@@ -1029,13 +1082,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
             <button class="stoggle on" id="ltt-dialogue" onclick="toggleLT('dialogue')"></button>
           </div>
         </div>
-      </div>
-      <div class="psec-title" style="margin-top:28px;">Keyboard shortcuts</div>
-      <div class="setting-row">
-        <div class="setting-label">Pill hotkeys</div>
-        <div class="setting-desc">Customize the key that activates each line-type pill. Press backtick (`) then the assigned key. <em style="display:block;margin-top:4px;color:var(--tx3);">Note: Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></div>
-        <div id="hk-settings"></div>
-        <button class="hk-reset" style="margin-top:8px;" onclick="resetHotkeys()">Reset to defaults</button>
       </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
       <div class="setting-row">
@@ -1166,6 +1212,9 @@ let ltColors={direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
 let ltEnabled={direction:false,action:false,dialogue:true};
 let pillHotkeys={dialogue:'1',action:'2',direction:'3'};
 let inputMode='pills'; /* 'pills' = manual pill selection, 'auto' = unified textbox with auto-detection */
+let lineAlign={charName:'center',dialogue:'left',stagedir:'left',cue:'left'}; /* per-element alignment */
+let dlgFormat='stacked'; /* 'stacked' = name above text, 'inline' = NAME: text */
+let viewFormat='stageplay'; /* 'stageplay' | 'fountain' | 'fdx' */
 let charPanelExpanded={};
 let showRevMarks=true;
 const REV_COLORS=[
@@ -1183,7 +1232,7 @@ const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -1260,6 +1309,22 @@ function isCont(scene,li){
 function nextPillAfter(t){if(t==='direction')return'dialogue';return'dialogue';}
 
 function setFontSize(v){document.documentElement.style.setProperty('--script-font-size',v+'px');$('font-preview').style.fontSize=v+'px';$('font-size-sel').value=v;lsSaveSettings();}
+function setFontFamily(v){document.documentElement.style.setProperty('--script-font-family',v);$('font-preview').style.fontFamily=v;$('font-family-sel').value=v;lsSaveSettings();}
+function setLineSpacing(v){document.documentElement.style.setProperty('--script-line-height',v);const sel=$('line-spacing-sel');if(sel)sel.value=v;lsSaveSettings();}
+function setEditorWidth(v){document.documentElement.style.setProperty('--script-max-width',v);const sel=$('editor-width-sel');if(sel)sel.value=v;lsSaveSettings();}
+function renderAlignSettings(){
+  const c=$('align-settings');if(!c)return;
+  const items=[{key:'charName',label:'Character name'},{key:'dialogue',label:'Dialogue text'},{key:'stagedir',label:'Stage direction'},{key:'cue',label:'Cue'}];
+  c.innerHTML=items.map(it=>`<div style="color:var(--tx1);">${it.label}</div><select class="size-select" style="width:auto;min-width:80px;" onchange="setLineAlign('${it.key}',this.value)"><option value="left"${lineAlign[it.key]==='left'?' selected':''}>Left</option><option value="center"${lineAlign[it.key]==='center'?' selected':''}>Center</option><option value="right"${lineAlign[it.key]==='right'?' selected':''}>Right</option></select>`).join('');
+}
+function setLineAlign(key,val){lineAlign[key]=val;applyLineAlign();lsSaveSettings();render();}
+function applyLineAlign(){
+  document.documentElement.style.setProperty('--align-char-name',lineAlign.charName);
+  document.documentElement.style.setProperty('--align-dialogue',lineAlign.dialogue);
+  document.documentElement.style.setProperty('--align-stagedir',lineAlign.stagedir);
+  document.documentElement.style.setProperty('--align-cue',lineAlign.cue);
+}
+function setDlgFormat(v){dlgFormat=v;const sel=$('dlg-format-sel');if(sel)sel.value=v;lsSaveSettings();render();}
 function setIndicator(mode){indicatorMode=mode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));$('opt-'+mode).classList.add('selected');const c=indicatorColors[mode];if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',c);else document.documentElement.style.setProperty('--highlight-color',c);lsSaveSettings();render();}
 function setIndicatorColor(mode,val){indicatorColors[mode]=val;if(mode===indicatorMode){if(mode==='barrier')document.documentElement.style.setProperty('--ins-color',val);else document.documentElement.style.setProperty('--highlight-color',val);render();}lsSaveSettings();}
 
@@ -1316,7 +1381,7 @@ function switchTab(t){
   $('right-panel-wrap').style.display=(t==='settings'||t==='outline')?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
   if(t==='outline')renderOutline();
-  if(t==='settings'){renderHotkeySettings();renderStats();}
+  if(t==='settings'){renderAlignSettings();renderStats();}
   closeFDD();
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='220px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
@@ -2029,7 +2094,7 @@ function renderScene(act,ai,sc,si){
     const hl=(text,field)=>findQuery?highlightText(text,ai,si,li,field):escBr(text);
     if(line.type==='setting')inner=`<div class="l-setting">${hl(line.value,'value')}</div>`;
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
-    else if(line.type==='dialogue')inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;
+    else if(line.type==='dialogue'){if(dlgFormat==='inline')inner=`<div class="l-dialogue l-dlg-inline"><span class="dl-inline-name">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</span>${line.dialogueAction?` <span class="dl-inline-paren">(${hl(line.dialogueAction,'dialogueAction')})</span>`:''} <span class="dl-inline-text">${hl(line.value,'value')}</span></div>`;else inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;}
     else if(line.type==='action')inner=`<div class="l-action">(${hl(line.value,'value')})</div>`;
     return`<div class="line-item ${selClass} ${revClass}" style="${revStyle}" onclick="selLine(${ai},${si},${li})" ondblclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})" draggable="true" ondragstart="DS(event,'line',${ai},${si},${li})" ondragover="DO(event,'line',${ai},${si},${li})" ondrop="DP(event,'line',${ai},${si},${li})" ondragend="DE()">
 <span class="line-drag-handle drag-handle" ontouchstart="touchDS(event,'line',${ai},${si},${li})">⠿</span>${inner}<div class="lbtns"><button class="rbtn" onclick="event.stopPropagation();startInlineEdit(${ai},${si},${li})">Edit</button><button class="${ldc}" onclick="event.stopPropagation();delBtn('${ldk}',()=>delLine(${ai},${si},${li}))">${ldl}</button></div>
@@ -2041,12 +2106,16 @@ ${sc.setting?`<div class="scene-setting" onclick="openEditScene(${ai},${si})">${
 <div class="lines-wrap">${lines||`<div class="scene-empty">No lines yet</div>`}</div></div>`;
 }
 
+function setViewFormat(f){viewFormat=f;renderView();}
 function renderView(){
   const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
-  let h=`<button class="view-print-btn" onclick="window.print()">Print</button>`;
+  const tb=(f,label)=>`<button class="vf-btn${viewFormat===f?' vf-active':''}" onclick="setViewFormat('${f}')">${label}</button>`;
+  let h=`<div class="vf-bar">${tb('stageplay','Stage Play')}${tb('fountain','Fountain')}${tb('fdx','FDX')}<button class="view-print-btn" onclick="window.print()" style="margin-left:auto;">Print</button></div>`;
+  if(viewFormat==='fountain'){h+=`<pre class="vf-pre">${esc(buildFountainText())}</pre>`;p.innerHTML=h;return;}
+  if(viewFormat==='fdx'){h+=`<pre class="vf-pre">${esc(buildFDXText())}</pre>`;p.innerHTML=h;return;}
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue')h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;});});});
+  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;});});});
   p.innerHTML=h;
 }
 
@@ -2439,11 +2508,11 @@ function closeModal(){$('mlayer').classList.remove('open');$('mcontent').innerHT
 
 function openActModal(isFirst){const num=numWord(S.acts.length+1);openModal(`<h3>${isFirst?'Act '+num:'New act — Act '+num}</h3><div class="mf"><label>Act name <em>(optional)</em></label><input class="minput" id="ma-n" placeholder="e.g. The Beginning"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ma-d"/></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmAct(${isFirst})">Next →</button></div>`,null);setTimeout(()=>{const el=$('ma-n');if(el)el.focus();},50);}
 function confirmAct(isFirst){const n=$('ma-n').value.trim();const d=$('ma-d').value.trim();pushUndo();S.acts.push({name:n,description:d,scenes:[]});closeModal();openSceneModal(S.acts.length-1,isFirst);}
-function openSceneModal(aiArg,isFirst){const ai=aiArg!==undefined?aiArg:S.acts.length-1;const act=S.acts[ai];if(!act)return;const num=numWord(act.scenes.length+1);openModal(`<h3>${isFirst?'Scene '+num+' in '+esc(actLabel(ai)):'New scene — Scene '+num+' in '+esc(actLabel(ai))}</h3><div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="ms-n" placeholder="e.g. Opening" data-ai="${ai}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ms-d"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="ms-setting" rows="2" placeholder="e.g. A dimly lit parlor. Evening." style="resize:vertical;font-family:'Courier New',monospace;"></textarea></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmScene()">Start writing</button></div>`,null);setTimeout(()=>{const el=$('ms-n');if(el)el.focus();},50);}
+function openSceneModal(aiArg,isFirst){const ai=aiArg!==undefined?aiArg:S.acts.length-1;const act=S.acts[ai];if(!act)return;const num=numWord(act.scenes.length+1);openModal(`<h3>${isFirst?'Scene '+num+' in '+esc(actLabel(ai)):'New scene — Scene '+num+' in '+esc(actLabel(ai))}</h3><div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="ms-n" placeholder="e.g. Opening" data-ai="${ai}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ms-d"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="ms-setting" rows="2" placeholder="e.g. A dimly lit parlor. Evening." style="resize:vertical;font-family:var(--script-font-family);"></textarea></div><div class="mbtns">${isFirst?'':'<button class="mb-c" onclick="closeModal()">Cancel</button>'}<button class="mb-ok" onclick="confirmScene()">Start writing</button></div>`,null);setTimeout(()=>{const el=$('ms-n');if(el)el.focus();},50);}
 function confirmScene(){const el=$('ms-n');if(!el)return;const ai=parseInt(el.dataset.ai);const n=el.value.trim();const d=$('ms-d').value.trim();const st=($('ms-setting')?$('ms-setting').value.trim():'');pushUndo();S.acts[ai].scenes.push({name:n,description:d,setting:st,synopsis:'',color:null,status:null,lines:[]});closeModal();autoSave();render();}
 function openEditAct(ai){const a=S.acts[ai];openModal(`<h3>Edit ${esc(actLabel(ai))}</h3><div class="mf"><label>Act name <em>(optional)</em></label><input class="minput" id="ea-n" value="${esc(a.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="ea-d" value="${esc(a.description||'')}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveActEdit(${ai})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('ea-n');if(el)el.focus();},50);}
 function saveActEdit(ai){const n=$('ea-n').value.trim();const d=$('ea-d').value.trim();pushUndo();S.acts[ai].name=n;S.acts[ai].description=d;closeModal();autoSave();render();}
-function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];const lockField=S.scenesLocked?`<div class="mf"><label>Locked scene number</label><input class="minput" id="es-ln" value="${esc(sc.lockedNum||numWord(si+1))}"/></div>`:'';openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3>${lockField}<div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="es-setting" rows="2" style="resize:vertical;font-family:'Courier New',monospace;">${esc(sc.setting||'')}</textarea></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$(S.scenesLocked?'es-ln':'es-n');if(el)el.focus();},50);}
+function openEditScene(ai,si){const sc=S.acts[ai].scenes[si];const lockField=S.scenesLocked?`<div class="mf"><label>Locked scene number</label><input class="minput" id="es-ln" value="${esc(sc.lockedNum||numWord(si+1))}"/></div>`:'';openModal(`<h3>Edit ${esc(sceneLabel(ai,si))}</h3>${lockField}<div class="mf"><label>Scene name <em>(optional)</em></label><input class="minput" id="es-n" value="${esc(sc.name)}"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="es-d" value="${esc(sc.description||'')}"/></div><div class="mf"><label>Setting</label><textarea class="minput" id="es-setting" rows="2" style="resize:vertical;font-family:var(--script-font-family);">${esc(sc.setting||'')}</textarea></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveSceneEdit(${ai},${si})">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$(S.scenesLocked?'es-ln':'es-n');if(el)el.focus();},50);}
 function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').value.trim();const st=$('es-setting')?$('es-setting').value.trim():'';pushUndo();S.acts[ai].scenes[si].name=n;S.acts[ai].scenes[si].description=d;S.acts[ai].scenes[si].setting=st;if(S.scenesLocked){const lnEl=$('es-ln');if(lnEl){const ln=lnEl.value.trim();if(ln)S.acts[ai].scenes[si].lockedNum=ln;}}closeModal();autoSave();render();}
 
 /* Edit line — direction gets full cue editor in modal */
@@ -2667,16 +2736,20 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 /* Setting: italic, indented — describes the physical stage */
 .s-setting{font-style:italic;margin:8pt 0;padding-left:36pt;line-height:1.5;}
 /* Cue: italic, indented, with bracketed cue annotations */
-.s-direction{font-style:italic;margin:8pt 0;padding-left:36pt;line-height:1.4;}
+.s-direction{font-style:italic;margin:8pt 0;padding-left:36pt;line-height:1.4;text-align:${lineAlign.cue};}
 .s-direction .cue-note{font-style:normal;font-size:10pt;color:#555;}
 /* Stage direction: italic, indented, in parentheses */
-.s-action{font-style:italic;margin:8pt 0;padding-left:36pt;line-height:1.4;}
+.s-action{font-style:italic;margin:8pt 0;padding-left:36pt;line-height:1.4;text-align:${lineAlign.stagedir};}
 /* Dialogue: character centered uppercase, parenthetical centered italic, text left-indented */
 .s-dlg{margin:10pt 0;}
-.s-dlg .dlg-char{text-align:center;text-transform:uppercase;font-weight:bold;letter-spacing:.04em;margin-bottom:2pt;}
+.s-dlg .dlg-char{text-align:${lineAlign.charName};text-transform:uppercase;font-weight:bold;letter-spacing:.04em;margin-bottom:2pt;}
 .s-dlg .dlg-cont{font-weight:normal;font-style:italic;text-transform:none;font-size:11pt;}
-.s-dlg .dlg-paren{text-align:center;font-style:italic;margin-bottom:2pt;}
-.s-dlg .dlg-text{padding-left:36pt;padding-right:36pt;line-height:1.5;}
+.s-dlg .dlg-paren{text-align:${lineAlign.charName};font-style:italic;margin-bottom:2pt;}
+.s-dlg .dlg-text{padding-left:36pt;padding-right:36pt;line-height:1.5;text-align:${lineAlign.dialogue};}
+.s-dlg-inline{text-align:${lineAlign.dialogue};padding-left:36pt;}
+.s-dlg-inline .dlg-char{display:inline;text-align:unset;margin:0;}
+.s-dlg-inline .dlg-paren{display:inline;text-align:unset;margin:0;}
+.s-dlg-inline .dlg-text{display:inline;padding:0;}
 </style></head><body>`;
 
   /* Title page */
@@ -2743,16 +2816,24 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
         }
         else if(l.type==='action'){html+=`<div class="s-action">(${esc2Br(l.value)})</div>`;}
         else if(l.type==='dialogue'){
-          html+=`<div class="s-dlg">`;
-          html+=`<div class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</div>`;
-          if(l.dialogueAction)html+=`<div class="dlg-paren">(${esc2Br(l.dialogueAction)})</div>`;
-          const parts=l.value.split('\n');
-          const rendered=parts.map(p=>{
-            const m=p.match(/^\(.*\)$/);
-            return m?`<div class="dlg-paren">${esc2(p)}</div>`:`<div class="dlg-text">${esc2(p)}</div>`;
-          }).join('');
-          html+=rendered;
-          html+='</div>';
+          if(dlgFormat==='inline'){
+            html+=`<div class="s-dlg s-dlg-inline">`;
+            html+=`<span class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</span>`;
+            if(l.dialogueAction)html+=` <span class="dlg-paren">(${esc2Br(l.dialogueAction)})</span>`;
+            html+=` <span class="dlg-text">${esc2Br(l.value)}</span>`;
+            html+='</div>';
+          } else {
+            html+=`<div class="s-dlg">`;
+            html+=`<div class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</div>`;
+            if(l.dialogueAction)html+=`<div class="dlg-paren">(${esc2Br(l.dialogueAction)})</div>`;
+            const parts=l.value.split('\n');
+            const rendered=parts.map(p=>{
+              const m=p.match(/^\(.*\)$/);
+              return m?`<div class="dlg-paren">${esc2(p)}</div>`:`<div class="dlg-text">${esc2(p)}</div>`;
+            }).join('');
+            html+=rendered;
+            html+='</div>';
+          }
         }
       });
       pageNum++;
@@ -3585,8 +3666,8 @@ function openKBRef(){
   const k=(label)=>`<span class="kb-ref-key">${label}</span>`;
   const row=(action,keys)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${keys}</div>`;
   const sec=(title)=>`<div class="kb-ref-section">${title}</div>`;
-  /* Build pill hotkey labels */
   const hk=typeof pillHotkeys!=='undefined'?pillHotkeys:{dialogue:'1',action:'2',direction:'3'};
+  const hkBtn=(type,label)=>`<div class="kb-ref-action">${label}</div><div class="kb-ref-keys"><span class="kb-ref-key">\`</span> then <span class="kb-ref-key kb-hk-capture" data-hk-type="${type}" onclick="startHkCaptureInModal(this,'${type}')" title="Click to change">${esc(hk[type])}</span></div>`;
   let h=`<h3 style="margin:0 0 14px;font-size:15px;color:var(--tx1);">Keyboard Shortcuts</h3>`;
   h+=`<div class="kb-ref-grid">`;
   h+=sec('General');
@@ -3597,10 +3678,11 @@ function openKBRef(){
   h+=row('Submit line',k('Enter')+' or '+k(mod)+' + '+k('Enter'));
   h+=row('New line in input',k('Shift')+' + '+k('Enter'));
   h+=row('Close dialog / find bar',k('Esc'));
-  h+=sec('Line-type pills');
-  h+=row('Activate Dialogue',k('`')+' then '+k(hk.dialogue));
-  h+=row('Activate Stage Direction',k('`')+' then '+k(hk.action));
-  h+=row('Activate Cue',k('`')+' then '+k(hk.direction));
+  h+=sec('Line-type pills — click a key to customize');
+  h+=hkBtn('dialogue','Activate Dialogue');
+  h+=hkBtn('action','Activate Stage Direction');
+  h+=hkBtn('direction','Activate Cue');
+  h+=`<div class="kb-ref-action" style="grid-column:1/-1;text-align:right;padding-top:4px;"><button onclick="resetHotkeys();openKBRef()" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--sans);">Reset to defaults</button></div>`;
   h+=sec('Inline editing');
   h+=row('Start editing a line','Double-click or Edit button');
   h+=row('Save edit',k('Enter'));
@@ -3617,6 +3699,22 @@ function openKBRef(){
   h+=`</div>`;
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
   openGenericModal(h);
+}
+function startHkCaptureInModal(el,type){
+  el.textContent='...';el.style.background='var(--tx1)';el.style.color='var(--bg1)';
+  const handler=e=>{
+    e.preventDefault();e.stopPropagation();
+    const key=e.key;
+    if(key==='Escape'||key==='Tab'){el.textContent=pillHotkeys[type];el.style.background='';el.style.color='';document.removeEventListener('keydown',handler,true);return;}
+    /* Swap if conflict */
+    const conflict=Object.keys(pillHotkeys).find(t=>t!==type&&pillHotkeys[t]===key);
+    if(conflict)pillHotkeys[conflict]=pillHotkeys[type];
+    pillHotkeys[type]=key;
+    updatePillLabels();lsSaveSettings();
+    document.removeEventListener('keydown',handler,true);
+    openKBRef(); /* refresh modal */
+  };
+  document.addEventListener('keydown',handler,true);
 }
 
 /* ── Character panel inline expansion ── */
@@ -3659,40 +3757,6 @@ function jumpToLine(ai,si,li){
 }
 
 /* ── Pill hotkey customization ── */
-function renderHotkeySettings(){
-  const c=$('hk-settings');if(!c)return;
-  const types=[{key:'dialogue',label:'Dialogue'},{key:'action',label:'Stage Direction'},{key:'direction',label:'Cue'}];
-  c.innerHTML=types.map(t=>`<div class="hk-row"><div class="hk-name">${t.label}</div><div class="hk-key-wrap"><span class="hk-prefix">\` +</span><input class="hk-input" id="hk-${t.key}" value="${esc(pillHotkeys[t.key])}" readonly onfocus="startHkCapture('${t.key}')" onblur="stopHkCapture('${t.key}')"/></div></div>`).join('');
-}
-let hkCapturing=null;
-function startHkCapture(type){
-  hkCapturing=type;
-  const el=$('hk-'+type);if(el){el.value='...';el.style.borderColor='var(--tx1)';}
-}
-function stopHkCapture(type){
-  if(hkCapturing===type){
-    const el=$('hk-'+type);
-    if(el&&el.value==='...')el.value=pillHotkeys[type];
-    if(el)el.style.borderColor='';
-    hkCapturing=null;
-  }
-}
-document.addEventListener('keydown',function hkHandler(e){
-  if(!hkCapturing)return;
-  e.preventDefault();e.stopPropagation();
-  const key=e.key;
-  if(key==='Escape'||key==='Tab'){stopHkCapture(hkCapturing);return;}
-  /* check for conflicts with other pill hotkeys */
-  const conflict=Object.keys(pillHotkeys).find(t=>t!==hkCapturing&&pillHotkeys[t]===key);
-  if(conflict){/* swap */pillHotkeys[conflict]=pillHotkeys[hkCapturing];}
-  pillHotkeys[hkCapturing]=key;
-  hkCapturing=null;
-  updatePillLabels();renderHotkeySettings();lsSaveSettings();
-},true);
-function resetHotkeys(){
-  pillHotkeys={dialogue:'1',action:'2',direction:'3'};
-  updatePillLabels();renderHotkeySettings();lsSaveSettings();
-}
 function updatePillLabels(){
   document.querySelectorAll('.tpill').forEach(p=>{
     const t=p.dataset.t;if(!t||!pillHotkeys[t])return;
@@ -3711,6 +3775,11 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.indicatorMode){indicatorMode=sets.indicatorMode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));const opt=$('opt-'+indicatorMode);if(opt){opt.classList.add('selected');opt.querySelector('input[type=radio]').checked=true;}}
     if(sets.indicatorColors)indicatorColors=sets.indicatorColors;
     if(sets.fontSize){document.documentElement.style.setProperty('--script-font-size',sets.fontSize);const sel=$('font-size-sel');if(sel)sel.value=parseInt(sets.fontSize);const prev=$('font-preview');if(prev)prev.style.fontSize=sets.fontSize;}
+    if(sets.fontFamily){document.documentElement.style.setProperty('--script-font-family',sets.fontFamily);const sel=$('font-family-sel');if(sel)sel.value=sets.fontFamily;const prev=$('font-preview');if(prev)prev.style.fontFamily=sets.fontFamily;}
+    if(sets.lineSpacing){document.documentElement.style.setProperty('--script-line-height',sets.lineSpacing);const sel=$('line-spacing-sel');if(sel)sel.value=sets.lineSpacing;}
+    if(sets.editorWidth){document.documentElement.style.setProperty('--script-max-width',sets.editorWidth);const sel=$('editor-width-sel');if(sel)sel.value=sets.editorWidth;}
+    if(sets.lineAlign){lineAlign=Object.assign(lineAlign,sets.lineAlign);applyLineAlign();}
+    if(sets.dlgFormat){dlgFormat=sets.dlgFormat;const sel=$('dlg-format-sel');if(sel)sel.value=dlgFormat;}
     if(typeof sets.rpCollapsed==='boolean')rpCollapsed=sets.rpCollapsed;
     if(sets.themeMode){themeMode=sets.themeMode;setTheme(themeMode);}
     if(sets.ltColors){ltColors={...ltColors,...sets.ltColors};['direction','action','dialogue'].forEach(t=>{const inp=$('ltc-'+t);if(inp)inp.value=ltColors[t];const sw=$('lts-'+t);if(sw)sw.style.background=ltColors[t];});}
@@ -3718,7 +3787,7 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.pillHotkeys){pillHotkeys=sets.pillHotkeys;updatePillLabels();}
     if(sets.inputMode){inputMode=sets.inputMode;}
   }
-  applyLTColors();renderHotkeySettings();applyInputMode();
+  applyLTColors();applyInputMode();
 })();
 
 /* ── Mobile helpers ── */
