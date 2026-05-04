@@ -48,8 +48,8 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 ### To Do — High-Impact Writing Experience (Priority 3)
 
-- [ ] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar (currently Enter always submits). Removes friction for longer stage directions and monologues.
-- [ ] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Every professional tool has this (Final Draft ScriptNotes, WriterDuet inline comments, Arc Studio margin notes).
+- [x] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar. *(Session 15)*
+- [x] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Inline expansion + right panel list with resolved/unresolved workflow. *(Session 16)*
 - [ ] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration.
 - [ ] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
 
@@ -80,3 +80,17 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [ ] **Plugin / extension system** — Allow user scripts (JavaScript) to process the script data. Beat supports this on macOS.
 - [ ] **Document styles** — Customizable page layout (fonts, margins) for the exported screenplay. Beat supports this.
 - [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.
+- [ ] **Character panel act/scene filter** — Update the character section in the right-side panel to filter character dialogue lines based on the act and scene filter dropdowns, showing only lines from the selected scope.
+
+## Standard Test Checklist (run after every new feature)
+
+1. **Syntax validation** — Parse all JS in the file; confirm no syntax errors.
+2. **Function reference check** — Verify every `onclick` handler references a defined function.
+3. **ID reference check** — Verify every `$('id')` call references an ID that exists in HTML or is created dynamically.
+4. **Key function existence** — Confirm core functions exist: `render`, `pushUndo`, `doUndo`, `doRedo`, `autoSave`, `buildFountain`, `buildFDXText`, `buildPDFHTML`, `parseFountain`, `parseFDX`, `renderView`, `renderOutline`, `buildFindMatches`, `renderRPNotes`, `renderRPBookmarks`.
+5. **Export exclusion** — Confirm bookmarks and notes-only constructs are excluded from Fountain, FDX, and PDF exports.
+6. **Customization resilience** — Toggle alignment options, dialogue format (stacked/inline), view format (stage play/fountain/fdx), and confirm new feature still renders correctly.
+7. **Undo/redo** — Confirm new feature calls `pushUndo()` before mutations and that undo reverses the change cleanly.
+8. **localStorage persistence** — Confirm new state is saved/restored from localStorage.
+9. **Mobile rendering** — Confirm no overflow or broken layout on narrow viewports.
+10. **Dead code scan** — Check for any functions defined but never called, or variables set but never read.

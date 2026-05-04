@@ -145,12 +145,13 @@ S = {
 - [ ] Auto-formatting (slugline conventions, character name capitalization)
 - [ ] Real-time collaboration
 - [ ] Beat board / index card view
-- [ ] Notes and comments on lines/scenes
 - [ ] Cloud sync / account-based storage
 
 ### Other Improvements
 - [x] Keyboard shortcuts reference panel (Session 15)
-- [ ] Multi-line setting/action support (Shift+Enter)
+- [x] Multi-line input with Shift+Enter (Session 15)
+- [x] Notes and comments on lines/scenes (Session 16)
+- [x] Bookmarks with notes support (Session 16)
 - [ ] Cross-act scene reordering
 - [ ] Cross-scene line moving
 - [x] Print-friendly View tab (Session 15)
@@ -290,3 +291,10 @@ S = {
 ### Session 15 — 2026-05-02
 - **Print-friendly View tab** — Added `@media print` CSS block that hides all chrome (top bar, input bar, side panel, save nudge, outline toolbar) and formats View tab content with black-on-white styling. Added `.view-print-btn` Print button at the top of `renderView()` output (hidden in print). Act/scene separators styled for print with proper borders. Users can press Ctrl+P from the View tab for clean paper output.
 - **Keyboard shortcuts reference panel** — `openKBRef()` builds a comprehensive shortcut reference in a generic modal. Grid layout with sections: General (save, undo/redo, find, submit, escape), Line-type pills (dynamically reads `pillHotkeys` for current bindings), Inline editing (enter/escape/tab), Find bar (next/prev/close), Navigation (select/deselect/jump). Added `?` button in top bar next to Undo/Redo. Added `?` keyboard shortcut (when no input focused). Added "View shortcuts" button in Settings → Help section. CSS classes: `.kb-ref-grid`, `.kb-ref-section`, `.kb-ref-action`, `.kb-ref-keys`, `.kb-ref-key`.
+
+### Session 16 — 2026-05-04
+- **Customization features** — Added alignment options per line type (CSS variables `--align-char-name`, `--align-dialogue`, `--align-stagedir`, `--align-cue`), inline dialogue format toggle (`dlgFormat`: 'stacked' vs 'inline'), and View tab format toggle (`viewFormat`: 'stageplay' | 'fountain' | 'fdx').
+- **Notes & comments system** — Hybrid inline expansion + right panel list with resolved/unresolved workflow. Data model: `{id, text, timestamp, resolved}` arrays on lines/scenes/acts. Functions: `addNote`, `resolveNote`, `deleteNote`, `renderNotesPanel`, `noteIconHtml`, `renderRPNotes`, `jumpToNote`. `openNotePanels` state tracks expanded panels. `noteIdCounter` incrementing ID. `showNotes` toggle. `noteFilter` for right panel ('all'|'open'|'resolved'). Notes exported to Fountain (`[[note:]]`), rendered in View tab, and shown in PDF.
+- **Bookmarks** — New line type `{type:'bookmark', label:string, notes:[]}` rendered as minimal dashed-border markers with 🔖 flag. Inserted via input bar button. Supports notes attachment (reuses existing system), inline editing (saves to `label` field), drag-and-drop reordering, and undo/redo. Right panel "Bookmarks" section with collapsible list and jump-to navigation. Excluded from: Fountain export, FDX export, PDF export, View tab, stats counts, outline line counts. `lineFingerprint()` uses `label` for revision tracking. Functions: `insertBookmark`, `editBookmarkLabel`, `toggleRPBookmarks`, `getAllBookmarks`, `renderRPBookmarks`, `jumpToBookmark`.
+- **Bug fixes** — Fixed `buildFountainText()` → `buildFountain()` call in View tab. Re-added `resetHotkeys()` that was deleted during dead code cleanup. Removed dead hotkey capture code (`renderHotkeySettings`, `startHkCapture`, `stopHkCapture`, `hkCapturing`, `hkHandler`).
+- **TODO.md updates** — Added "Character panel act/scene filter" feature item and "Standard Test Checklist" section (10-item checklist to run after every new feature).

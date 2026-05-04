@@ -251,6 +251,21 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .rp-note-filters button{font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:3px;background:transparent;color:var(--tx2);cursor:pointer;}
 .rp-note-filters button.active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
 
+/* ── Bookmarks ── */
+.bookmark-btn{font-size:14px;background:transparent;border:1px solid var(--bd2);border-radius:4px;padding:2px 8px;cursor:pointer;opacity:0.6;transition:opacity .15s;}
+.bookmark-btn:hover{opacity:1;}
+.l-bookmark{display:flex;align-items:center;gap:8px;padding:4px 10px;margin:2px 0;border-radius:4px;border:1px dashed var(--bd2);background:var(--bg2);font-size:11px;color:var(--tx2);font-family:var(--sans);}
+.l-bookmark .bm-flag{font-size:14px;}
+.l-bookmark .bm-label{flex:1;font-style:italic;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.l-bookmark .bm-label-empty{color:var(--tx3);}
+/* Right panel bookmarks */
+.rp-bm-list{max-height:200px;overflow-y:auto;font-size:11px;}
+.rp-bm-entry{padding:6px 8px;border-bottom:1px solid var(--bd3);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .1s;}
+.rp-bm-entry:hover{background:var(--bg3);}
+.rp-bm-entry:last-child{border-bottom:none;}
+.rp-bm-label{flex:1;color:var(--tx1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rp-bm-loc{font-size:10px;color:var(--tx3);}
+
 /* Panels */
 /* ── View tab — stage play format ── */
 #view-panel{display:none;flex:1;overflow-y:auto;padding:40px 80px;max-width:var(--script-max-width,720px);margin:0 auto;}
@@ -1142,6 +1157,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <span class="tpill" data-t="action" data-n="2" onclick="selPill(this,'action')">Stage Dir.<span class="sc">` 2</span></span>
           <div class="pill-tip"><strong>Stage Direction</strong> &nbsp;·&nbsp; Shortcut: <code>` 2</code><br>Describes physical action, movement, or<br>stage business. Attributed to a specific<br>character — appears alongside their name.</div>
         </div>
+        <button class="bookmark-btn" onclick="insertBookmark()" title="Insert bookmark at cursor">🔖</button>
         <button id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel">Panel</button>
       </div>
       <div id="input-box">
@@ -1225,6 +1241,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
               <button onclick="setNoteFilter('resolved')">Resolved</button>
             </div>
             <div id="rp-notes-list" class="rp-notes-list"></div>
+          </div>
+        </div>
+        <div class="rp-section">
+          <div class="rp-label" onclick="toggleRPBookmarks()" style="cursor:pointer"><span id="rp-bm-toggle">▶</span> <span>Bookmarks</span> <span id="rp-bm-count" style="font-size:10px;color:var(--tx3);margin-left:4px;"></span></div>
+          <div id="rp-bookmarks" style="display:none">
+            <div id="rp-bm-list" class="rp-bm-list"></div>
           </div>
         </div>
       </div>
@@ -2051,6 +2073,8 @@ function renderInlineEditLine(line,ai,si,li){
     inner=`<div class="l-dialogue"><div class="dl-char-line"><select class="ie-input ie-dlg-char" id="ie-char" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()">${charOpts}</select></div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
   }else if(line.type==='action'){
     inner=`<div class="l-action"><textarea class="ie-ta" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div>`;
+  }else if(line.type==='bookmark'){
+    inner=`<div class="l-bookmark"><span class="bm-flag">🔖</span><input class="ie-input" id="ie-val" value="${esc(line.label||'')}" placeholder="Bookmark label" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div>`;
   }
   return`<div class="line-item inline-editing" onclick="event.stopPropagation()">${inner}<div class="ie-btns"><button class="ie-btn ie-cancel" onclick="cancelInlineEdit()">Cancel</button><button class="ie-btn ie-save" onclick="saveInlineEdit()">Save</button></div></div>`;
 }
@@ -2074,6 +2098,7 @@ function saveInlineEdit(){
   const valEl=document.getElementById('ie-val');
   if(!line||!valEl){editingLine=null;render();return;}
   const v=valEl.value.trim();
+  if(line.type==='bookmark'){pushUndo();line.label=v;editingLine=null;autoSave();render();return;}
   if(!v){editingLine=null;render();return;}
   pushUndo();line.value=v;
   if(line.type==='dialogue'){
@@ -2113,7 +2138,7 @@ function render(){
 ${isNotePanelOpen('act',ai,null,null)?renderNotesPanel('act',ai,null,null):''}
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
-  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();renderRPNotes();
+  updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();renderRPNotes();renderRPBookmarks();
 }
 
 function renderScene(act,ai,sc,si){
@@ -2141,6 +2166,7 @@ function renderScene(act,ai,sc,si){
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
     else if(line.type==='dialogue'){if(dlgFormat==='inline')inner=`<div class="l-dialogue l-dlg-inline"><span class="dl-inline-name">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</span>${line.dialogueAction?` <span class="dl-inline-paren">(${hl(line.dialogueAction,'dialogueAction')})</span>`:''} <span class="dl-inline-text">${hl(line.value,'value')}</span></div>`;else inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;}
     else if(line.type==='action')inner=`<div class="l-action">(${hl(line.value,'value')})</div>`;
+    else if(line.type==='bookmark')inner=`<div class="l-bookmark"><span class="bm-flag">🔖</span><span class="bm-label${line.label?'':' bm-label-empty'}" onclick="event.stopPropagation();editBookmarkLabel(${ai},${si},${li})">${line.label?esc(line.label):'Click to add label'}</span></div>`;
     const lineNoteIcon=noteIconHtml('line',ai,si,li,line.notes);
     const lineNotesOpen=isNotePanelOpen('line',ai,si,li);
     const lineNotesHtml=lineNotesOpen?renderNotesPanel('line',ai,si,li):'';
@@ -2194,7 +2220,7 @@ function renderOutline(){
     act.scenes.forEach((sc,si)=>{
       const label=sceneLabel(ai,si);
       const chars=getSceneCharsList(sc);
-      const lineCount=sc.lines.length;
+      const lineCount=sc.lines.filter(l=>l.type!=='bookmark').length;
       const dlgCount=sc.lines.filter(l=>l.type==='dialogue').length;
       const borderColor=sc.color||'transparent';
       h+=`<div class="outline-card" draggable="true" data-ai="${ai}" data-si="${si}" style="border-left-color:${borderColor}" ondragstart="outlineDragStart(event,${ai},${si})" ondragover="outlineDragOver(event,${ai},${si})" ondragleave="outlineDragLeave(event)" ondrop="outlineDrop(event,${ai},${si})" ondragend="outlineDragEnd(event)" ontouchstart="outlineTouchStart(event)">`;
@@ -2326,7 +2352,7 @@ let rpStatsOpen=false;
 function toggleRPStats(){rpStatsOpen=!rpStatsOpen;$('rp-stats').style.display=rpStatsOpen?'block':'none';$('rp-stats-toggle').textContent=rpStatsOpen?'▼':'▶';if(rpStatsOpen)renderStats();}
 function renderStats(){
   const p=$('rp-stats');if(!p||!S.title)return;
-  let tl=0,tdlg=0;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{tl++;if(l.type==='dialogue')tdlg++;})));let ts=0;S.acts.forEach(a=>ts+=a.scenes.length);const cc=S.characters.filter(c=>!c.archived).length,ac=S.characters.filter(c=>c.archived).length;
+  let tl=0,tdlg=0;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{if(l.type==='bookmark')return;tl++;if(l.type==='dialogue')tdlg++;})));let ts=0;S.acts.forEach(a=>ts+=a.scenes.length);const cc=S.characters.filter(c=>!c.archived).length,ac=S.characters.filter(c=>c.archived).length;
   p.innerHTML=`<div class="rp-stats-grid">${[['Acts',S.acts.length],['Scenes',ts],['Lines',tl],['Dialogue',tdlg],['Characters',cc],['Archived',ac]].map(([label,val])=>`<div class="rp-stat"><div class="rp-stat-val">${val}</div><div class="rp-stat-label">${label}</div></div>`).join('')}</div>
 <div style="margin-top:8px;"><input class="rp-stat-input" id="rp-title-input" value="${esc(S.title)}" placeholder="Title"/><button class="rp-stat-save" onclick="rpUpdateTitle()">✓</button></div>
 <div style="margin-top:4px;"><input class="rp-stat-input" id="rp-author-input" value="${esc(S.author||'')}" placeholder="Author"/><button class="rp-stat-save" onclick="rpUpdateAuthor()">✓</button></div>`;
@@ -2962,6 +2988,7 @@ function buildFountain(){
       }
 
       sc.lines.forEach((line,li)=>{
+        if(line.type==='bookmark')return;/* skip bookmarks in export */
         if(line.type==='setting'){
           /* Legacy setting lines — still export for backward compat */
           const v=line.value.trim();
@@ -3547,7 +3574,7 @@ function exportFDX(){
 /* ── Revision tracking ── */
 function lineFingerprint(line){
   /* Create a content hash string for a line to detect changes */
-  let fp=line.type+'|'+line.value;
+  let fp=line.type+'|'+(line.type==='bookmark'?(line.label||''):line.value);
   if(line.character)fp+='|'+line.character.name;
   if(line.dialogueAction)fp+='|'+line.dialogueAction;
   if(line.cues){
@@ -3943,6 +3970,56 @@ function jumpToNote(scope,ai,si,li){
     const el=document.querySelector('.notes-panel');
     if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
   },50);
+}
+
+/* ── Bookmarks ── */
+function insertBookmark(){
+  if(!S.acts.length)return;
+  pushUndo();
+  const bm={type:'bookmark',label:'',notes:[]};
+  if(selectedLine){const[ai,si,li]=selectedLine;S.acts[ai].scenes[si].lines.splice(li+1,0,bm);selectedLine=[ai,si,li+1];}
+  else if(S.acts.length){const lastAi=S.acts.length-1;const lastSi=S.acts[lastAi].scenes.length-1;if(lastSi>=0){S.acts[lastAi].scenes[lastSi].lines.push(bm);selectedLine=[lastAi,lastSi,S.acts[lastAi].scenes[lastSi].lines.length-1];}}
+  autoSave();render();
+  /* Open note panel immediately so user can add label/notes */
+  if(selectedLine){const[ai,si,li]=selectedLine;openNotePanels['line-'+ai+'-'+si+'-'+li]=true;render();}
+}
+function editBookmarkLabel(ai,si,li){
+  const line=S.acts[ai].scenes[si].lines[li];if(!line||line.type!=='bookmark')return;
+  const newLabel=prompt('Bookmark label:',line.label||'');
+  if(newLabel===null)return;
+  pushUndo();line.label=newLabel.trim();autoSave();render();renderRPBookmarks();
+}
+function toggleRPBookmarks(){
+  const el=$('rp-bookmarks'),tog=$('rp-bm-toggle');
+  if(!el)return;
+  const vis=el.style.display==='none';
+  el.style.display=vis?'block':'none';
+  if(tog)tog.textContent=vis?'▼':'▶';
+  if(vis)renderRPBookmarks();
+}
+function getAllBookmarks(){
+  const all=[];
+  S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>sc.lines.forEach((l,li)=>{
+    if(l.type==='bookmark')all.push({label:l.label,ai,si,li,loc:sceneLabel(ai,si),noteCount:(l.notes||[]).length});
+  })));
+  return all;
+}
+function renderRPBookmarks(){
+  const list=$('rp-bm-list'),countEl=$('rp-bm-count');
+  if(!list)return;
+  const all=getAllBookmarks();
+  if(countEl)countEl.textContent=all.length?'('+all.length+')':'';
+  if(!all.length){list.innerHTML='<div style="color:var(--tx3);padding:8px;font-size:11px;">No bookmarks yet.</div>';return;}
+  list.innerHTML=all.map(b=>{
+    const label=b.label||'(untitled)';
+    const notes=b.noteCount?` · ${b.noteCount} note${b.noteCount>1?'s':''}`:'';;
+    return`<div class="rp-bm-entry" onclick="jumpToBookmark(${b.ai},${b.si},${b.li})"><span>🔖</span><span class="rp-bm-label">${esc(label)}</span><span class="rp-bm-loc">${esc(b.loc)}${notes}</span></div>`;
+  }).join('');
+}
+function jumpToBookmark(ai,si,li){
+  switchTab('edit');selLine(ai,si,li);
+  openNotePanels['line-'+ai+'-'+si+'-'+li]=true;render();
+  setTimeout(()=>{const el=document.querySelector('.line-item.sel');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},50);
 }
 
 updateInputMode();switchTab('edit');updateSaveIndicator();
