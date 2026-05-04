@@ -173,6 +173,34 @@ a:hover{text-decoration:underline;}
     <h3>Undo &amp; Redo</h3>
     <p>Full 50-level undo/redo with <span class="key">Ctrl</span>+<span class="key">Z</span> / <span class="key">Ctrl</span>+<span class="key">Shift</span>+<span class="key">Z</span> (or <span class="key">Ctrl</span>+<span class="key">Y</span>). Every structural change captures a complete state snapshot, so undo always brings you back to exactly how things were. The Undo/Redo buttons in the top bar show the current state.</p>
   </div>
+
+  <div class="feature">
+    <h3>Multi-line input <span class="badge">Shift+Enter</span></h3>
+    <p>Press <span class="key">Shift</span>+<span class="key">Enter</span> in the input bar to insert a newline without submitting. This lets you write longer stage directions or monologues that span multiple lines. Press <span class="key">Enter</span> alone to submit the line.</p>
+  </div>
+</div>
+
+<!-- ─── NOTES & BOOKMARKS ─── -->
+<div class="section">
+  <h2>Notes &amp; bookmarks</h2>
+
+  <div class="feature">
+    <h3>Notes &amp; comments <span class="badge">New</span></h3>
+    <p>Attach notes to any line, scene, or act using the <strong>📝 note icon</strong> that appears next to each element. Click it to expand the note panel inline, where you can add, resolve, or delete notes. Notes have a resolved/unresolved workflow — resolved notes are dimmed but kept for reference.</p>
+    <p style="margin-top:6px;">The right-side panel has a <strong>Notes</strong> section listing all notes across the script, filterable by status (all, open, resolved). Click any note in the list to jump to its location in the editor. Toggle note visibility globally with the 📝 button in the top bar.</p>
+    <p style="margin-top:6px;">Unresolved notes are exported in Fountain format (as <code>[[note:]]</code> annotations) and displayed in the View tab and PDF.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Bookmarks <span class="badge">New</span></h3>
+    <p>Click the <strong>🔖 button</strong> in the input bar to insert a bookmark at the current cursor position. Bookmarks are placeholders — they don't contain script content but they can carry notes and a label. Use them to mark points in the script you want to return to later.</p>
+    <ul>
+      <li>Click the bookmark label to rename it (or use inline editing with double-click)</li>
+      <li>Attach notes to bookmarks just like any other line</li>
+      <li>Drag-and-drop to reorder bookmarks within a scene</li>
+    </ul>
+    <p style="margin-top:6px;">The right-side panel has a collapsible <strong>Bookmarks</strong> section with a list of all bookmarks. Click any entry to jump to it. Bookmarks are excluded from all exports (PDF, Fountain, FDX) — they're for your editing workflow only.</p>
+  </div>
 </div>
 
 <!-- ─── CHARACTER PANEL ─── -->
@@ -311,6 +339,26 @@ a:hover{text-decoration:underline;}
   <div class="feature">
     <h3>Theme override</h3>
     <p>By default the app follows your system's light/dark preference. You can force light or dark mode in <strong>Settings → Theme</strong>. Your choice persists across sessions.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Line alignment <span class="badge">New</span></h3>
+    <p>Under <strong>Settings &rarr; Formatting</strong>, you can set text alignment independently for each line type: character names, dialogue text, stage directions, and cues. Options are left, center, or right. Changes apply in both the editor and the View tab.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Inline dialogue format <span class="badge">New</span></h3>
+    <p>Choose between <strong>stacked</strong> (character name on its own line above dialogue) and <strong>inline</strong> (character name and dialogue on the same line, separated by a space) in <strong>Settings &rarr; Formatting</strong>. Affects the editor, View tab, and PDF export.</p>
+  </div>
+
+  <div class="feature">
+    <h3>View tab format toggle <span class="badge">New</span></h3>
+    <p>The View tab now has three format buttons at the top: <strong>Stage Play</strong> (formatted output), <strong>Fountain</strong> (plain-text Fountain markup), and <strong>FDX</strong> (Final Draft XML). Switch between them to preview how your script will look in each export format.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Print from View tab</h3>
+    <p>The View tab includes a <strong>Print</strong> button (also works with <span class="key">Ctrl</span>+<span class="key">P</span>). All editor chrome is hidden — you get a clean black-on-white formatted script ready for paper.</p>
   </div>
 </div>
 
