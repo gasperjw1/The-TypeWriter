@@ -369,16 +369,19 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .pacing-toggle button:first-child{border-radius:4px 0 0 4px;}
 .pacing-toggle button:last-child{border-radius:0 4px 4px 0;}
 .pacing-toggle button.active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
-.pacing-ribbon{display:flex;height:36px;border-radius:6px;overflow:hidden;border:1px solid var(--bd3);background:var(--bg2);}
-.pacing-seg{position:relative;min-width:2px;cursor:pointer;transition:opacity .15s,filter .15s;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.pacing-seg:hover{opacity:.85;filter:brightness(1.1);}
-.pacing-seg-label{font-size:9px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 3px;pointer-events:none;}
+.pacing-ribbon{display:flex;height:28px;border-radius:5px;overflow:hidden;border:1px solid var(--bd3);background:var(--bg2);gap:1px;}
+.pacing-seg{position:relative;min-width:2px;cursor:pointer;transition:filter .15s;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.pacing-seg:hover{filter:brightness(1.15);}
+.pacing-seg-label{font-size:8px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;pointer-events:none;}
 .pacing-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg1);border:1px solid var(--bd2);border-radius:4px;padding:4px 8px;font-size:10px;color:var(--tx1);white-space:nowrap;z-index:10;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.15);display:none;font-family:var(--sans);}
 .pacing-seg:hover .pacing-tip{display:block;}
-.pacing-act-sep{width:2px;background:var(--bd1);flex-shrink:0;}
-.pacing-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-.pacing-legend-item{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--tx3);font-family:var(--sans);}
-.pacing-legend-dot{width:8px;height:8px;border-radius:2px;}
+.pacing-act-row{margin-bottom:6px;}
+.pacing-act-row-label{font-size:10px;color:var(--tx3);margin-bottom:3px;font-family:var(--sans);display:flex;align-items:center;gap:6px;}
+.pacing-act-row-label span{white-space:nowrap;}
+.pacing-act-row-label .pacing-act-total{font-weight:400;color:var(--tx3);opacity:.7;}
+.pacing-acts-ribbon{display:flex;height:20px;border-radius:4px;overflow:hidden;border:1px solid var(--bd3);background:var(--bg2);gap:1px;margin-bottom:12px;}
+.pacing-acts-ribbon .pacing-seg{border-radius:0;}
+.pacing-acts-seg-label{font-size:9px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none;}
 .outline-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:12px;}
 .outline-toolbar button{font-size:11px;padding:4px 10px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;}
 .outline-toolbar button:hover{border-color:var(--bd1);color:var(--tx1);}
@@ -2438,10 +2441,12 @@ function setPacingMetric(m){pacingMetric=m;renderOutline();}
 const ACT_PALETTE=['#378ADD','#E67E22','#2ECC71','#9B59B6','#E74C3C','#1ABC9C','#F1C40F','#E91E9E'];
 
 function renderPacingRibbon(){
-  /* Gather scene data */
-  const scenes=[];
-  let total=0;
+  /* Compute per-scene and per-act totals */
+  const actData=[];
+  let grandTotal=0;
   S.acts.forEach((act,ai)=>{
+    const scenes=[];
+    let actTotal=0;
     act.scenes.forEach((sc,si)=>{
       const lines=sc.lines.filter(l=>l.type!=='bookmark');
       const lc=lines.length;
@@ -2452,39 +2457,53 @@ function renderPacingRibbon(){
       },0);
       const val=pacingMetric==='lines'?lc:wc;
       const color=sc.color||ACT_PALETTE[ai%ACT_PALETTE.length];
-      const label=sceneLabel(ai,si);
-      scenes.push({ai,si,label,lc,wc,val,color});
-      total+=val;
+      scenes.push({ai,si,lc,wc,val,color});
+      actTotal+=val;
     });
+    actData.push({ai,scenes,total:actTotal,color:ACT_PALETTE[ai%ACT_PALETTE.length]});
+    grandTotal+=actTotal;
   });
-  if(!scenes.length||total===0)return'';
+  if(grandTotal===0)return'';
 
   let h=`<div class="pacing-wrap">`;
   h+=`<div class="pacing-header"><span class="pacing-label">Pacing</span>`;
   h+=`<div class="pacing-toggle"><button class="${pacingMetric==='lines'?'active':''}" onclick="setPacingMetric('lines')">Lines</button><button class="${pacingMetric==='words'?'active':''}" onclick="setPacingMetric('words')">Words</button></div>`;
   h+=`</div>`;
-  h+=`<div class="pacing-ribbon">`;
-  let prevAi=-1;
-  scenes.forEach(s=>{
-    if(prevAi>=0&&s.ai!==prevAi)h+=`<div class="pacing-act-sep"></div>`;
-    prevAi=s.ai;
-    const pct=((s.val/total)*100).toFixed(2);
-    const tipText=`${s.label} — ${s.lc} line${s.lc!==1?'s':''}, ${s.wc} word${s.wc!==1?'s':''}`;
-    h+=`<div class="pacing-seg" style="width:${pct}%;background:${s.color}" onclick="outlineCardClick(${s.ai},${s.si})" title="">`;
-    h+=`<span class="pacing-tip">${esc(tipText)}</span>`;
-    if(s.val/total>.06)h+=`<span class="pacing-seg-label">${esc(s.label.replace(/^Scene /,'S'))}</span>`;
-    h+=`</div>`;
-  });
-  h+=`</div>`;
-  /* Legend for acts */
-  if(S.acts.length>1){
-    h+=`<div class="pacing-legend">`;
-    S.acts.forEach((act,ai)=>{
-      const c=ACT_PALETTE[ai%ACT_PALETTE.length];
-      h+=`<span class="pacing-legend-item"><span class="pacing-legend-dot" style="background:${c}"></span>${esc(actLabel(ai))}</span>`;
+
+  /* Act comparison ribbon (only if multiple acts) */
+  if(actData.length>1){
+    h+=`<div class="pacing-acts-ribbon">`;
+    actData.forEach(a=>{
+      const pct=((a.total/grandTotal)*100).toFixed(2);
+      const tipText=`${actLabel(a.ai)} — ${a.total} ${pacingMetric}`;
+      h+=`<div class="pacing-seg" style="width:${pct}%;background:${a.color}">`;
+      h+=`<span class="pacing-tip">${esc(tipText)}</span>`;
+      h+=`<span class="pacing-acts-seg-label">${esc(actLabel(a.ai))}</span>`;
+      h+=`</div>`;
     });
     h+=`</div>`;
   }
+
+  /* Per-act scene ribbons */
+  actData.forEach(a=>{
+    if(!a.scenes.length||a.total===0)return;
+    const metricLabel=pacingMetric==='lines'?'lines':'words';
+    h+=`<div class="pacing-act-row">`;
+    h+=`<div class="pacing-act-row-label"><span>${esc(actLabel(a.ai))}</span><span class="pacing-act-total">${a.total} ${metricLabel}</span></div>`;
+    h+=`<div class="pacing-ribbon">`;
+    a.scenes.forEach(s=>{
+      const pct=((s.val/a.total)*100).toFixed(2);
+      const scLabel='S'+(s.si+1);
+      const tipText=`Scene ${s.si+1} — ${s.lc} line${s.lc!==1?'s':''}, ${s.wc} word${s.wc!==1?'s':''}`;
+      h+=`<div class="pacing-seg" style="width:${pct}%;background:${s.color}" onclick="outlineCardClick(${s.ai},${s.si})">`;
+      h+=`<span class="pacing-tip">${esc(tipText)}</span>`;
+      if(s.val/a.total>.04)h+=`<span class="pacing-seg-label">${scLabel}</span>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+    h+=`</div>`;
+  });
+
   h+=`</div>`;
   return h;
 }
