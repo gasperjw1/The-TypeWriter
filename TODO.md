@@ -80,7 +80,7 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [ ] **Plugin / extension system** — Allow user scripts (JavaScript) to process the script data. Beat supports this on macOS.
 - [ ] **Document styles** — Customizable page layout (fonts, margins) for the exported screenplay. Beat supports this.
 - [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.
-- [ ] **Character panel act/scene filter** — Update the character section in the right-side panel to filter character dialogue lines based on the act and scene filter dropdowns, showing only lines from the selected scope.
+- [x] **Character panel act/scene filter** — Dialogue list respects act/scene dropdowns, line/word count badges, first/last appearance, sort by name/lines/appearance. *(Session 16)*
 
 ## Standard Test Checklist (run after every new feature)
 
