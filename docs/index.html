@@ -275,6 +275,36 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .vf-btn:hover{background:var(--bg3);}
 .vf-btn.vf-active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
 .vf-pre{font-family:var(--script-font-family);font-size:var(--script-font-size);white-space:pre-wrap;word-wrap:break-word;line-height:1.5;color:var(--tx1);background:var(--bg2);border:1px solid var(--bd3);border-radius:6px;padding:20px;overflow-x:auto;}
+.vf-sub-bar{display:flex;gap:6px;margin-bottom:16px;}
+.vf-sub-btn{background:var(--bg2);border:1px solid var(--bd2);border-radius:4px;padding:3px 10px;font-size:10px;color:var(--tx2);cursor:pointer;font-family:inherit;}
+.vf-sub-btn:hover{background:var(--bg3);}
+.vf-sub-btn.vf-sub-active{background:var(--pill-active-bg);color:var(--pill-active-fg);border-color:var(--pill-active-bg);}
+/* Fountain syntax highlighting */
+.ftn-title-key{color:#9B59B6;font-weight:600;}
+.ftn-section{color:#E67E22;font-weight:700;}
+.ftn-scene{color:#2ECC71;font-weight:600;}
+.ftn-char{color:#378ADD;font-weight:600;}
+.ftn-paren{color:#E91E9E;font-style:italic;}
+.ftn-transition{color:#E74C3C;}
+.ftn-note{color:var(--tx3);font-style:italic;}
+/* FDX syntax highlighting */
+.fdx-tag{color:#378ADD;}
+.fdx-attr{color:#E67E22;}
+.fdx-val{color:#2ECC71;}
+.fdx-text{color:var(--tx1);}
+.fdx-comment{color:var(--tx3);font-style:italic;}
+/* Rendered fountain/fdx view */
+.vr-title{text-align:center;font-size:18px;font-weight:700;margin-bottom:4px;font-family:var(--script-font-family);}
+.vr-author{text-align:center;font-size:14px;color:var(--tx2);margin-bottom:24px;font-family:var(--script-font-family);}
+.vr-act{font-size:15px;font-weight:700;text-decoration:underline;text-transform:uppercase;margin:24px 0 8px;font-family:var(--script-font-family);}
+.vr-scene{font-size:13px;font-weight:600;margin:16px 0 6px;font-family:var(--script-font-family);}
+.vr-setting{font-style:italic;margin:4px 0;color:var(--tx2);font-family:var(--script-font-family);}
+.vr-char{text-align:center;text-transform:uppercase;font-weight:600;margin:12px 0 2px;font-family:var(--script-font-family);}
+.vr-paren{text-align:center;font-style:italic;color:var(--tx2);font-family:var(--script-font-family);}
+.vr-dialogue{text-align:center;padding:0 20%;margin-bottom:8px;font-family:var(--script-font-family);}
+.vr-action{font-style:italic;margin:6px 0;color:var(--tx2);font-family:var(--script-font-family);}
+.vr-transition{text-align:right;margin:8px 0;font-family:var(--script-font-family);}
+.vr-cue{font-size:11px;color:var(--tx3);margin-left:8px;font-family:var(--sans);}
 #view-panel .v-title{font-size:20px;font-weight:700;text-align:center;font-family:var(--script-font-family);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}
 #view-panel .v-author{font-size:var(--script-font-size);text-align:center;font-family:var(--script-font-family);margin-bottom:32px;color:var(--tx2);}
 /* Act/scene headings: centered, uppercase, underlined */
@@ -350,7 +380,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #view-panel .v-act{border-top:1.5pt solid #000 !important;margin-top:24pt !important;}
   #view-panel .v-scene{border-top:0.5pt solid #666 !important;}
   #view-panel .v-setting,#view-panel .v-direction,#view-panel .v-action{color:#333 !important;}
-  .view-print-btn,.vf-bar{display:none !important;}
+  .view-print-btn,.vf-bar,.vf-sub-bar{display:none !important;}
 }
 .view-print-btn{display:inline-block;font-size:11px;padding:4px 12px;border:1px solid var(--bd2);border-radius:4px;background:var(--bg2);color:var(--tx2);cursor:pointer;}
 .view-print-btn:hover{border-color:var(--bd1);color:var(--tx1);}
@@ -1298,6 +1328,7 @@ let inputMode='pills'; /* 'pills' = manual pill selection, 'auto' = unified text
 let lineAlign={charName:'center',dialogue:'left',stagedir:'left',cue:'left'}; /* per-element alignment */
 let dlgFormat='stacked'; /* 'stacked' = name above text, 'inline' = NAME: text */
 let viewFormat='stageplay'; /* 'stageplay' | 'fountain' | 'fdx' */
+let viewSubMode='rendered'; /* 'raw' | 'rendered' — applies to fountain & fdx views */
 let showNotes=true; /* toggle note visibility */
 let noteIdCounter=1; /* incrementing ID for new notes */
 let charPanelExpanded={};
@@ -1317,7 +1348,7 @@ const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes,viewSubMode}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -2201,12 +2232,165 @@ ${sc.setting?`<div class="scene-setting" onclick="openEditScene(${ai},${si})">${
 }
 
 function setViewFormat(f){viewFormat=f;renderView();}
+function setViewSubMode(m){viewSubMode=m;lsSaveSettings();renderView();}
+
+/* ── Fountain syntax highlighting ── */
+function highlightFountain(text){
+  return esc(text).split('\n').map(line=>{
+    /* Title page keys */
+    if(/^(Title|Author|Draft date|Source|Contact|Copyright):/.test(line))
+      return line.replace(/^([^:]+:)/, '<span class="ftn-title-key">$1</span>');
+    /* Section headings */
+    if(/^#{1,3}\s/.test(line))return `<span class="ftn-section">${line}</span>`;
+    /* Scene headings (forced . or INT/EXT) */
+    if(/^\.(.*)|^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(line))return `<span class="ftn-scene">${line}</span>`;
+    /* Character names (all-caps, possibly with ^) */
+    if(/^[A-Z][A-Z0-9 .''-]+(\s*\^)?$/.test(line.trim())&&line.trim().length>1&&!/^(FADE|CUT|SMASH|DISSOLVE|WIPE)/.test(line.trim()))
+      return `<span class="ftn-char">${line}</span>`;
+    /* Parentheticals */
+    if(/^\s*\(.*\)\s*$/.test(line))return `<span class="ftn-paren">${line}</span>`;
+    /* Transitions (> or ends with TO:) */
+    if(/^&gt;\s/.test(line)||/[A-Z\s]+TO:$/.test(line.trim()))return `<span class="ftn-transition">${line}</span>`;
+    /* Notes [[...]] */
+    if(/\[\[.*\]\]/.test(line))return line.replace(/(\[\[.*?\]\])/g,'<span class="ftn-note">$1</span>');
+    return line;
+  }).join('\n');
+}
+
+/* ── FDX syntax highlighting ── */
+function highlightFDX(text){
+  return esc(text).split('\n').map(line=>{
+    /* XML comments */
+    if(/^\s*&lt;!--/.test(line))return `<span class="fdx-comment">${line}</span>`;
+    /* XML declaration and processing instructions */
+    if(/^\s*&lt;\?/.test(line))return `<span class="fdx-tag">${line}</span>`;
+    /* Tags with attributes */
+    line=line.replace(/(&lt;\/?[A-Za-z][A-Za-z0-9]*)/g,'<span class="fdx-tag">$1</span>');
+    line=line.replace(/(\s)([a-zA-Z-]+)(=)(&quot;[^&]*?&quot;)/g,'$1<span class="fdx-attr">$2</span>$3<span class="fdx-val">$4</span>');
+    line=line.replace(/(\/?)(&gt;)/g,'<span class="fdx-tag">$1$2</span>');
+    return line;
+  }).join('\n');
+}
+
+/* ── Rendered Fountain view ── */
+function renderFountainFormatted(){
+  const text=buildFountain();
+  const lines=text.split('\n');
+  let h='<div class="vf-rendered">';
+  let inTitlePage=true;
+  let i=0;
+  /* Title page (up to first blank line after key:value pairs) */
+  while(i<lines.length){
+    const ln=lines[i];
+    if(inTitlePage){
+      if(ln.trim()===''){inTitlePage=false;i++;continue;}
+      if(/^Title:\s*(.*)/.test(ln)){h+=`<div class="vr-title">${esc(RegExp.$1)}</div>`;i++;continue;}
+      if(/^Author:\s*(.*)/.test(ln)){h+=`<div class="vr-author">by ${esc(RegExp.$1)}</div>`;i++;continue;}
+      if(/^[A-Za-z ]+:/.test(ln)){i++;continue;} /* skip other title page keys */
+    }
+    /* Section headings */
+    if(/^#\s+(.*)/.test(ln)){h+=`<div class="vr-act">${esc(RegExp.$1)}</div>`;i++;continue;}
+    if(/^##\s+(.*)/.test(ln)){h+=`<div class="vr-scene">${esc(RegExp.$1)}</div>`;i++;continue;}
+    /* Scene headings */
+    if(/^\.(.+)/.test(ln)){h+=`<div class="vr-setting">${esc(RegExp.$1)}</div>`;i++;continue;}
+    if(/^(INT|EXT|EST|INT\.?\/EXT|I\/E)[\.\s]/i.test(ln)){h+=`<div class="vr-setting">${esc(ln)}</div>`;i++;continue;}
+    /* Transitions */
+    if(/^>\s*(.+)/.test(ln)){
+      let txt=RegExp.$1;let cue='';
+      if(/^(.*?)\s*\[\[(.*?)\]\]/.test(txt)){txt=RegExp.$1;cue=RegExp.$2;}
+      h+=`<div class="vr-transition">${esc(txt)}${cue?`<span class="vr-cue">[${esc(cue)}]</span>`:''}</div>`;i++;continue;
+    }
+    if(/^[A-Z\s]+TO:(\s*\[\[.*?\]\])?$/.test(ln.trim())){
+      let txt=ln.trim();let cue='';
+      if(/^(.*?)\s*\[\[(.*?)\]\]/.test(txt)){txt=RegExp.$1;cue=RegExp.$2;}
+      h+=`<div class="vr-transition">${esc(txt)}${cue?`<span class="vr-cue">[${esc(cue)}]</span>`:''}</div>`;i++;continue;
+    }
+    /* Notes */
+    if(/^\[\[.*\]\]$/.test(ln.trim())){i++;continue;} /* skip standalone notes (descriptions) */
+    /* Character names (uppercase, next line is dialogue or parenthetical) */
+    if(/^[A-Z][A-Z0-9 .''-]+(\s*\^)?$/.test(ln.trim())&&ln.trim().length>1&&!/^(FADE|CUT|SMASH|DISSOLVE|WIPE)/.test(ln.trim())){
+      h+=`<div class="vr-char">${esc(ln.trim())}</div>`;
+      i++;
+      /* Parenthetical */
+      if(i<lines.length&&/^\s*\(.*\)\s*$/.test(lines[i])){h+=`<div class="vr-paren">${esc(lines[i].trim())}</div>`;i++;}
+      /* Dialogue lines (until blank line) */
+      while(i<lines.length&&lines[i].trim()!==''){
+        if(/^\s*\(.*\)\s*$/.test(lines[i])){h+=`<div class="vr-paren">${esc(lines[i].trim())}</div>`;}
+        else{h+=`<div class="vr-dialogue">${esc(lines[i])}</div>`;}
+        i++;
+      }
+      continue;
+    }
+    /* Forced action (!) */
+    if(/^!(.+)/.test(ln)){h+=`<div class="vr-action">(${esc(RegExp.$1)})</div>`;i++;continue;}
+    /* Regular action (non-blank lines that didn't match anything else) */
+    if(ln.trim()!==''){h+=`<div class="vr-action">(${esc(ln)})</div>`;}
+    i++;
+  }
+  h+='</div>';
+  return h;
+}
+
+/* ── Rendered FDX view ── */
+function renderFDXFormatted(){
+  const xml=buildFDXText();
+  const parser=new DOMParser();
+  const doc=parser.parseFromString(xml,'text/xml');
+  let h='<div class="vf-rendered">';
+  /* Title page */
+  const tp=doc.querySelector('TitlePage');
+  if(tp){
+    const content=tp.querySelector('Content');
+    if(content){
+      const paras=content.querySelectorAll('Paragraph');
+      let foundTitle=false,foundBy=false;
+      paras.forEach(p=>{
+        const txt=Array.from(p.querySelectorAll('Text')).map(t=>t.textContent).join('');
+        if(!foundTitle&&txt.trim()){h+=`<div class="vr-title">${esc(txt)}</div>`;foundTitle=true;return;}
+        if(/written by/i.test(txt)){foundBy=true;return;}
+        if(foundBy&&txt.trim()){h+=`<div class="vr-author">by ${esc(txt)}</div>`;foundBy=false;return;}
+      });
+    }
+  }
+  /* Body paragraphs — get main Content (direct child of FinalDraft, not inside TitlePage) */
+  const mainContent=doc.querySelector('FinalDraft > Content');
+  let paras=mainContent?mainContent.querySelectorAll('Paragraph'):doc.querySelectorAll('Content > Paragraph');
+  paras.forEach(p=>{
+    const type=p.getAttribute('Type')||'';
+    const txt=Array.from(p.querySelectorAll('Text')).map(t=>t.textContent).join('');
+    if(!txt.trim()&&type!=='Act Break')return;
+    switch(type){
+      case 'Act Break':h+=`<div class="vr-act">${esc(txt||'Act Break')}</div>`;break;
+      case 'Scene Heading':h+=`<div class="vr-setting">${esc(txt)}</div>`;break;
+      case 'Character':h+=`<div class="vr-char">${esc(txt)}</div>`;break;
+      case 'Parenthetical':h+=`<div class="vr-paren">${esc(txt)}</div>`;break;
+      case 'Dialogue':h+=`<div class="vr-dialogue">${esc(txt)}</div>`;break;
+      case 'Transition':h+=`<div class="vr-transition">${esc(txt)}</div>`;break;
+      case 'Action':default:h+=`<div class="vr-action">(${esc(txt)})</div>`;break;
+    }
+  });
+  h+='</div>';
+  return h;
+}
+
 function renderView(){
   const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
   const tb=(f,label)=>`<button class="vf-btn${viewFormat===f?' vf-active':''}" onclick="setViewFormat('${f}')">${label}</button>`;
   let h=`<div class="vf-bar">${tb('stageplay','Stage Play')}${tb('fountain','Fountain')}${tb('fdx','FDX')}<button class="view-print-btn" onclick="window.print()" style="margin-left:auto;">Print</button></div>`;
-  if(viewFormat==='fountain'){h+=`<pre class="vf-pre">${esc(buildFountain())}</pre>`;p.innerHTML=h;return;}
-  if(viewFormat==='fdx'){h+=`<pre class="vf-pre">${esc(buildFDXText())}</pre>`;p.innerHTML=h;return;}
+  if(viewFormat==='fountain'){
+    const sb=`<div class="vf-sub-bar"><button class="vf-sub-btn${viewSubMode==='rendered'?' vf-sub-active':''}" onclick="setViewSubMode('rendered')">Rendered</button><button class="vf-sub-btn${viewSubMode==='raw'?' vf-sub-active':''}" onclick="setViewSubMode('raw')">Raw</button></div>`;
+    h+=sb;
+    if(viewSubMode==='raw'){h+=`<pre class="vf-pre">${highlightFountain(buildFountain())}</pre>`;}
+    else{h+=renderFountainFormatted();}
+    p.innerHTML=h;return;
+  }
+  if(viewFormat==='fdx'){
+    const sb=`<div class="vf-sub-bar"><button class="vf-sub-btn${viewSubMode==='rendered'?' vf-sub-active':''}" onclick="setViewSubMode('rendered')">Rendered</button><button class="vf-sub-btn${viewSubMode==='raw'?' vf-sub-active':''}" onclick="setViewSubMode('raw')">Raw</button></div>`;
+    h+=sb;
+    if(viewSubMode==='raw'){h+=`<pre class="vf-pre">${highlightFDX(buildFDXText())}</pre>`;}
+    else{h+=renderFDXFormatted();}
+    p.innerHTML=h;return;
+  }
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
   S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
@@ -4114,6 +4298,7 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.ltEnabled){ltEnabled={...ltEnabled,...sets.ltEnabled};['direction','action','dialogue'].forEach(t=>{const btn=$('ltt-'+t);if(btn)btn.classList.toggle('on',ltEnabled[t]);});}
     if(sets.pillHotkeys){pillHotkeys=sets.pillHotkeys;updatePillLabels();}
     if(sets.inputMode){inputMode=sets.inputMode;}
+    if(sets.viewSubMode){viewSubMode=sets.viewSubMode;}
   }
   applyLTColors();applyInputMode();
 })();
