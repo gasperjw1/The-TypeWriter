@@ -1,5 +1,5 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v2';
+const CACHE_NAME = 'scriptwriter-v3';
 const ASSETS = [
   './',
   './index.html',
