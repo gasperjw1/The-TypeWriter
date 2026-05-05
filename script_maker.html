@@ -695,6 +695,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .char-dlg-item{font-size:11px;color:var(--tx1);padding:3px 6px;border-radius:4px;cursor:pointer;line-height:1.4;border-left:2px solid var(--lt-dialogue);background:var(--lt-dialogue-bg);}
 .char-dlg-item:hover{background:var(--bg2);}
 .char-dlg-item .cdl-loc{font-size:10px;color:var(--tx3);display:block;}
+.char-stat-badge{display:block;font-size:10px;color:var(--tx3);font-weight:400;margin-top:1px;font-family:var(--sans);}
+.char-appear-info{font-size:10px;color:var(--tx3);margin-bottom:6px;font-family:var(--sans);}
+.char-sort-bar{display:flex;align-items:center;gap:4px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--bd3);}
+.char-sort-btn{font-size:10px;font-family:var(--sans);padding:2px 6px;border:1px solid var(--bd3);border-radius:4px;background:transparent;color:var(--tx3);cursor:pointer;}
+.char-sort-btn:hover{background:var(--bg2);color:var(--tx1);}
+.char-sort-btn.active{background:var(--bg3);color:var(--tx1);border-color:var(--bd2);}
 .char-dlg-empty{font-size:11px;color:var(--tx3);font-style:italic;padding:3px 6px;}
 .char-chip-toggle{font-size:10px;border:none;background:none;cursor:pointer;color:var(--tx3);padding:1px 4px;font-family:var(--sans);transition:transform .15s;}
 .char-chip-toggle.open{transform:rotate(90deg);}
@@ -2396,21 +2402,60 @@ function getFilteredChars(){
   const names=new Set();scenes.forEach(sc=>getAllSceneChars(sc).forEach(n=>names.add(n)));
   return S.characters.filter(c=>names.has(c.name));
 }
+function getCharStats(name){
+  const scope=getCFScope();
+  let lines=0,words=0,firstAi=null,firstSi=null,lastAi=null,lastSi=null;
+  S.acts.forEach((a,ai)=>{
+    if(scope.actIdx!==null&&ai!==scope.actIdx)return;
+    a.scenes.forEach((sc,si)=>{
+      if(scope.sceneIdx!==null&&si!==scope.sceneIdx)return;
+      sc.lines.forEach(l=>{
+        if(l.type==='dialogue'&&l.character&&l.character.name===name){
+          lines++;words+=l.value.trim().split(/\s+/).filter(Boolean).length;
+          if(firstAi===null){firstAi=ai;firstSi=si;}
+          lastAi=ai;lastSi=si;
+        }
+      });
+    });
+  });
+  return{lines,words,firstAi,firstSi,lastAi,lastSi};
+}
+let charSortMode='name';
+function setCharSort(mode){charSortMode=mode;renderCharList();}
 function renderCharList(){
   const c=$('char-list-rp');if(!c)return;const filtered=getFilteredChars();
   if(!filtered.length){c.innerHTML=`<div style="font-size:11px;color:var(--tx3);">No characters found</div>`;return;}
-  c.innerHTML=filtered.map(ch=>{
+  /* compute stats for sorting and display */
+  const statsMap={};filtered.forEach(ch=>{statsMap[ch.name]=getCharStats(ch.name);});
+  /* sort */
+  const sorted=[...filtered];
+  if(charSortMode==='lines')sorted.sort((a,b)=>statsMap[b.name].lines-statsMap[a.name].lines);
+  else if(charSortMode==='appearance'){sorted.sort((a,b)=>{const sa=statsMap[a.name],sb=statsMap[b.name];if(sa.firstAi===null&&sb.firstAi===null)return 0;if(sa.firstAi===null)return 1;if(sb.firstAi===null)return -1;if(sa.firstAi!==sb.firstAi)return sa.firstAi-sb.firstAi;return sa.firstSi-sb.firstSi;});}
+  else sorted.sort((a,b)=>a.name.localeCompare(b.name));
+  /* sort bar */
+  const sortBar=`<div class="char-sort-bar"><span style="font-size:10px;color:var(--tx3);">Sort:</span>${[['name','Name'],['lines','Lines'],['appearance','Appearance']].map(([k,lbl])=>`<button class="char-sort-btn${charSortMode===k?' active':''}" onclick="event.stopPropagation();setCharSort('${k}')">${lbl}</button>`).join('')}</div>`;
+  let html=sortBar;
+  html+=sorted.map(ch=>{
     const isOpen=charPanelExpanded[ch.name];
     const toggleCls='char-chip-toggle'+(isOpen?' open':'');
+    const st=statsMap[ch.name];
+    const badge=st.lines?`<span class="char-stat-badge">${st.lines} line${st.lines!==1?'s':''} · ${st.words} word${st.words!==1?'s':''}</span>`:'<span class="char-stat-badge" style="opacity:0.5;">0 lines</span>';
     let expandHtml='';
     if(isOpen){
       const descHtml=ch.description?`<div class="char-full-desc">${esc(ch.description)}</div>`:'<div class="char-full-desc" style="color:var(--tx3);">No description</div>';
-      expandHtml=`<div class="char-expand open">${descHtml}<input class="char-dlg-search" id="cdl-search-${ch.name}" placeholder="Search dialogue..." oninput="filterCharDlg('${escJs(ch.name)}')"/><div class="char-dlg-list" id="cdl-list-${ch.name}"></div></div>`;
+      let appearHtml='';
+      if(st.firstAi!==null){
+        const first=sceneLabel(st.firstAi,st.firstSi);
+        const last=sceneLabel(st.lastAi,st.lastSi);
+        appearHtml=`<div class="char-appear-info">First: ${esc(first)}${first!==last?' · Last: '+esc(last):''}</div>`;
+      }
+      expandHtml=`<div class="char-expand open">${descHtml}${appearHtml}<input class="char-dlg-search" id="cdl-search-${ch.name}" placeholder="Search dialogue..." oninput="filterCharDlg('${escJs(ch.name)}')"/><div class="char-dlg-list" id="cdl-list-${ch.name}"></div></div>`;
     }
-    return`<div class="char-chip${ch.archived?' archived':''}" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;justify-content:space-between;" onclick="toggleCharExpand('${escJs(ch.name)}')"><div style="display:flex;align-items:center;gap:4px;min-width:0"><button class="${toggleCls}">▶</button><div style="min-width:0"><div class="char-chip-name">${esc(ch.name)}${ch.archived?`<span class="char-chip-archived-badge">archived</span>`:''}</div></div></div><div class="char-chip-btns" onclick="event.stopPropagation()"><button class="char-chip-btn" onclick="openEditChar('${escJs(ch.name)}')">Edit</button><button class="char-chip-btn" style="color:#A32D2D" onclick="tryDeleteChar('${escJs(ch.name)}')">Del</button></div></div>${expandHtml}</div>`;
+    return`<div class="char-chip${ch.archived?' archived':''}" style="flex-direction:column;align-items:stretch;"><div style="display:flex;align-items:center;justify-content:space-between;" onclick="toggleCharExpand('${escJs(ch.name)}')"><div style="display:flex;align-items:center;gap:4px;min-width:0"><button class="${toggleCls}">▶</button><div style="min-width:0"><div class="char-chip-name">${esc(ch.name)}${ch.archived?`<span class="char-chip-archived-badge">archived</span>`:''}</div>${badge}</div></div><div class="char-chip-btns" onclick="event.stopPropagation()"><button class="char-chip-btn" onclick="openEditChar('${escJs(ch.name)}')">Edit</button><button class="char-chip-btn" style="color:#A32D2D" onclick="tryDeleteChar('${escJs(ch.name)}')">Del</button></div></div>${expandHtml}</div>`;
   }).join('');
+  c.innerHTML=html;
   /* populate open dialogue lists */
-  filtered.forEach(ch=>{if(charPanelExpanded[ch.name])renderCharDlgList(ch.name,'');});
+  sorted.forEach(ch=>{if(charPanelExpanded[ch.name])renderCharDlgList(ch.name,'');});
 }
 
 function delAct(ai){if(editingLine&&editingLine.actIdx===ai)editingLine=null;pushUndo();S.acts.splice(ai,1);if(insertAfter&&insertAfter.actIdx===ai)insertAfter=null;autoSave();render();}
@@ -3819,19 +3864,30 @@ function filterCharDlg(name){
   if(!input)return;
   renderCharDlgList(name,input.value);
 }
+function getCFScope(){
+  const ai=$('cf-act-sel')?.value,si=$('cf-scene-sel')?.value;
+  return{actIdx:ai&&ai!=='*'?parseInt(ai):null,sceneIdx:si&&si!=='*'?parseInt(si):null};
+}
 function renderCharDlgList(name,query){
   const listEl=document.getElementById('cdl-list-'+name);
   if(!listEl)return;
   const q=(query||'').toLowerCase();
+  const scope=getCFScope();
   let lines=[];
-  S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>sc.lines.forEach((l,li)=>{
-    if(l.type==='dialogue'&&l.character&&l.character.name===name){
-      if(!q||l.value.toLowerCase().includes(q)||(l.dialogueAction||'').toLowerCase().includes(q)){
-        lines.push({ai,si,li,value:l.value,da:l.dialogueAction});
-      }
-    }
-  })));
-  if(!lines.length){listEl.innerHTML='<div class="char-dlg-empty">No dialogue lines'+(q?' matching "'+esc(q)+'"':'')+'</div>';return;}
+  S.acts.forEach((a,ai)=>{
+    if(scope.actIdx!==null&&ai!==scope.actIdx)return;
+    a.scenes.forEach((sc,si)=>{
+      if(scope.sceneIdx!==null&&si!==scope.sceneIdx)return;
+      sc.lines.forEach((l,li)=>{
+        if(l.type==='dialogue'&&l.character&&l.character.name===name){
+          if(!q||l.value.toLowerCase().includes(q)||(l.dialogueAction||'').toLowerCase().includes(q)){
+            lines.push({ai,si,li,value:l.value,da:l.dialogueAction});
+          }
+        }
+      });
+    });
+  });
+  if(!lines.length){listEl.innerHTML='<div class="char-dlg-empty">No dialogue lines'+(q?' matching "'+esc(q)+'"':'')+(scope.actIdx!==null?' in this scope':'')+'</div>';return;}
   listEl.innerHTML=lines.map(d=>{
     const loc=sceneLabel(d.ai,d.si);
     const preview=d.value.length>80?d.value.slice(0,80)+'...':d.value;
