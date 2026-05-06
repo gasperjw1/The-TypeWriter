@@ -365,6 +365,21 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .outline-filter-dot{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid transparent;opacity:0.5;transition:opacity .15s,transform .1s;}
 .outline-filter-dot:hover{opacity:1;transform:scale(1.2);}
 .outline-filter-dot.active{opacity:1;border-color:var(--tx1);transform:scale(1.2);}
+/* Character relationships */
+.rel-section{margin-top:24px;border-top:1px solid var(--bd2);padding-top:16px;}
+.rel-header{font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;padding:4px 0;user-select:none;}
+.rel-header:hover{color:var(--tx1);}
+.rel-toggle{display:inline-block;width:12px;font-size:10px;}
+.rel-empty{font-size:11px;color:var(--tx3);padding:8px 0;}
+.rel-view-toggle{display:flex;gap:4px;margin:8px 0;}
+.rel-view-toggle button{font-size:11px;padding:3px 10px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;}
+.rel-view-toggle button:hover{border-color:var(--bd1);color:var(--tx1);}
+.rel-view-toggle button.active{background:var(--tx1);color:var(--bg1);border-color:var(--tx1);}
+.rel-matrix-wrap{overflow-x:auto;margin-top:8px;}
+.rel-matrix{border-collapse:collapse;font-size:10px;width:auto;}
+.rel-matrix th{padding:3px 6px;font-weight:600;white-space:nowrap;color:var(--tx2);border:1px solid var(--bd2);background:var(--bg2);}
+.rel-matrix td{padding:3px 6px;text-align:center;border:1px solid var(--bd2);min-width:28px;font-size:10px;cursor:default;}
+.rel-matrix td.rel-self{background:var(--bg2);color:var(--tx3);}
 .oc-color-none{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid var(--bd2);background:transparent;position:relative;}
 .oc-color-none:hover{border-color:var(--tx3);}
 .oc-color-none::after{content:'';position:absolute;top:3px;left:3px;width:2px;height:2px;border-radius:50%;background:var(--tx3);}
@@ -2581,7 +2596,11 @@ function renderOutline(){
     });
     h+=`</div>`;
   });
+  /* Character relationship section */
+  h+=renderRelationshipSection();
   p.innerHTML=h;
+  /* Draw relationship graph if visible */
+  if(showRelGraph&&relViewMode==='graph')setTimeout(drawRelGraph,0);
 }
 function setSceneColor(ai,si,color){pushUndo();S.acts[ai].scenes[si].color=color;autoSave();renderOutline();}
 function editColorLabel(color,el){
@@ -2593,6 +2612,132 @@ function editColorLabel(color,el){
 }
 function setOutlineColorFilter(color){outlineColorFilter=(outlineColorFilter===color)?null:color;renderOutline();}
 function getColorLabel(color){return (S.colorLabels||{})[color]||'';}
+
+/* ── Character Relationship Mapping ── */
+let showRelGraph=false;
+let relViewMode='matrix'; /* 'matrix' | 'graph' */
+function toggleRelGraph(){showRelGraph=!showRelGraph;renderOutline();}
+function setRelViewMode(m){relViewMode=m;renderOutline();}
+
+function buildCoAppearanceData(){
+  /* Returns {chars:string[], matrix:number[][]} where matrix[i][j] = shared scene count */
+  const chars=S.characters.filter(c=>!c.archived).map(c=>c.name);
+  if(chars.length<2)return{chars,matrix:[]};
+  const n=chars.length;
+  const matrix=Array.from({length:n},()=>Array(n).fill(0));
+  S.acts.forEach(act=>{
+    act.scenes.forEach(sc=>{
+      /* Gather characters present in this scene */
+      const present=new Set();
+      sc.lines.forEach(l=>{
+        if(l.type==='dialogue'&&l.character)present.add(l.character.name);
+        if(l.type==='action'&&l.character)present.add(l.character.name);
+        if(l.type==='direction'&&l.cues){
+          (l.cues.enters||[]).forEach(n=>present.add(n));
+          (l.cues.exits||[]).forEach(n=>present.add(n));
+        }
+      });
+      /* Increment co-appearance counts for each pair */
+      const arr=[...present].map(name=>chars.indexOf(name)).filter(i=>i>=0);
+      for(let i=0;i<arr.length;i++){
+        for(let j=i+1;j<arr.length;j++){
+          matrix[arr[i]][arr[j]]++;
+          matrix[arr[j]][arr[i]]++;
+        }
+      }
+    });
+  });
+  return{chars,matrix};
+}
+
+function renderRelationshipSection(){
+  let h='<div class="rel-section">';
+  h+=`<div class="rel-header" onclick="toggleRelGraph()"><span class="rel-toggle">${showRelGraph?'▾':'▸'}</span> Character Relationships</div>`;
+  if(!showRelGraph){h+='</div>';return h;}
+  const data=buildCoAppearanceData();
+  if(data.chars.length<2){h+='<div class="rel-empty">Need at least 2 characters with scene appearances.</div></div>';return h;}
+  h+=`<div class="rel-view-toggle"><button class="${relViewMode==='matrix'?'active':''}" onclick="setRelViewMode('matrix')">Matrix</button><button class="${relViewMode==='graph'?'active':''}" onclick="setRelViewMode('graph')">Graph</button></div>`;
+  if(relViewMode==='matrix'){
+    h+=renderRelMatrix(data);
+  }else{
+    h+=`<div id="rel-graph-container" style="width:100%;height:320px;position:relative;border:1px solid var(--bd2);border-radius:var(--rm);overflow:hidden;"></div>`;
+  }
+  h+='</div>';
+  return h;
+}
+
+function renderRelMatrix(data){
+  const{chars,matrix}=data;
+  const n=chars.length;
+  /* Find max for heat coloring */
+  let max=1;
+  matrix.forEach(row=>row.forEach(v=>{if(v>max)max=v;}));
+  let h='<div class="rel-matrix-wrap"><table class="rel-matrix"><thead><tr><th></th>';
+  chars.forEach((c,i)=>{h+=`<th title="${esc(c)}">${esc(c.length>6?c.substring(0,5)+'…':c)}</th>`;});
+  h+='</tr></thead><tbody>';
+  chars.forEach((c,i)=>{
+    h+=`<tr><th title="${esc(c)}">${esc(c.length>8?c.substring(0,7)+'…':c)}</th>`;
+    chars.forEach((c2,j)=>{
+      if(i===j){h+=`<td class="rel-self">—</td>`;}
+      else{
+        const v=matrix[i][j];
+        const intensity=v/max;
+        const bg=v>0?`rgba(55,138,221,${(intensity*0.7+0.1).toFixed(2)})`:'transparent';
+        h+=`<td style="background:${bg};color:${intensity>0.5?'#fff':'var(--tx1)'}" title="${esc(c)} + ${esc(c2)}: ${v} scene${v!==1?'s':''}">${v||''}</td>`;
+      }
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  return h;
+}
+
+function drawRelGraph(){
+  const container=$('rel-graph-container');
+  if(!container)return;
+  const data=buildCoAppearanceData();
+  const{chars,matrix}=data;
+  const n=chars.length;
+  if(n<2)return;
+  const W=container.clientWidth||400;
+  const H=container.clientHeight||320;
+  const cx=W/2,cy=H/2;
+  /* Find max edge weight */
+  let maxW=1;
+  matrix.forEach(row=>row.forEach(v=>{if(v>maxW)maxW=v;}));
+  /* Position nodes in a circle */
+  const nodes=chars.map((name,i)=>{
+    const angle=(2*Math.PI*i/n)-(Math.PI/2);
+    const rx=Math.min(W,H)*0.35;
+    return{name,x:cx+rx*Math.cos(angle),y:cy+rx*Math.sin(angle)};
+  });
+  /* Build SVG */
+  let svg=`<svg width="${W}" height="${H}" style="position:absolute;top:0;left:0;">`;
+  /* Edges */
+  for(let i=0;i<n;i++){
+    for(let j=i+1;j<n;j++){
+      const v=matrix[i][j];
+      if(!v)continue;
+      const thickness=Math.max(1,Math.min(6,(v/maxW)*6));
+      const opacity=(v/maxW*0.7+0.2).toFixed(2);
+      svg+=`<line x1="${nodes[i].x.toFixed(1)}" y1="${nodes[i].y.toFixed(1)}" x2="${nodes[j].x.toFixed(1)}" y2="${nodes[j].y.toFixed(1)}" stroke="var(--tx3)" stroke-width="${thickness}" opacity="${opacity}"/>`;
+    }
+  }
+  /* Nodes */
+  const nodeR=Math.max(14,Math.min(24,140/n));
+  nodes.forEach((nd,i)=>{
+    /* Count total connections */
+    const total=matrix[i].reduce((a,b)=>a+b,0);
+    const fill=total>0?'#378ADD':'var(--tx3)';
+    svg+=`<circle cx="${nd.x.toFixed(1)}" cy="${nd.y.toFixed(1)}" r="${nodeR}" fill="${fill}" opacity="0.85"/>`;
+    /* Label */
+    const label=nd.name.length>8?nd.name.substring(0,7)+'…':nd.name;
+    svg+=`<text x="${nd.x.toFixed(1)}" y="${(nd.y+nodeR+14).toFixed(1)}" text-anchor="middle" fill="var(--tx1)" font-size="10" font-family="var(--fn)">${esc(label)}</text>`;
+  });
+  svg+='</svg>';
+  container.innerHTML=svg;
+}
+
 function cycleSceneStatus(ai,si){
   const sc=S.acts[ai].scenes[si];
   const cur=SCENE_STATUSES.indexOf(sc.status);

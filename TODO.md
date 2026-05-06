@@ -57,7 +57,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 No lightweight stage play editor does these. Building them would set The Scriptwriter apart from every competitor.
 
-- [ ] **Character relationship mapping** — Visual showing which characters share scenes, or a co-appearance matrix. Leverages our existing character panel (already the best of any editor) to help playwrights track ensemble dynamics.
+- [x] **Character relationship mapping** — Visual showing which characters share scenes, or a co-appearance matrix. Leverages our existing character panel (already the best of any editor) to help playwrights track ensemble dynamics. *(Session 17)*
 - [x] **Pacing visualization** — Bar chart or timeline showing scene lengths in the outline view. Writers obsess over pacing but no lightweight editor visualizes it. *(Session 17)*
 - [x] **Rehearsal sides export** — Extract one character's lines + cues for table reads. Specific to stage plays and something no competitor does well. *(Session 17)*
 
