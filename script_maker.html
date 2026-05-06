@@ -357,6 +357,14 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .oc-color-dot{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid transparent;transition:transform .1s;}
 .oc-color-dot:hover{transform:scale(1.3);}
 .oc-color-dot.active{border-color:var(--tx1);transform:scale(1.2);}
+.oc-color-label{font-size:9px;color:var(--tx2);margin-left:4px;cursor:pointer;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.oc-color-label:hover{color:var(--tx1);}
+.oc-color-label-input{font-size:9px;border:1px solid var(--bdr);border-radius:3px;padding:1px 3px;width:70px;background:var(--bg2);color:var(--tx1);}
+.outline-card-label{display:inline-block;font-size:9px;padding:1px 5px;border-radius:8px;color:#fff;margin-left:6px;vertical-align:middle;}
+.outline-filter-wrap{display:inline-flex;align-items:center;gap:4px;margin-left:8px;}
+.outline-filter-dot{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid transparent;opacity:0.5;transition:opacity .15s,transform .1s;}
+.outline-filter-dot:hover{opacity:1;transform:scale(1.2);}
+.outline-filter-dot.active{opacity:1;border-color:var(--tx1);transform:scale(1.2);}
 .oc-color-none{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid var(--bd2);background:transparent;position:relative;}
 .oc-color-none:hover{border-color:var(--tx3);}
 .oc-color-none::after{content:'';position:absolute;top:3px;left:3px;width:2px;height:2px;border-radius:50%;background:var(--tx3);}
@@ -961,6 +969,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="exportFountain()">Export to Fountain (.fountain)</div>
         <div class="fdd-item" onclick="exportFDX()">Export to Final Draft (.fdx)</div>
+        <div class="fdd-item" onclick="openRehearsalSidesModal()">Export rehearsal sides</div>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="importFountain()">Import Fountain file</div>
         <input type="file" id="fountain-open-in" accept=".fountain,.txt,.spmd" style="display:none" onchange="loadFountainFile(event)"/>
@@ -1051,7 +1060,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
-        <div class="setup-version">v1.19 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div class="setup-version">v1.20 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
       </div>
       <div id="script-content"></div>
     </div>
@@ -1209,7 +1218,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a>
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.19 · May 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.20 · May 2026</div>
       </div>
     </div>
 
@@ -1377,7 +1386,7 @@ const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escBr(s){return esc(s).replace(/\n/g,'<br>');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
-function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false});}
+function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false,colorLabels:S.colorLabels||{}});}
 function cloneState(){return JSON.parse(stateJSON());}
 
 function updateSaveIndicator(){
@@ -1569,12 +1578,12 @@ function migrateSettingLines(){
   }));
 }
 function loadFromData(data){
-  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
+  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};
   migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
-  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};
   migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
@@ -1636,12 +1645,12 @@ const SAMPLE_SCRIPT={
 };
 function loadSample(){
   const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
-  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];S.scenesLocked=false;revisionChanges={};
+  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};revisionChanges={};
   resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
 }
 function menuNew(){closeFDD();if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
 function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false,colorLabels:{}};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';fileHandle=null;$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
@@ -2435,6 +2444,7 @@ const STATUS_LABELS={outline:'Outline',draft:'Draft',revised:'Revised',final:'Fi
 let outlineCompact=false;
 let pacingMetric='lines'; /* 'lines' | 'words' */
 let showPacing=true; /* toggle pacing ribbon visibility */
+let outlineColorFilter=null; /* null = show all, or a hex color string to filter by */
 function toggleOutlineView(){outlineCompact=!outlineCompact;renderOutline();}
 function setPacingMetric(m){pacingMetric=m;renderOutline();}
 function togglePacing(){showPacing=!showPacing;lsSaveSettings();renderOutline();}
@@ -2514,12 +2524,23 @@ function renderOutline(){
   const p=$('outline-panel');
   if(!S.acts.length){p.innerHTML='<div class="outline-empty">No acts yet. Create a script to see scene cards here.</div>';return;}
   let h=showPacing?renderPacingRibbon():'';
-  h+=`<div class="outline-toolbar"><button onclick="togglePacing()" class="${showPacing?'active':''}" title="Toggle pacing ribbon">Pacing</button><button onclick="toggleOutlineView()" class="${outlineCompact?'active':''}">${outlineCompact?'Compact':'Expanded'}</button></div>`;
+  /* Toolbar with pacing toggle, compact toggle, and color filter dots */
+  h+=`<div class="outline-toolbar"><button onclick="togglePacing()" class="${showPacing?'active':''}" title="Toggle pacing ribbon">Pacing</button><button onclick="toggleOutlineView()" class="${outlineCompact?'active':''}">${outlineCompact?'Compact':'Expanded'}</button>`;
+  /* Color filter dots — only show colors that are in use */
+  const usedColors=new Set();S.acts.forEach(a=>a.scenes.forEach(sc=>{if(sc.color)usedColors.add(sc.color);}));
+  if(usedColors.size){
+    h+=`<span class="outline-filter-wrap" title="Filter by color label">`;
+    h+=`<span class="outline-filter-dot${!outlineColorFilter?' active':''}" style="background:var(--tx3)" onclick="setOutlineColorFilter(null)" title="Show all"></span>`;
+    usedColors.forEach(c=>{const lbl=getColorLabel(c);h+=`<span class="outline-filter-dot${outlineColorFilter===c?' active':''}" style="background:${c}" onclick="setOutlineColorFilter('${c}')" title="${lbl||c}"></span>`;});
+    h+=`</span>`;
+  }
+  h+=`</div>`;
   S.acts.forEach((act,ai)=>{
     h+=`<div class="outline-act-header">${esc(actLabel(ai))}</div>`;
     if(!act.scenes.length){h+=`<div style="font-size:12px;color:var(--tx3);margin-bottom:16px;">No scenes in this act.</div>`;return;}
     h+=`<div class="outline-grid" data-act="${ai}">`;
     act.scenes.forEach((sc,si)=>{
+      if(outlineColorFilter&&sc.color!==outlineColorFilter)return;
       const label=sceneLabel(ai,si);
       const chars=getSceneCharsList(sc);
       const lineCount=sc.lines.filter(l=>l.type!=='bookmark').length;
@@ -2528,7 +2549,9 @@ function renderOutline(){
       h+=`<div class="outline-card" draggable="true" data-ai="${ai}" data-si="${si}" style="border-left-color:${borderColor}" ondragstart="outlineDragStart(event,${ai},${si})" ondragover="outlineDragOver(event,${ai},${si})" ondragleave="outlineDragLeave(event)" ondrop="outlineDrop(event,${ai},${si})" ondragend="outlineDragEnd(event)" ontouchstart="outlineTouchStart(event)">`;
       /* Header row: title + status badge */
       h+=`<div class="outline-card-head">`;
-      h+=`<div class="outline-card-title" onclick="outlineCardClick(${ai},${si})">${esc(label)}</div>`;
+      h+=`<div class="outline-card-title" onclick="outlineCardClick(${ai},${si})">${esc(label)}`;
+      if(sc.color&&getColorLabel(sc.color)){h+=`<span class="outline-card-label" style="background:${sc.color}">${esc(getColorLabel(sc.color))}</span>`;}
+      h+=`</div>`;
       if(sc.status){h+=`<span class="outline-card-status oc-status-${sc.status}" onclick="event.stopPropagation();cycleSceneStatus(${ai},${si})">${STATUS_LABELS[sc.status]}</span>`;}
       else{h+=`<span class="outline-card-status oc-status-outline" style="opacity:0;transition:opacity .15s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0" onclick="event.stopPropagation();cycleSceneStatus(${ai},${si})">Status</span>`;}
       h+=`</div>`;
@@ -2551,7 +2574,8 @@ function renderOutline(){
       /* Color picker row */
       h+=`<div class="outline-card-color" onclick="event.stopPropagation()">`;
       h+=`<span class="oc-color-none${!sc.color?' active':''}" onclick="setSceneColor(${ai},${si},null)" title="No color"></span>`;
-      SCENE_COLORS.forEach(c=>{h+=`<span class="oc-color-dot${sc.color===c?' active':''}" style="background:${c}" onclick="setSceneColor(${ai},${si},'${c}')" title="${c}"></span>`;});
+      SCENE_COLORS.forEach(c=>{h+=`<span class="oc-color-dot${sc.color===c?' active':''}" style="background:${c}" onclick="setSceneColor(${ai},${si},'${c}')" title="${getColorLabel(c)||c}"></span>`;});
+      if(sc.color){const clbl=getColorLabel(sc.color);h+=`<span class="oc-color-label" onclick="event.stopPropagation();editColorLabel('${sc.color}',this)">${clbl?esc(clbl):'+ label'}</span>`;}
       h+=`</div>`;
       h+=`</div>`;
     });
@@ -2560,6 +2584,15 @@ function renderOutline(){
   p.innerHTML=h;
 }
 function setSceneColor(ai,si,color){pushUndo();S.acts[ai].scenes[si].color=color;autoSave();renderOutline();}
+function editColorLabel(color,el){
+  const cur=(S.colorLabels||{})[color]||'';
+  const inp=document.createElement('input');inp.type='text';inp.className='oc-color-label-input';inp.value=cur;inp.placeholder='Label...';
+  inp.onblur=()=>{const v=inp.value.trim();if(!S.colorLabels)S.colorLabels={};if(v)S.colorLabels[color]=v;else delete S.colorLabels[color];autoSave();renderOutline();};
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}if(e.key==='Escape'){e.preventDefault();inp.value=cur;inp.blur();}};
+  el.replaceWith(inp);inp.focus();inp.select();
+}
+function setOutlineColorFilter(color){outlineColorFilter=(outlineColorFilter===color)?null:color;renderOutline();}
+function getColorLabel(color){return (S.colorLabels||{})[color]||'';}
 function cycleSceneStatus(ai,si){
   const sc=S.acts[ai].scenes[si];
   const cur=SCENE_STATUSES.indexOf(sc.status);
@@ -3578,7 +3611,7 @@ function parseFountain(text){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};
   revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
@@ -3803,7 +3836,7 @@ function parseFDX(xmlText){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};
   revisionChanges={};
   resetEditorState();hasFilename=false;fileHandle=null;lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
@@ -3908,6 +3941,96 @@ function exportFDX(){
   const a=document.createElement('a');
   a.href=url;
   a.download=(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.fdx';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ── Rehearsal Sides Export ── */
+function openRehearsalSidesModal(){
+  closeFDD();
+  const chars=S.characters.filter(c=>!c.archived);
+  if(!chars.length){alert('No characters to export sides for.');return;}
+  let h='<h3>Export Rehearsal Sides</h3>';
+  h+='<p style="font-size:12px;color:var(--tx2);margin-bottom:12px;">Select a character to generate their rehearsal sides — all their lines plus cues and context.</p>';
+  h+='<div style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;">';
+  chars.forEach(c=>{
+    h+=`<button class="mb-ok" style="text-align:left;padding:8px 12px;" onclick="exportRehearsalSides('${escJs(c.name)}')">${esc(c.name)}</button>`;
+  });
+  h+='</div>';
+  h+='<div class="mbtns" style="margin-top:12px;"><button class="mb-c" onclick="closeModal()">Cancel</button></div>';
+  openModal(h,null);
+}
+function exportRehearsalSides(charName){
+  closeModal();
+  const lines=[];
+  lines.push(S.title||'Untitled');
+  lines.push('REHEARSAL SIDES — '+charName.toUpperCase());
+  lines.push('');
+
+  S.acts.forEach((act,ai)=>{
+    act.scenes.forEach((sc,si)=>{
+      /* Check if this character appears in this scene */
+      const hasChar=sc.lines.some(l=>{
+        if(l.type==='dialogue'&&l.character&&l.character.name===charName)return true;
+        if(l.type==='action'&&l.character&&l.character.name===charName)return true;
+        if(l.type==='direction'&&l.cues){
+          if((l.cues.enters||[]).includes(charName))return true;
+          if((l.cues.exits||[]).includes(charName))return true;
+        }
+        return false;
+      });
+      if(!hasChar)return;
+
+      lines.push('═'.repeat(50));
+      lines.push(actLabel(ai)+' / '+sceneLabel(ai,si));
+      if(sc.setting)lines.push('  '+sc.setting);
+      lines.push('');
+
+      sc.lines.forEach(l=>{
+        if(l.type==='bookmark')return;
+        if(l.type==='direction'){
+          const enters=(l.cues&&l.cues.enters)||[];
+          const exits=(l.cues&&l.cues.exits)||[];
+          const relevant=enters.includes(charName)||exits.includes(charName);
+          if(relevant||l.value){
+            let cueText='';
+            if(enters.length)cueText+='[Enter: '+enters.join(', ')+']';
+            if(exits.length)cueText+=(cueText?' ':'')+'[Exit: '+exits.join(', ')+']';
+            if(l.value)cueText+=(cueText?' — ':'')+l.value;
+            lines.push('  '+cueText);
+          }
+        }else if(l.type==='dialogue'){
+          if(l.character&&l.character.name===charName){
+            /* This character's line — shown in full */
+            let dlgLine=charName.toUpperCase();
+            if(l.dialogueAction)dlgLine+=' ('+l.dialogueAction+')';
+            lines.push(dlgLine);
+            lines.push('  '+l.value);
+            lines.push('');
+          }else{
+            /* Other character's line — show as cue line */
+            const otherName=l.character?l.character.name.toUpperCase():'???';
+            lines.push('  '+otherName+': .......');
+          }
+        }else if(l.type==='action'){
+          if(l.character&&l.character.name===charName){
+            lines.push('  ('+l.value+')');
+          }else{
+            /* Stage direction involving others — brief context */
+            lines.push('  ('+l.value.substring(0,60)+(l.value.length>60?'...':'')+')');
+          }
+        }
+      });
+      lines.push('');
+    });
+  });
+
+  const text=lines.join('\n');
+  const blob=new Blob([text],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='sides_'+charName.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.txt';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }

@@ -41,7 +41,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 - [x] **Editable synopsis on cards** — Add a synopsis/notes field per scene, editable inline on the card. Every major competitor (Scrivener, Final Draft, Arc Studio) centers their corkboard around this. *(Session 15)*
 - [x] **Color coding** — Color-dot and left-border accent per scene, selectable from a palette. Provides instant visual structure mapping. *(Session 15)*
-- [ ] **Color labels** — Custom label names for colors (e.g., "A-Plot", "B-Plot", "Flashback"). Let users name what each color means and filter/sort by label. Turns color dots into a real structural analysis tool.
+- [x] **Color labels** — Custom label names for colors (e.g., "A-Plot", "B-Plot", "Flashback"). Let users name what each color means and filter/sort by label. Turns color dots into a real structural analysis tool. *(Session 17)*
 - [x] **Status markers** — Per-scene status badge (Outline / Draft / Revised / Final) for tracking progress at a glance. Inspired by Scrivener's status labels. *(Session 15)*
 - [x] **Card size toggle** — Compact (title + color only) vs expanded (synopsis + stats + characters) view for the outline grid. *(Session 15)*
 - [ ] **Beat board mode** — Free-form cards not tied to scenes, for brainstorming story beats before committing to script structure. Larger feature inspired by Final Draft and Arc Studio.
@@ -50,7 +50,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 - [x] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar. *(Session 15)*
 - [x] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Inline expansion + right panel list with resolved/unresolved workflow. *(Session 16)*
-- [ ] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration.
+- [x] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration. *(Session 17)*
 - [ ] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
 
 ### To Do — Unique Differentiators (Priority 4)
@@ -58,8 +58,8 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 No lightweight stage play editor does these. Building them would set The Scriptwriter apart from every competitor.
 
 - [ ] **Character relationship mapping** — Visual showing which characters share scenes, or a co-appearance matrix. Leverages our existing character panel (already the best of any editor) to help playwrights track ensemble dynamics.
-- [ ] **Pacing visualization** — Bar chart or timeline showing scene lengths in the outline view. Writers obsess over pacing but no lightweight editor visualizes it.
-- [ ] **Rehearsal sides export** — Extract one character's lines + cues for table reads. Specific to stage plays and something no competitor does well.
+- [x] **Pacing visualization** — Bar chart or timeline showing scene lengths in the outline view. Writers obsess over pacing but no lightweight editor visualizes it. *(Session 17)*
+- [x] **Rehearsal sides export** — Extract one character's lines + cues for table reads. Specific to stage plays and something no competitor does well. *(Session 17)*
 
 ### To Do — Collaboration & Storage (Priority 5)
 
