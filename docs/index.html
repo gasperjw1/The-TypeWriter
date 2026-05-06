@@ -1075,7 +1075,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
-        <div class="setup-version">v1.20 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div class="setup-version">v1.21 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
       </div>
       <div id="script-content"></div>
     </div>
@@ -1097,6 +1097,21 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </label>
         </div>
       </div>
+      <div class="setting-row" style="margin-top:16px;">
+        <div class="setting-label">Auto-formatting</div>
+        <div class="setting-desc">Automatically apply stage play formatting conventions when lines are submitted.</div>
+        <div class="setting-toggle-row">
+          <div><div class="setting-toggle-label">Auto-format enabled</div><div class="setting-toggle-desc" id="autoformat-desc">Off — text is submitted as-is</div></div>
+          <button class="stoggle" id="autoformat-toggle" onclick="toggleAutoFormat()"></button>
+        </div>
+        <div id="autoformat-options" style="display:none;margin-top:8px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);margin-bottom:4px;cursor:pointer;"><input type="checkbox" id="af-char-caps" onchange="updateAFOptions()" checked/> Capitalize character names (e.g., helen → HELEN)</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);margin-bottom:4px;cursor:pointer;"><input type="checkbox" id="af-trim-space" onchange="updateAFOptions()" checked/> Clean up extra whitespace</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);margin-bottom:4px;cursor:pointer;"><input type="checkbox" id="af-paren-wrap" onchange="updateAFOptions()" checked/> Auto-wrap parenthetical actions: <em>quietly</em> → <em>(quietly)</em></label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);cursor:pointer;"><input type="checkbox" id="af-sentence-cap" onchange="updateAFOptions()" checked/> Capitalize first letter of dialogue and stage directions</label>
+        </div>
+      </div>
+
       <div class="psec-title" style="margin-top:28px;">Formatting</div>
       <div class="setting-row">
         <div class="setting-label">Autosave</div>
@@ -1233,7 +1248,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a>
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.20 · May 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.21 · May 2026</div>
       </div>
     </div>
 
@@ -1376,6 +1391,8 @@ let dlgFormat='stacked'; /* 'stacked' = name above text, 'inline' = NAME: text *
 let viewFormat='stageplay'; /* 'stageplay' | 'fountain' | 'fdx' */
 let viewSubMode='rendered'; /* 'raw' | 'rendered' — applies to fountain & fdx views */
 let showNotes=true; /* toggle note visibility */
+let autoFormat=false;
+let afOptions={charCaps:true,trimSpace:true,parenWrap:true,sentenceCap:true};
 let noteIdCounter=1; /* incrementing ID for new notes */
 let charPanelExpanded={};
 let showRevMarks=true;
@@ -1394,7 +1411,7 @@ const LS_SETTINGS_KEY='tw_settings';
 function lsSaveScript(){try{localStorage.setItem(LS_SCRIPT_KEY,stateJSON());}catch(e){}}
 function lsClearScript(){try{localStorage.removeItem(LS_SCRIPT_KEY);}catch(e){}}
 function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e){return null;}}
-function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes,viewSubMode,showPacing}));}catch(e){}}
+function lsSaveSettings(){try{localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes,viewSubMode,showPacing,autoFormat,afOptions}));}catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
 const $=id=>document.getElementById(id);
@@ -1416,6 +1433,47 @@ async function writeToFileHandle(json){
 }
 function autoSave(){if(S.title)lsSaveScript();lastSavedJSON=stateJSON();if(fileHandle&&autosaveEnabled)writeToFileHandle(lastSavedJSON);updateSaveIndicator();computeRevisionChanges();}
 function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
+function toggleAutoFormat(){
+  autoFormat=!autoFormat;
+  const btn=$('autoformat-toggle'),desc=$('autoformat-desc'),opts=$('autoformat-options');
+  btn.classList.toggle('on',autoFormat);
+  desc.textContent=autoFormat?'On — formatting applied on submit':'Off — text is submitted as-is';
+  if(opts)opts.style.display=autoFormat?'block':'none';
+  lsSaveSettings();
+}
+function updateAFOptions(){
+  afOptions.charCaps=$('af-char-caps').checked;
+  afOptions.trimSpace=$('af-trim-space').checked;
+  afOptions.parenWrap=$('af-paren-wrap').checked;
+  afOptions.sentenceCap=$('af-sentence-cap').checked;
+  lsSaveSettings();
+}
+function applyAutoFormat(line){
+  /* Apply formatting rules to a line object before insertion */
+  if(!autoFormat)return line;
+  if(afOptions.trimSpace){
+    if(line.value)line.value=line.value.replace(/[ \t]+/g,' ').replace(/\n /g,'\n').trim();
+    if(line.dialogueAction)line.dialogueAction=line.dialogueAction.trim();
+  }
+  if(afOptions.charCaps&&line.character){
+    line.character.name=line.character.name.toUpperCase();
+    /* Also update the character in S.characters to keep consistent */
+    const c=S.characters.find(ch=>ch.name.toUpperCase()===line.character.name.toUpperCase());
+    if(c)c.name=line.character.name;
+  }
+  if(afOptions.parenWrap&&line.dialogueAction){
+    let da=line.dialogueAction.trim();
+    if(da&&!da.startsWith('('))da='('+da;
+    if(da&&!da.endsWith(')'))da=da+')';
+    /* Store without wrapping parens since the renderer adds them — strip back */
+    line.dialogueAction=da.replace(/^\(|\)$/g,'').trim();
+  }
+  if(afOptions.sentenceCap&&line.value){
+    /* Capitalize first letter of each sentence (after ., !, ? or start of text) */
+    line.value=line.value.replace(/(^|[.!?]\s+)([a-z])/g,(m,pre,ch)=>pre+ch.toUpperCase());
+  }
+  return line;
+}
 function triggerDownload(title,json){const b=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json';a.click();}
 function pushUndo(){
   undoStack.splice(undoCursor+1);
@@ -1866,6 +1924,7 @@ function submitLine(){
   else if(t==='direction'){const v=$('dir-desc-ta').value.trim();if(!v)return;line={type:'direction',value:v};if(pendingCues.enters.length||pendingCues.exits.length)line.cues={enters:[...pendingCues.enters],exits:[...pendingCues.exits]};}
   else if(t==='dialogue'){const cn=$('dlg-char-ta').value.trim(),da=$('dlg-act-ta').value.trim();const vRaw=$('dlg-text-ta').value.trim();if(!cn||!vRaw)return;const ex=findChar(cn);if(!ex){openNewCharModal(cn,da,vRaw);return;}/* inject newlines around parentheticals only after char is confirmed */const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};if(da)line.dialogueAction=da;}
   if(!line)return;
+  applyAutoFormat(line);
   pushUndo();
   if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
   else scene.lines.push(line);
@@ -2094,6 +2153,7 @@ function submitAutoLine(){
     line={type:'action',value:text.trim()};
   }
   if(!line)return;
+  applyAutoFormat(line);
   pushUndo();
   if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
   else scene.lines.push(line);
@@ -2110,6 +2170,7 @@ function forceAutoSubmit(charName){
   const v=det.parsed.dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
   const line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};
   if(det.parsed.dlgAction)line.dialogueAction=det.parsed.dlgAction;
+  applyAutoFormat(line);
   pushUndo();
   if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
   else scene.lines.push(line);
@@ -4667,6 +4728,8 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
     if(sets.inputMode){inputMode=sets.inputMode;}
     if(sets.viewSubMode){viewSubMode=sets.viewSubMode;}
     if(typeof sets.showPacing!=='undefined'){showPacing=sets.showPacing;}
+    if(typeof sets.autoFormat==='boolean'){autoFormat=sets.autoFormat;const btn=$('autoformat-toggle'),desc=$('autoformat-desc'),opts=$('autoformat-options');if(btn)btn.classList.toggle('on',autoFormat);if(desc)desc.textContent=autoFormat?'On — formatting applied on submit':'Off — text is submitted as-is';if(opts)opts.style.display=autoFormat?'block':'none';}
+    if(sets.afOptions){afOptions={...afOptions,...sets.afOptions};if($('af-char-caps'))$('af-char-caps').checked=afOptions.charCaps;if($('af-trim-space'))$('af-trim-space').checked=afOptions.trimSpace;if($('af-paren-wrap'))$('af-paren-wrap').checked=afOptions.parenWrap;if($('af-sentence-cap'))$('af-sentence-cap').checked=afOptions.sentenceCap;}
   }
   applyLTColors();applyInputMode();
 })();

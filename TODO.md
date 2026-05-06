@@ -32,7 +32,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 ### To Do — Writing Experience (Priority 2)
 
-- [ ] **Auto-formatting mode** — Automatic detection of screenplay elements as you type: lines starting with INT./EXT. become scene headings, all-caps lines become character names, etc. Toggle between explicit pill mode and auto-detect mode.
+- [x] **Auto-formatting mode** — Automatic detection of screenplay elements as you type: lines starting with INT./EXT. become scene headings, all-caps lines become character names, etc. Toggle between explicit pill mode and auto-detect mode.
 - [x] **Scene cards / outline view** — Visual outlining mode where scenes appear as movable cards on a corkboard. Beat calls this "Powerful outlining" with scene cards. Also on Arc Studio and WriterSolo. *(Session 10)*
 - [x] **Revision tracking** — Track script revisions with industry-standard colored revision marks (white, blue, pink, yellow, green, goldenrod). Highlight changes between revisions. Beat and Final Draft both support this. *(Session 9)*
 - [x] **Lockable scene numbers** — Lock scene numbers for production drafts so they don't change when scenes are reordered. Allow inline editing of locked numbers. Beat and Final Draft support this. *(Session 10)*
@@ -51,7 +51,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar. *(Session 15)*
 - [x] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Inline expansion + right panel list with resolved/unresolved workflow. *(Session 16)*
 - [x] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration. *(Session 17)*
-- [ ] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
+- [x] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
 
 ### To Do — Unique Differentiators (Priority 4)
 
