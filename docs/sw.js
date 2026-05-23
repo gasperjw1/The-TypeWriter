@@ -1,11 +1,11 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v1.21';
+const CACHE_NAME = 'scriptwriter-v1.22';
 const ASSETS = [
   './',
   './index.html',
   './icon-192.png',
   './icon-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'
+  './vendor/jszip.min.js'
 ];
 
 // Install: cache core assets

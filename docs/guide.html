@@ -352,12 +352,35 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Install as a desktop app</h3>
-    <p>The Scriptwriter is a Progressive Web App (PWA). In Chrome, click the install icon in the address bar (or <strong>Menu &rarr; Install The Scriptwriter</strong>). Once installed, it runs in its own standalone window — no tabs, no address bar, no browser distractions.</p>
+    <p>The Scriptwriter is a Progressive Web App (PWA). After installing, it runs in its own standalone window — no tabs, no address bar, no browser distractions — and works fully offline.</p>
+    <ul>
+      <li><strong>Chrome / Edge / Brave / Arc</strong> (macOS, Windows, Linux) — click the install icon in the address bar, or use the browser menu &rarr; <strong>Install The Scriptwriter</strong>. A one-click <strong>Install</strong> button also appears on the start screen.</li>
+      <li><strong>Safari</strong> (macOS 14+) — <strong>File &rarr; Add to Dock</strong>. On iPhone/iPad, use the Share menu &rarr; <strong>Add to Home Screen</strong>.</li>
+      <li><strong>Firefox</strong> — no PWA install support on desktop. Use a Chromium-based browser.</li>
+    </ul>
+  </div>
+
+  <div class="feature">
+    <h3>Open files by double-click <span class="badge">Installed only</span></h3>
+    <p>Once installed, The Scriptwriter registers itself as a handler for <code>.json</code>, <code>.fountain</code>, and <code>.fdx</code> files. Double-click any of those in Finder or Explorer and they'll open directly in the app — no need to use <strong>File &rarr; Open</strong> first.</p>
+    <p style="margin-top:6px;"><em style="color:var(--tx3);">On macOS, you may need to right-click &rarr; Open With &rarr; The Scriptwriter the first time to register the association.</em></p>
   </div>
 
   <div class="feature">
     <h3>Works offline</h3>
     <p>After your first visit, the entire app is cached locally. You can write, edit, save, and export scripts with no internet connection. Everything works the same — localStorage, disk file saving, PDF export, the works.</p>
+  </div>
+
+  <div class="feature" id="sync">
+    <h3>Sync across devices <span class="badge">Free, no setup</span></h3>
+    <p>The Scriptwriter has no cloud account system on purpose — your files belong to you. But you can still get cross-device sync for free by saving into a folder that's already synced by your OS:</p>
+    <ul>
+      <li><strong>iCloud Drive</strong> (macOS) — save into <code>~/Library/Mobile Documents/com~apple~CloudDocs/</code>, or just <strong>iCloud Drive</strong> in Finder's sidebar.</li>
+      <li><strong>Dropbox</strong> — save into your Dropbox folder. The file appears on every device with Dropbox installed within seconds.</li>
+      <li><strong>Google Drive</strong> — install <a href="https://www.google.com/drive/download/" target="_blank">Drive for desktop</a>, then save into your mounted Drive folder.</li>
+      <li><strong>OneDrive</strong> — save into the OneDrive folder. Works the same way.</li>
+    </ul>
+    <p style="margin-top:8px;">Open the same file from another machine and you have your script. The OS-level sync client handles everything — no accounts on our side, no API tokens, nothing to configure in the app. <em style="color:var(--tx3);">Heads up: if you edit the same file on two devices at once, last write wins — keep one device as the source of truth or sync before switching.</em></p>
   </div>
 </div>
 

@@ -2,7 +2,7 @@
 
 A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
 
-**[Try it live →](https://yashmahtani.github.io/The-TypeWriter/)**
+**[Try it live →](https://thescriptwriter.app/)**
 
 ## What it does
 
@@ -12,7 +12,13 @@ Scripts auto-save to your browser's localStorage and can be linked to a file on 
 
 ## Quick start
 
-Open `script_maker.html` in any modern browser. That's it. You can start a new script, open a saved JSON file, import a Fountain or Final Draft (.fdx) file, or try the built-in sample script.
+Three ways to use it:
+
+1. **Try it online** — [thescriptwriter.app](https://thescriptwriter.app/). Just open and start writing.
+2. **Install as a desktop app** — visit the site in Chrome, Edge, Brave, or Arc and click the install icon in the address bar (or use the one-click **Install** button on the start screen). On Safari, use **File → Add to Dock**. The installed app runs in its own window, works fully offline, and registers itself to open `.json`, `.fountain`, and `.fdx` files by double-click.
+3. **Run locally** — clone the repo and open `script_maker.html` in any modern browser. No build step, no dependencies to install.
+
+You can start a new script, open a saved JSON file, import a Fountain or Final Draft (.fdx) file, or try the built-in sample script.
 
 ## Features
 
@@ -56,12 +62,20 @@ Open `script_maker.html` in any modern browser. That's it. You can start a new s
 **Navigation**
 - Click the app title in the top bar to return to the home screen (prompts to save unsaved work)
 - In-app Guide tab with a full feature reference you can read without leaving the editor
-- [Compare page](https://yashmahtani.github.io/The-TypeWriter/compare.html) showing how The Scriptwriter stacks up against Final Draft, Arc Studio Pro, WriterDuet, and others
+- [Compare page](https://thescriptwriter.app/compare.html) showing how The Scriptwriter stacks up against Final Draft, Arc Studio Pro, WriterDuet, and others
 
 **Offline & installable**
-- Progressive Web App (PWA) — install from your browser to your desktop or phone
+- Progressive Web App (PWA) — installable on Chrome, Edge, Brave, Arc, and Safari (macOS 14+ / iOS) with one click
+- Runs in its own standalone window once installed — no tabs, no address bar, no browser distractions
 - Works fully offline after first visit, including all editing, saving, and exporting
-- Service worker caches the app and JSZip dependency for zero-network operation
+- File-handler registration — installed app opens `.json`, `.fountain`, and `.fdx` files when you double-click them in Finder or Explorer
+- Service worker caches the app shell and the (locally vendored) JSZip dependency for true zero-network operation
+- App shortcuts — right-click the installed app icon in your dock/taskbar for **New Script** and **Open File**
+
+**Sync across devices (no account required)**
+- Save your script into any folder synced by iCloud Drive, Dropbox, Google Drive, or OneDrive — the OS sync client handles cross-device sync for free
+- No tokens, no cloud account on our side, no API setup — your files stay your files
+- See the [Sync across devices](https://thescriptwriter.app/guide.html#sync) section of the guide for details
 
 **Appearance**
 - Dark mode follows your system preference, or override with light/dark in Settings
@@ -81,6 +95,9 @@ The-TypeWriter/
     manifest.json               # PWA web app manifest
     sw.js                       # Service worker for offline support
     icon-192.png / icon-512.png # PWA app icons
+    screenshot-wide.png         # PWA install dialog (desktop)
+    screenshot-narrow.png       # PWA install dialog (mobile)
+    vendor/jszip.min.js         # Vendored JSZip for offline ZIP export
     sitemap.xml                 # SEO sitemap
     robots.txt                  # Crawler directives
   TODO.md                       # Feature roadmap
@@ -91,15 +108,15 @@ The-TypeWriter/
 
 ## How it works under the hood
 
-The entire app is a single HTML file with one external dependency (JSZip via CDN for ZIP export). No build step, no framework. All state lives in a global JavaScript object (`S`) that maps directly to the JSON save format. The UI re-renders from that object on every change, with undo snapshots captured before each mutation.
+The entire app is a single HTML file with one vendored dependency (JSZip, served from `docs/vendor/` for true offline operation — no CDN at runtime). No build step, no framework. All state lives in a global JavaScript object (`S`) that maps directly to the JSON save format. The UI re-renders from that object on every change, with undo snapshots captured before each mutation.
 
 ## Roadmap
 
 See [TODO.md](TODO.md) for the full list. Up next:
 
-- Auto-formatting for stage play conventions
-- Notes and comments on lines and scenes
-- Real-time collaboration
+- One-click cloud save/load via Dropbox Chooser/Saver and Google Drive Picker (no account on our side)
+- Beat board mode — free-form story cards not tied to scenes
+- Cross-act scene reordering and cross-scene line moves
 
 ## License
 

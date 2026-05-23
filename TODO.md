@@ -63,8 +63,11 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 
 ### To Do — Collaboration & Storage (Priority 5)
 
-- [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet. (Deprioritized — massive backend effort, not our differentiator.)
-- [ ] **Cloud sync / account-based storage** — Save scripts to a server with user accounts so work persists across devices. (Deprioritized — our value is "your files, your machine, no accounts.")
+- [x] **OS-level folder sync (zero code)** — Documented in the guide. Users save into iCloud Drive / Dropbox / Google Drive / OneDrive folders for free cross-device sync via the OS sync client. No accounts on our side, no API tokens. *(Session — docs only)*
+- [ ] **Dropbox Chooser/Saver integration** — Drop-in JS widgets (no full OAuth flow visible to user) for one-click "Save to Dropbox" / "Open from Dropbox" buttons in the File menu. ~2 hours of work. Requires a free Dropbox app registration at dropbox.com/developers/apps. Conflict handling: store the rev returned by the API on open, compare on save, prompt the user if it changed. Smaller user base than Drive but simplest API.
+- [ ] **Google Drive Picker integration** — `gapi.client.drive` + Picker API using the `drive.file` scope so we avoid Google's sensitive-scope OAuth verification (which takes weeks and a $75 security review). User logs into their own Google account in a popup — we never see a token server-side. ~1 day of work. OAuth client setup at console.cloud.google.com. Biggest writer audience; do after Dropbox lands.
+- [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet. (Deprioritized — massive backend effort, not our differentiator. Note: Drive/Dropbox sync is async last-writer-wins — wrong primitive for collab, would need a CRDT layer.)
+- [ ] **Cloud sync / account-based storage** — Save scripts to a server with user accounts so work persists across devices. (Deprioritized — our value is "your files, your machine, no accounts." The Dropbox/Drive integrations above cover most of the use case without an account system.)
 
 ### To Do — Statistics & Analysis (Priority 6)
 

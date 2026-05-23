@@ -8,7 +8,7 @@
 <meta property="og:title" content="The Scriptwriter"/>
 <meta property="og:description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://yashmahtani.github.io/The-TypeWriter/"/>
+<meta property="og:url" content="https://thescriptwriter.app/"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="The Scriptwriter"/>
 <meta name="twitter:description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts."/>
@@ -22,7 +22,7 @@
   "@type": "SoftwareApplication",
   "name": "The Scriptwriter",
   "description": "A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing.",
-  "url": "https://yashmahtani.github.io/The-TypeWriter/",
+  "url": "https://thescriptwriter.app/",
   "applicationCategory": "Multimedia",
   "operatingSystem": "Any (browser-based)",
   "offers": {
@@ -38,7 +38,7 @@
   "license": "https://github.com/gasperjw1/The-TypeWriter"
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -111,6 +111,11 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
 .setup-brand{font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--tx1);}
 .setup-tagline{font-size:15px;color:var(--tx2);text-align:center;max-width:360px;line-height:1.5;margin-bottom:20px;}
 .setup-version{margin-top:32px;font-size:11px;color:var(--tx3);text-align:center;font-family:var(--sans);}
+.setup-install-hint{margin-top:14px;display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px dashed var(--bd2);border-radius:20px;background:var(--bg2);font-size:11px;color:var(--tx2);max-width:520px;}
+.setup-install-icon{font-size:13px;color:var(--tx2);}
+.setup-install-text{flex:1;}
+.setup-install-btn{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--tx1);background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;}
+.setup-install-btn:hover{opacity:.85;}
 #setup-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
 .setup-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 24px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;min-width:130px;max-width:160px;}
 .setup-card:hover{border-color:var(--bd1);background:var(--bg1);}
@@ -1075,7 +1080,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
-        <div class="setup-version">v1.21 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div class="setup-version">v1.22 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div id="install-hint" class="setup-install-hint" style="display:none;">
+          <span class="setup-install-icon">⤓</span>
+          <span class="setup-install-text">Install for offline use: <span id="install-hint-action">click the install icon in your browser's address bar</span>.</span>
+          <button id="install-btn" class="setup-install-btn" style="display:none;" onclick="triggerInstall()">Install</button>
+        </div>
       </div>
       <div id="script-content"></div>
     </div>
@@ -4798,6 +4808,95 @@ document.querySelectorAll('#file-dd .fdd-item').forEach(item=>{
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js',{scope:'.'}).catch(()=>{});
 }
+
+/* PWA: handle files passed in via the OS (file_handlers in manifest) */
+async function openLaunchedFile(handleOrFile){
+  try{
+    const isHandle=handleOrFile&&typeof handleOrFile.getFile==='function';
+    const file=isHandle?await handleOrFile.getFile():handleOrFile;
+    if(!file)return;
+    const name=(file.name||'').toLowerCase();
+    const text=await file.text();
+    if(name.endsWith('.fountain')){parseFountain(text);}
+    else if(name.endsWith('.fdx')){parseFDX(text);}
+    else{
+      /* default: try JSON (raw_script_*.json) */
+      const data=JSON.parse(text);
+      if(isHandle&&'showSaveFilePicker' in window)fileHandle=handleOrFile;
+      loadFromData(data);
+    }
+  }catch(err){console.warn('Failed to open launched file:',err);alert('Could not open file: '+(err&&err.message?err.message:err));}
+}
+if('launchQueue' in window&&typeof LaunchParams!=='undefined'&&'files' in LaunchParams.prototype){
+  launchQueue.setConsumer(async params=>{
+    if(!params||!params.files||!params.files.length)return;
+    /* Open the first file only — single-client launch mode */
+    await openLaunchedFile(params.files[0]);
+  });
+}
+
+/* PWA install hint + Chrome/Edge install prompt */
+let deferredInstallPrompt=null;
+function isStandalonePWA(){
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.matchMedia('(display-mode: window-controls-overlay)').matches
+      || window.navigator.standalone===true;
+}
+function showInstallHint(){
+  const hint=document.getElementById('install-hint');
+  if(!hint||isStandalonePWA())return;
+  const ua=navigator.userAgent.toLowerCase();
+  const actionEl=document.getElementById('install-hint-action');
+  const btn=document.getElementById('install-btn');
+  if(deferredInstallPrompt){
+    if(actionEl)actionEl.textContent='one click to install as a desktop app';
+    if(btn)btn.style.display='inline-block';
+  }else if(/safari/.test(ua)&&!/chrome|chromium|edg/.test(ua)){
+    if(actionEl)actionEl.textContent="open the Share menu and choose 'Add to Dock' (macOS) or 'Add to Home Screen' (iOS)";
+  }else if(/firefox/.test(ua)){
+    if(actionEl)actionEl.textContent='use a Chromium-based browser (Chrome, Edge, Brave, Arc) to install — Firefox does not support PWA install on desktop';
+  }else{
+    if(actionEl)actionEl.textContent="click the install icon in your browser's address bar";
+  }
+  hint.style.display='flex';
+}
+async function triggerInstall(){
+  if(!deferredInstallPrompt)return;
+  deferredInstallPrompt.prompt();
+  try{await deferredInstallPrompt.userChoice;}catch(e){}
+  deferredInstallPrompt=null;
+  const hint=document.getElementById('install-hint');
+  if(hint)hint.style.display='none';
+}
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  showInstallHint();
+});
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt=null;
+  const hint=document.getElementById('install-hint');
+  if(hint)hint.style.display='none';
+});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',showInstallHint);
+else showInstallHint();
+
+/* PWA shortcuts: ?action=new|open routes from the manifest's shortcut list */
+(function(){
+  try{
+    const p=new URLSearchParams(window.location.search);
+    const action=p.get('action');
+    if(!action)return;
+    /* Defer until DOM + functions are ready */
+    const run=()=>{
+      if(action==='new'&&typeof showNewTitleInput==='function')showNewTitleInput();
+      else if(action==='open'&&typeof menuOpen==='function')menuOpen();
+      else if(action==='sample'&&typeof loadSample==='function')loadSample();
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
+    else run();
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
