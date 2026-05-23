@@ -1,5 +1,6 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v1.23';
+const CACHE_NAME = 'scriptwriter-v1.24';
+const SHARED_FILES_CACHE = 'scriptwriter-shared-files';
 const ASSETS = [
   './',
   './index.html',
@@ -17,25 +18,73 @@ self.addEventListener('install', e => {
   );
 });
 
-// Activate: clean up old caches
+// Activate: clean up old caches (keep app-shell + shared-files caches)
 self.addEventListener('activate', e => {
+  const keep = new Set([CACHE_NAME, SHARED_FILES_CACHE]);
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
 
-// Fetch: cache-first, then network with cache update
+// Share Target: handle POSTed files from other apps' Share menus.
+// Stashes files in SHARED_FILES_CACHE and redirects the user to
+// `./?action=share`, which the app consumes on load.
+async function handleSharedFiles(request) {
+  try {
+    const formData = await request.formData();
+    const files = formData.getAll('file');
+    const cache = await caches.open(SHARED_FILES_CACHE);
+    // Clear any leftovers from a previous share
+    const oldKeys = await cache.keys();
+    await Promise.all(oldKeys.map(k => cache.delete(k)));
+    let stored = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file || typeof file === 'string') continue;
+      const name = file.name || ('shared-' + i);
+      const cacheUrl = './_shared/' + i + '/' + encodeURIComponent(name);
+      const response = new Response(file, {
+        status: 200,
+        headers: {
+          'Content-Type': file.type || 'application/octet-stream',
+          'X-Shared-Filename': name
+        }
+      });
+      await cache.put(cacheUrl, response);
+      stored++;
+    }
+    const dest = stored > 0 ? './?action=share' : './';
+    return Response.redirect(dest, 303);
+  } catch (err) {
+    console.error('Share target handler failed:', err);
+    return Response.redirect('./', 303);
+  }
+}
+
+// Fetch: route POSTs (share target) through the handler; everything
+// else uses cache-first with background network refresh.
 self.addEventListener('fetch', e => {
-  // Only handle GET requests
+  const url = new URL(e.request.url);
+  const scopePath = new URL(self.registration.scope).pathname;
+
+  // Share target POST landing on the scope root
+  if (e.request.method === 'POST' && url.pathname === scopePath) {
+    e.respondWith(handleSharedFiles(e.request));
+    return;
+  }
+
+  // Only cache GETs from here on
   if (e.request.method !== 'GET') return;
+
+  // Never intercept the SW-owned shared-files cache URLs — they're
+  // consumed directly by the app via caches.open(), not by fetch().
+  if (url.pathname.includes('/_shared/')) return;
 
   e.respondWith(
     caches.match(e.request).then(cached => {
-      // Return cached version immediately if available
       const fetchPromise = fetch(e.request).then(response => {
-        // Cache valid responses for future use
         if (response && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
@@ -44,7 +93,6 @@ self.addEventListener('fetch', e => {
       }).catch(() => {
         // Network failed — cached version (if any) was already returned
       });
-
       return cached || fetchPromise;
     })
   );

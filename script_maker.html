@@ -1080,7 +1080,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
-        <div class="setup-version">v1.23 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div class="setup-version">v1.24 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
         <div id="install-hint" class="setup-install-hint" style="display:none;">
           <span class="setup-install-icon">⤓</span>
           <span class="setup-install-text">Install for offline use: <span id="install-hint-action">click the install icon in your browser's address bar</span>.</span>
@@ -4947,6 +4947,36 @@ async function openLaunchedFile(handleOrFile){
     }
   }catch(err){console.warn('Failed to open launched file:',err);alert('Could not open file: '+(err&&err.message?err.message:err));}
 }
+/* Web Share Target: drain files that the service worker stashed for us
+   when another app shared into the installed PWA. The SW redirects here
+   with ?action=share once it has populated the 'scriptwriter-shared-files'
+   Cache. We reconstruct File objects and reuse openLaunchedFile(). */
+async function consumeSharedFiles(){
+  if(!('caches' in window))return;
+  try{
+    const cache=await caches.open('scriptwriter-shared-files');
+    const keys=await cache.keys();
+    if(!keys.length){console.warn('No shared files found in cache');return;}
+    /* Sort by index path (./_shared/0/..., ./_shared/1/...) so order is stable */
+    keys.sort((a,b)=>a.url.localeCompare(b.url));
+    for(const req of keys){
+      const resp=await cache.match(req);
+      if(!resp)continue;
+      const blob=await resp.blob();
+      let filename=resp.headers.get('X-Shared-Filename');
+      if(!filename){
+        const pathParts=new URL(req.url).pathname.split('/');
+        filename=decodeURIComponent(pathParts[pathParts.length-1]||'shared');
+      }
+      const file=new File([blob],filename,{type:blob.type||'application/octet-stream'});
+      await openLaunchedFile(file);
+      await cache.delete(req);
+    }
+    /* Clean the URL so a refresh doesn't try to re-share */
+    if(history.replaceState)history.replaceState({},'',location.pathname);
+  }catch(err){console.warn('consumeSharedFiles failed:',err);}
+}
+
 if('launchQueue' in window&&typeof LaunchParams!=='undefined'&&'files' in LaunchParams.prototype){
   launchQueue.setConsumer(async params=>{
     if(!params||!params.files||!params.files.length)return;
@@ -5012,6 +5042,7 @@ else showInstallHint();
       if(action==='new'&&typeof showNewTitleInput==='function')showNewTitleInput();
       else if(action==='open'&&typeof menuOpen==='function')menuOpen();
       else if(action==='sample'&&typeof loadSample==='function')loadSample();
+      else if(action==='share'&&typeof consumeSharedFiles==='function')consumeSharedFiles();
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
     else run();
