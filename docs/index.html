@@ -1080,7 +1080,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <button id="setup-go" onclick="startScript()">Create script</button>
           <button id="setup-back" onclick="hideNewTitleInput()">← Back</button>
         </div>
-        <div class="setup-version">v1.24 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
+        <div class="setup-version">v1.25 · May 2026 · <a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a></div>
         <div id="install-hint" class="setup-install-hint" style="display:none;">
           <span class="setup-install-icon">⤓</span>
           <span class="setup-install-text">Install for offline use: <span id="install-hint-action">click the install icon in your browser's address bar</span>.</span>
@@ -4947,6 +4947,51 @@ async function openLaunchedFile(handleOrFile){
     }
   }catch(err){console.warn('Failed to open launched file:',err);alert('Could not open file: '+(err&&err.message?err.message:err));}
 }
+/* Custom protocol handler: web+scriptwriter:
+   The browser routes web+scriptwriter:<rest> URL clicks to
+   ./?action=protocol&payload=web+scriptwriter:<rest>. We parse the
+   payload and route. Currently supported:
+     web+scriptwriter:                       — just open the editor
+     web+scriptwriter:open?url=<remote>      — fetch remote file and open
+                                              (.fountain / .fdx / .json)
+     web+scriptwriter:text=<encoded>         — placeholder for future use
+*/
+async function handleProtocolPayload(payload){
+  if(!payload)return;
+  try{
+    const stripped=payload.replace(/^web\+scriptwriter:/i,'');
+    if(!stripped)return;
+    const qIdx=stripped.indexOf('?');
+    const cmd=qIdx===-1?stripped:stripped.slice(0,qIdx);
+    const params=new URLSearchParams(qIdx===-1?'':stripped.slice(qIdx+1));
+    const remoteUrl=params.get('url');
+    if(remoteUrl){
+      /* Fetch the remote script and route through the existing parsers */
+      const resp=await fetch(remoteUrl,{mode:'cors',cache:'no-store'});
+      if(!resp.ok)throw new Error('HTTP '+resp.status);
+      const text=await resp.text();
+      const ext=(remoteUrl.split(/[?#]/)[0].split('.').pop()||'').toLowerCase();
+      if(ext==='fountain'){parseFountain(text);}
+      else if(ext==='fdx'){parseFDX(text);}
+      else{
+        try{loadFromData(JSON.parse(text));}
+        catch(e){
+          /* Fall back to Fountain heuristic */
+          if(/^(title|author)\s*:/im.test(text))parseFountain(text);
+          else if(/^\s*<\?xml/.test(text))parseFDX(text);
+          else throw new Error('Unrecognized format');
+        }
+      }
+    }
+    /* Future: handle text= or other commands */
+    /* Strip the action params from the URL so refresh doesn't re-handle */
+    if(history.replaceState)history.replaceState({},'',location.pathname);
+  }catch(err){
+    console.warn('Protocol handler failed:',err);
+    alert('Could not open the link: '+(err&&err.message?err.message:err));
+  }
+}
+
 /* Web Share Target: drain files that the service worker stashed for us
    when another app shared into the installed PWA. The SW redirects here
    with ?action=share once it has populated the 'scriptwriter-shared-files'
@@ -5043,6 +5088,7 @@ else showInstallHint();
       else if(action==='open'&&typeof menuOpen==='function')menuOpen();
       else if(action==='sample'&&typeof loadSample==='function')loadSample();
       else if(action==='share'&&typeof consumeSharedFiles==='function')consumeSharedFiles();
+      else if(action==='protocol'&&typeof handleProtocolPayload==='function')handleProtocolPayload(p.get('payload'));
     };
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);
     else run();
