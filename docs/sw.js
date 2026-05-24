@@ -1,11 +1,15 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v1.25';
+const CACHE_NAME = 'scriptwriter-v1.26';
 const SHARED_FILES_CACHE = 'scriptwriter-shared-files';
 const ASSETS = [
   './',
   './index.html',
   './icon-192.png',
   './icon-512.png',
+  './icon-1024.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png',
+  './icon-maskable-1024.png',
   './vendor/jszip.min.js'
 ];
 

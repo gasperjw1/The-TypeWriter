@@ -21,4 +21,8 @@ sed -i '' "s|register('docs/sw.js'|register('sw.js'|" docs/index.html 2>/dev/nul
 sed -i '' 's|src="docs/vendor/|src="vendor/|g' docs/index.html 2>/dev/null \
   || sed -i 's|src="docs/vendor/|src="vendor/|g' docs/index.html
 
+# Rewrite badge paths (badges/ is a sibling of index.html inside docs/)
+sed -i '' 's|src="docs/badges/|src="badges/|g' docs/index.html 2>/dev/null \
+  || sed -i 's|src="docs/badges/|src="badges/|g' docs/index.html
+
 echo "✓ docs/index.html synced with script_maker.html"

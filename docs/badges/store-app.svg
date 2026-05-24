@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 44" role="img" aria-label="Listed on store.app">
+  <title>Listed on store.app</title>
+  <!-- Pill background -->
+  <rect width="160" height="44" rx="10" fill="#1a1a18"/>
+  <rect width="160" height="44" rx="10" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <!-- store.app dot-pattern mark (2×2 grid with one accent dot) -->
+  <g transform="translate(12,12)">
+    <circle cx="4" cy="4" r="3.4" fill="#5B8DEF"/>
+    <circle cx="16" cy="4" r="3.4" fill="#5B8DEF"/>
+    <circle cx="4" cy="16" r="3.4" fill="#5B8DEF"/>
+    <circle cx="19" cy="19" r="3.4" fill="#5B8DEF"/>
+  </g>
+  <!-- "Listed on" small label -->
+  <text x="48" y="18" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="#999997" letter-spacing="0.6">LISTED ON</text>
+  <!-- "store.app" primary mark -->
+  <text x="48" y="34" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="15" font-weight="600" fill="#f0ede8">store.app</text>
+</svg>

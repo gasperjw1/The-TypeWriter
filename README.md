@@ -2,7 +2,9 @@
 
 A free, open-source stage play editor that runs entirely in your browser. No accounts, no installs, no cloud — just open the HTML file and start writing.
 
-**[Try it live →](https://thescriptwriter.app/)**
+**[Try it live →](https://thescriptwriter.app/)**  ·  [Listed on store.app](https://store.app/thescriptwriter)
+
+[![Listed on store.app](docs/badges/store-app.svg)](https://store.app/thescriptwriter)
 
 ## What it does
 
