@@ -97,3 +97,36 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 8. **localStorage persistence** — Confirm new state is saved/restored from localStorage.
 9. **Mobile rendering** — Confirm no overflow or broken layout on narrow viewports.
 10. **Dead code scan** — Check for any functions defined but never called, or variables set but never read.
+
+## Blog Post Checklist (run for every new blog post)
+
+Use the template at `docs/blog/_template.html` as the starting point. The template includes inline `<!-- ⚠️ -->` comments next to every field with limits.
+
+### File setup
+1. Copy the template: `cp docs/blog/_template.html docs/blog/<your-slug>.html`
+2. Replace every `TEMPLATE_…` token (titles, descriptions, lede, dates, slug in canonical/og:url).
+3. Replace `<meta name="robots" content="noindex,nofollow"/>` with the live equivalent (just delete that line — the template has it to keep the placeholder out of Google's index).
+4. Rewrite the H2 sections in `.content` to match your outline; update the `<li>` entries in the TOC to mirror them one-for-one with matching `#id`s.
+
+### SEO limits (verified against Google + Bing rubrics)
+- **`<title>`** — ≤ 60 chars total (including the ` | The Scriptwriter` suffix). Google truncates at ~60; Bing's hard cap is 70 — aim for 60 to survive both.
+- **`<meta description>`** — 140–155 chars. Google displays ~155, Bing caps at 160. Lead with the target keyword.
+- **`<h1>`** — should be the `<title>` minus the site-name suffix. Exactly one per page.
+- **`<h2>`** — keep < 50 chars each so the sticky TOC doesn't wrap awkwardly.
+- **Canonical URL** — always `https://thescriptwriter.app/blog/<slug>.html`, not the github.io URL.
+- **JSON-LD `headline` + `description`** — must match `<title>` and `<meta description>` exactly. Don't drift.
+- **OG image** — 1200×630 PNG ideal. The home `screenshot-wide.png` is a fine default; swap in something post-specific when the topic warrants it.
+
+### Cross-linking + indexability
+5. Add a card to `docs/blog/index.html` under "Published". If a matching "Coming soon" card existed, delete it.
+6. Add the new URL to `docs/sitemap.xml` with today's `<lastmod>` (2026-MM-DD) and `<changefreq>monthly</changefreq>`, and bump the `lastmod` on the `/blog/` listing entry too.
+7. Update at least one sibling post's "Read next" / "Up next" card to point at the new post.
+
+### Pre-push validation
+8. Verify title length: `grep -oE '<title>[^<]+</title>' docs/blog/<slug>.html | sed 's/<title>\|<\/title>//g' | awk '{print length}'`
+9. Verify meta description length: `grep -m1 -oE '<meta name="description" content="[^"]+"' docs/blog/<slug>.html | sed 's/.*content="\(.*\)"/\1/' | awk '{print length}'`
+10. Spot-check render at desktop + mobile widths.
+
+### After deploy
+11. Request indexing in Google Search Console + Bing Webmaster Tools.
+12. (Optional) Ping IndexNow if configured.
