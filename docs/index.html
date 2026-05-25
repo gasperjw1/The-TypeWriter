@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
 <title>The Scriptwriter — Free Stage Play Editor</title>
 <meta name="description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing."/>
 <meta property="og:title" content="The Scriptwriter"/>
@@ -1085,7 +1086,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.26 · May 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.28 · May 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
         <div id="install-hint" class="setup-install-hint" style="display:none;">
           <span class="setup-install-icon">⤓</span>
@@ -4964,6 +4965,15 @@ async function openLaunchedFile(handleOrFile){
 */
 async function handleProtocolPayload(payload){
   if(!payload)return;
+  /* Defense-in-depth limits for fetched remote content. The XSS audit
+     confirmed parsers don't execute embedded scripts, but a malicious
+     URL could still DoS the tab with a huge file or slow server. */
+  const MAX_BYTES=10*1024*1024;             /* 10 MB cap */
+  const TIMEOUT_MS=30000;                    /* 30 s overall fetch timeout */
+  /* Strict allowlist: only the MIME types our parsers actually consume.
+     Notably text/html, text/css, text/javascript are NOT allowed —
+     they belong to web pages and scripts, not stage-play formats. */
+  const OK_CT=/^(text\/(plain|xml|x-fountain)|application\/(json|xml|x-fountain|octet-stream))\b/i;
   try{
     const stripped=payload.replace(/^web\+scriptwriter:/i,'');
     if(!stripped)return;
@@ -4972,17 +4982,64 @@ async function handleProtocolPayload(payload){
     const params=new URLSearchParams(qIdx===-1?'':stripped.slice(qIdx+1));
     const remoteUrl=params.get('url');
     if(remoteUrl){
-      /* Fetch the remote script and route through the existing parsers */
-      const resp=await fetch(remoteUrl,{mode:'cors',cache:'no-store'});
+      /* 1. Reject non-http(s) schemes (file://, data:, javascript:, …) */
+      let urlObj;
+      try{urlObj=new URL(remoteUrl);}catch(e){throw new Error('Invalid URL');}
+      if(urlObj.protocol!=='https:'&&urlObj.protocol!=='http:'){
+        throw new Error('Only http(s) URLs are supported, got '+urlObj.protocol);
+      }
+      /* 2. Fetch with timeout via AbortController */
+      const controller=new AbortController();
+      const timeoutId=setTimeout(()=>controller.abort(),TIMEOUT_MS);
+      let resp;
+      try{
+        resp=await fetch(remoteUrl,{mode:'cors',cache:'no-store',redirect:'follow',signal:controller.signal});
+      }catch(e){
+        if(e.name==='AbortError')throw new Error('Timed out after '+(TIMEOUT_MS/1000)+'s');
+        throw e;
+      }finally{clearTimeout(timeoutId);}
       if(!resp.ok)throw new Error('HTTP '+resp.status);
-      const text=await resp.text();
+      /* 3. Content-Type allowlist — refuse HTML/binary/etc. */
+      const ct=(resp.headers.get('Content-Type')||'').toLowerCase();
+      if(ct&&!OK_CT.test(ct)){
+        throw new Error('Refusing content-type: '+ct.split(';')[0].trim());
+      }
+      /* 4. Preflight size check via Content-Length when present */
+      const cl=parseInt(resp.headers.get('Content-Length')||'0',10);
+      if(cl>MAX_BYTES){
+        throw new Error('File too large ('+Math.round(cl/1024/1024)+' MB > '+(MAX_BYTES/1024/1024)+' MB cap)');
+      }
+      /* 5. Streaming body read with hard byte cap — covers servers that
+         lie about or omit Content-Length, or pipe a chunked endless stream. */
+      let text;
+      if(resp.body&&typeof resp.body.getReader==='function'){
+        const reader=resp.body.getReader();
+        const chunks=[];
+        let received=0;
+        while(true){
+          const{done,value}=await reader.read();
+          if(done)break;
+          received+=value.length;
+          if(received>MAX_BYTES){
+            await reader.cancel();
+            throw new Error('Response exceeded '+(MAX_BYTES/1024/1024)+' MB cap');
+          }
+          chunks.push(value);
+        }
+        text=new TextDecoder('utf-8').decode(new Uint8Array(await new Blob(chunks).arrayBuffer()));
+      }else{
+        /* Streaming API not available (very old browser) — fall back */
+        text=await resp.text();
+        if(text.length>MAX_BYTES)throw new Error('Response exceeded size cap');
+      }
+      /* 6. Route through the appropriate parser (unchanged) */
       const ext=(remoteUrl.split(/[?#]/)[0].split('.').pop()||'').toLowerCase();
       if(ext==='fountain'){parseFountain(text);}
       else if(ext==='fdx'){parseFDX(text);}
       else{
         try{loadFromData(JSON.parse(text));}
         catch(e){
-          /* Fall back to Fountain heuristic */
+          /* Fall back to content sniff */
           if(/^(title|author)\s*:/im.test(text))parseFountain(text);
           else if(/^\s*<\?xml/.test(text))parseFDX(text);
           else throw new Error('Unrecognized format');
