@@ -21,6 +21,78 @@
   }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is The Scriptwriter really free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — completely. It's open source under a permissive license, with no accounts, no premium tier, no ads, and no tracking. Every feature is available from the first visit. If you want to fund development, future-you starring the GitHub repo is the most useful thing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does The Scriptwriter work offline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. After your first visit (or after you install it as a desktop app), the entire app is cached locally by the service worker and runs fully offline. You can write, edit, save, and export PDF/Fountain/FDX without an internet connection."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where are my scripts saved?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On your computer. Your script auto-saves to your browser's localStorage and — if you use File → Save — directly to a real file on your disk via the File System Access API. Nothing is uploaded anywhere. For cross-device sync, save into a folder that's already synced by iCloud Drive, Dropbox, Google Drive, or OneDrive."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I import a script from Final Draft (.fdx) or Fountain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. File → Import from Final Draft (.fdx) handles both screenplay and stage play FDX files. File → Import from Fountain handles .fountain files. Export works the same way in reverse, and round-trip fidelity is preserved: an FDX-out then FDX-in produces the same script."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is The Scriptwriter only for stage plays, or can I write screenplays too?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It's stage-play-first — the line types (Cue, Dialogue, Stage Direction), character entrance/exit tracking, and rehearsal sides export are built around stage plays specifically. You can write screenplays in it, but tools like Highland, Fade In, or Final Draft are more specialized for that format. The Fountain and FDX export support means you can always move a script out to a more screenplay-focused editor later."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens to my scripts if The Scriptwriter shuts down?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nothing happens to your scripts — they live on your disk, not in a vendor database. Even if the website goes offline, you still have your .json save files, plus any Fountain or FDX exports you made. The app itself is open source on GitHub, so you (or anyone) can run it locally forever by downloading the single HTML file."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you collect any analytics or telemetry?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No user-action tracking, no script-content telemetry, no third-party scripts beyond the service worker. The hosting provider sees standard web request logs (which any web server collects), but the app itself sends nothing about what you write."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I install it as a desktop app?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In Chrome, Edge, Brave, or Arc: click the install icon in the address bar, or use the one-click Install button on the start screen. In Safari (macOS 14+): File → Add to Dock. On iPhone/iPad: Share menu → Add to Home Screen. Once installed it runs in its own standalone window, registers itself as a handler for .json/.fountain/.fdx files, and works fully offline."
+      }
+    }
+  ]
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -97,6 +169,17 @@ tbody tr:hover{background:var(--bg2);}
 .hl-card p{font-size:13px;color:var(--tx2);margin:0;line-height:1.6;}
 .hl-icon{font-size:20px;margin-bottom:8px;}
 
+/* FAQ accordion — native <details>/<summary>, no JS required */
+.faq-list{display:flex;flex-direction:column;gap:8px;margin-bottom:0;}
+.faq-item{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--rl);overflow:hidden;}
+.faq-item summary{padding:14px 18px;font-size:14px;font-weight:600;color:var(--tx1);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.faq-item summary::-webkit-details-marker{display:none;}
+.faq-item summary::after{content:'+';font-size:18px;font-weight:400;color:var(--tx3);flex-shrink:0;transition:transform .15s;}
+.faq-item[open] summary::after{content:'−';}
+.faq-item summary:hover{color:var(--accent);}
+.faq-answer{padding:0 18px 16px;font-size:13px;color:var(--tx2);line-height:1.7;}
+.faq-answer p{margin:0;}
+
 /* Changelog — 2-col grid on wide screens, single column on narrow */
 .changelog{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;margin-bottom:0;}
 .cl-entry{background:var(--bg2);border:1px solid var(--bd3);border-radius:var(--rl);padding:16px 18px;margin-bottom:0;}
@@ -163,6 +246,7 @@ tbody tr:hover{background:var(--bg2);}
         <ul>
           <li><a href="#why">Why The Scriptwriter?</a></li>
           <li><a href="#compare">How we compare</a></li>
+          <li><a href="#faq">Common questions</a></li>
           <li><a href="#changelog">Latest features</a></li>
         </ul>
       </div>
@@ -287,6 +371,54 @@ tbody tr:hover{background:var(--bg2);}
         </tr>
       </tbody>
     </table>
+  </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="page-section" id="faq">
+  <h2 class="section-title">Common questions</h2>
+  <div class="faq-list">
+
+    <details class="faq-item">
+      <summary>Is The Scriptwriter really free?</summary>
+      <div class="faq-answer"><p>Yes &mdash; completely. It's open source under a permissive license, with no accounts, no premium tier, no ads, and no tracking. Every feature is available from the first visit. If you want to fund development, future-you starring the <a href="https://github.com/gasperjw1/The-TypeWriter" target="_blank" rel="noopener">GitHub repo</a> is the most useful thing.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Does The Scriptwriter work offline?</summary>
+      <div class="faq-answer"><p>Yes. After your first visit (or after you install it as a desktop app), the entire app is cached locally by the service worker and runs fully offline. You can write, edit, save, and export PDF/Fountain/FDX without an internet connection.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Where are my scripts saved?</summary>
+      <div class="faq-answer"><p>On your computer. Your script auto-saves to your browser's localStorage and &mdash; if you use <strong>File &rarr; Save</strong> &mdash; directly to a real file on your disk via the File System Access API. Nothing is uploaded anywhere. For cross-device sync, save into a folder that's already synced by iCloud Drive, Dropbox, Google Drive, or OneDrive. See the <a href="guide.html#sync">Sync across devices</a> section of the guide for details.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Can I import a script from Final Draft (.fdx) or Fountain?</summary>
+      <div class="faq-answer"><p>Yes. <strong>File &rarr; Import from Final Draft (.fdx)</strong> handles both screenplay and stage play FDX files. <strong>File &rarr; Import from Fountain</strong> handles <code>.fountain</code> files. Export works the same way in reverse, and round-trip fidelity is preserved: an FDX-out then FDX-in produces the same script.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Is The Scriptwriter only for stage plays, or can I write screenplays too?</summary>
+      <div class="faq-answer"><p>It's stage-play-first &mdash; the line types (Cue, Dialogue, Stage Direction), character entrance/exit tracking, and rehearsal sides export are built around stage plays specifically. You can write screenplays in it, but tools like Highland, Fade In, or Final Draft are more specialized for that format. The Fountain and FDX export support means you can always move a script out to a more screenplay-focused editor later.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>What happens to my scripts if The Scriptwriter shuts down?</summary>
+      <div class="faq-answer"><p>Nothing happens to your scripts &mdash; they live on your disk, not in a vendor database. Even if the website goes offline, you still have your <code>.json</code> save files, plus any Fountain or FDX exports you made. The app itself is open source on GitHub, so you (or anyone) can run it locally forever by downloading the single HTML file.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>Do you collect any analytics or telemetry?</summary>
+      <div class="faq-answer"><p>No user-action tracking, no script-content telemetry, no third-party scripts beyond the service worker. The hosting provider sees standard web request logs (which any web server collects), but the app itself sends nothing about what you write.</p></div>
+    </details>
+
+    <details class="faq-item">
+      <summary>How do I install it as a desktop app?</summary>
+      <div class="faq-answer"><p>In Chrome, Edge, Brave, or Arc: click the install icon in the address bar, or use the one-click <strong>Install</strong> button on the start screen. In Safari (macOS 14+): <strong>File &rarr; Add to Dock</strong>. On iPhone/iPad: Share menu &rarr; <strong>Add to Home Screen</strong>. Once installed it runs in its own standalone window, registers itself as a handler for <code>.json</code>/<code>.fountain</code>/<code>.fdx</code> files, and works fully offline.</p></div>
+    </details>
+
   </div>
   </section>
 

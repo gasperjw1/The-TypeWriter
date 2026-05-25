@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>The Scriptwriter Blog</title>
+    <link>https://thescriptwriter.app/blog/</link>
+    <description>Articles on the craft of stage play writing — formatting, structure, tools, and the small decisions that make a script work.</description>
+    <language>en-us</language>
+    <copyright>The Scriptwriter — open source. Content is freely shareable with attribution.</copyright>
+    <lastBuildDate>Sun, 24 May 2026 12:00:00 GMT</lastBuildDate>
+    <generator>Hand-maintained — see docs/blog/_template.html for the workflow</generator>
+    <atom:link href="https://thescriptwriter.app/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>https://thescriptwriter.app/icon-512.png</url>
+      <title>The Scriptwriter Blog</title>
+      <link>https://thescriptwriter.app/blog/</link>
+    </image>
+
+    <item>
+      <title>Free alternatives to Final Draft (2026)</title>
+      <link>https://thescriptwriter.app/blog/free-final-draft-alternatives.html</link>
+      <guid isPermaLink="true">https://thescriptwriter.app/blog/free-final-draft-alternatives.html</guid>
+      <description>Seven free or pay-what-you-want script editors compared honestly. What each one does well, where it falls short, and how to pick the right one.</description>
+      <pubDate>Sat, 23 May 2026 12:00:00 GMT</pubDate>
+      <category>Tools</category>
+    </item>
+
+    <item>
+      <title>How to write a stage play: a beginner's guide</title>
+      <link>https://thescriptwriter.app/blog/how-to-write-a-stage-play.html</link>
+      <guid isPermaLink="true">https://thescriptwriter.app/blog/how-to-write-a-stage-play.html</guid>
+      <description>A practical guide to writing your first stage play — structure, formatting, dialogue, cues, and a workflow that gets you to a finished first draft.</description>
+      <pubDate>Sat, 23 May 2026 12:00:00 GMT</pubDate>
+      <category>Beginner's guide</category>
+    </item>
+
+  </channel>
+</rss>

@@ -128,5 +128,11 @@ Use the template at `docs/blog/_template.html` as the starting point. The templa
 10. Spot-check render at desktop + mobile widths.
 
 ### After deploy
-11. Request indexing in Google Search Console + Bing Webmaster Tools.
-12. (Optional) Ping IndexNow if configured.
+11. Wait ~60s for GitHub Pages to rebuild.
+12. Ping IndexNow so Bing re-crawls within minutes instead of days:
+    ```bash
+    ./bin/indexnow.sh https://thescriptwriter.app/blog/<your-slug>.html
+    ```
+    Or with no args to ping every URL in the sitemap.
+13. Request indexing in Google Search Console (no batch equivalent — manual URL inspection).
+14. Add the new post as an `<item>` to `docs/blog/feed.xml` and bump the channel `<lastBuildDate>`.

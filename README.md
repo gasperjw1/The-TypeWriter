@@ -102,6 +102,10 @@ The-TypeWriter/
     vendor/jszip.min.js         # Vendored JSZip for offline ZIP export
     sitemap.xml                 # SEO sitemap
     robots.txt                  # Crawler directives
+    blog/feed.xml               # RSS 2.0 feed for the blog
+    a72c523…abd.txt             # IndexNow API key file (do not rename)
+  bin/
+    indexnow.sh                 # Pings Bing's IndexNow API after deploy
   TODO.md                       # Feature roadmap
   CLAUDE.md                     # Dev notes and project memory
   README.md                     # This file
