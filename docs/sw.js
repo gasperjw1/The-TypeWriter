@@ -1,5 +1,5 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v1.28';
+const CACHE_NAME = 'scriptwriter-v1.29';
 const SHARED_FILES_CACHE = 'scriptwriter-shared-files';
 const ASSETS = [
   './',
@@ -86,6 +86,29 @@ self.addEventListener('fetch', e => {
   // consumed directly by the app via caches.open(), not by fetch().
   if (url.pathname.includes('/_shared/')) return;
 
+  // Navigation requests (the HTML document for any page): cache, then
+  // network (caching the result), then fall back to the cached app shell.
+  // This guarantees a navigation ALWAYS resolves to something offline —
+  // even a page that was never visited returns the editor instead of the
+  // browser's error page. (This is also the pattern PWA Builder's offline
+  // check looks for.)
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      caches.match(e.request).then(cached =>
+        cached || fetch(e.request).then(response => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          }
+          return response;
+        }).catch(() => caches.match('./index.html'))
+      )
+    );
+    return;
+  }
+
+  // Everything else (assets, JSON, etc.): cache-first with background
+  // network refresh.
   e.respondWith(
     caches.match(e.request).then(cached => {
       const fetchPromise = fetch(e.request).then(response => {
