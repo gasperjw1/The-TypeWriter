@@ -43,6 +43,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://thescriptwriter.app/privacy.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://thescriptwriter.app/blog/feed.xml</loc>
     <lastmod>2026-05-24</lastmod>
     <changefreq>weekly</changefreq>

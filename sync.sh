@@ -8,8 +8,8 @@ set -e
 cp script_maker.html docs/index.html
 
 # Rewrite docs/ links for the docs context (index.html is already inside docs/)
-sed -i '' 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|;s|href="docs/blog/"|href="blog/"|g' docs/index.html 2>/dev/null \
-  || sed -i 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|;s|href="docs/blog/"|href="blog/"|g' docs/index.html
+sed -i '' 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|;s|href="docs/blog/"|href="blog/"|g;s|href="docs/privacy.html"|href="privacy.html"|g' docs/index.html 2>/dev/null \
+  || sed -i 's|href="docs/guide.html"|href="guide.html"|;s|href="docs/compare.html"|href="compare.html"|;s|href="docs/blog/"|href="blog/"|g;s|href="docs/privacy.html"|href="privacy.html"|g' docs/index.html
 
 # Rewrite PWA paths for the docs context (manifest, icons, SW are in same dir)
 sed -i '' 's|href="docs/manifest.json"|href="manifest.json"|;s|href="docs/icon-192.png"|href="icon-192.png"|' docs/index.html 2>/dev/null \
