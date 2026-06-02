@@ -1,7 +1,7 @@
 {
   "id": "/",
   "name": "The Scriptwriter",
-  "short_name": "Scriptwriter",
+  "short_name": "TheScriptwriter",
   "description": "A free, open-source stage play editor. No accounts, no installs — just open and start writing.",
   "start_url": "./",
   "scope": "./",
