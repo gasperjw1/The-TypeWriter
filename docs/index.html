@@ -1979,8 +1979,41 @@ document.addEventListener('keydown',e=>{
   if(e.key==='?'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const tag=document.activeElement?.tagName;if(tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'){e.preventDefault();openKBRef();return;}}
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){inputMode==='auto'?submitAutoLine():submitLine();return;}
   if(e.key==='`'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();pendingPillKey=true;return;}
-  if(pendingPillKey){const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}}
-  pendingPillKey=false;
+  if(pendingPillKey){
+    /* ` + 1/2/3 → activate pill (existing) */
+    const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);
+    if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}
+    /* ` + 4 → New Scene */
+    if(e.key==='4'){e.preventDefault();pendingPillKey=false;if(S.title)openSceneModal();return;}
+    /* ` + 5 → New Act */
+    if(e.key==='5'){e.preventDefault();pendingPillKey=false;if(S.title)openActModal();return;}
+    pendingPillKey=false;return;
+  }
+  /* ↑ / ↓ arrow key navigation through script lines when no input is active */
+  if((e.key==='ArrowUp'||e.key==='ArrowDown')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    const tag=document.activeElement?.tagName;
+    const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+    if(!inInput&&activeTab==='edit'&&S.title){
+      e.preventDefault();
+      const direction=e.key==='ArrowUp'?-1:1;
+      /* Build flat ordered list of all lines */
+      const lines=[];
+      S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>sc.lines.forEach((l,li)=>lines.push({ai,si,li}))));
+      if(!lines.length)return;
+      if(!insertAfter){
+        /* Nothing selected — ↑ selects last line, ↓ selects first */
+        const idx=direction===-1?lines.length-1:0;
+        const {ai,si,li}=lines[idx];selLine(ai,si,li);
+      }else{
+        const cur=lines.findIndex(x=>x.ai===insertAfter.actIdx&&x.si===insertAfter.sceneIdx&&x.li===insertAfter.lineIdx);
+        const next=Math.max(0,Math.min(lines.length-1,cur+direction));
+        const {ai,si,li}=lines[next];selLine(ai,si,li);
+      }
+      /* Scroll selected line into view */
+      setTimeout(()=>{const el=document.querySelector('.line-item.sel-barrier, .line-item.sel-highlight');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},30);
+      return;
+    }
+  }
 });
 
 function hasInput(){if(inputMode==='auto')return $('auto-ta').value.trim();if(cType==='dialogue')return($('dlg-char-ta').value.trim()||$('dlg-act-ta').value.trim()||$('dlg-text-ta').value.trim());if(cType==='direction')return $('dir-desc-ta').value.trim()||pendingCues.enters.length||pendingCues.exits.length;return $('simple-ta').value.trim();}
@@ -4552,6 +4585,8 @@ function openKBRef(){
   h+=hkBtn('dialogue','Activate Dialogue');
   h+=hkBtn('action','Activate Stage Direction');
   h+=hkBtn('direction','Activate Cue');
+  h+=row('New Scene',k('`')+' then '+k('4'));
+  h+=row('New Act',k('`')+' then '+k('5'));
   h+=`<div class="kb-ref-action" style="grid-column:1/-1;text-align:right;padding-top:4px;"><button onclick="resetHotkeys();openKBRef()" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--sans);">Reset to defaults</button></div>`;
   h+=sec('Inline editing');
   h+=row('Start editing a line','Double-click or Edit button');
@@ -4564,6 +4599,7 @@ function openKBRef(){
   h+=row('Close',k('Esc'));
   h+=sec('Navigation');
   h+=row('Select a line','Click on it');
+  h+=row('Move selection up / down',k('↑')+' / '+k('↓')+' (when input is empty)');
   h+=row('Deselect','Click selected line again');
   h+=row('Jump from character panel','Click a dialogue line');
   h+=`</div>`;
