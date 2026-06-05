@@ -166,11 +166,27 @@ a:hover{text-decoration:underline;}
     <h3>Line type pills &amp; shortcuts <span class="badge">Keyboard</span></h3>
     <p>In manual pills mode, every line you write is one of three types — <strong>Cue</strong>, <strong>Dialogue</strong>, or <strong>Stage Direction</strong> — selected by clicking a pill above the input bar. You can also use keyboard shortcuts:</p>
     <ul>
-      <li>Press <span class="key">`</span> (backtick) then <span class="key">1</span> → Dialogue</li>
-      <li>Press <span class="key">`</span> then <span class="key">2</span> → Stage Direction</li>
-      <li>Press <span class="key">`</span> then <span class="key">3</span> → Cue</li>
+      <li><span class="key">`</span> then <span class="key">1</span> → Dialogue</li>
+      <li><span class="key">`</span> then <span class="key">2</span> → Stage Direction</li>
+      <li><span class="key">`</span> then <span class="key">3</span> → Cue</li>
+      <li><span class="key">`</span> then <span class="key">4</span> → New Scene</li>
+      <li><span class="key">`</span> then <span class="key">5</span> → New Act</li>
     </ul>
-    <p style="margin-top:8px;">These keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them to any key you like. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
+    <p style="margin-top:8px;">The 1/2/3 keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
+  </div>
+
+  <div class="feature">
+    <h3>Navigation mode <span class="badge">Keyboard</span></h3>
+    <p>Press <span class="key">Esc</span> from the input bar to enter <strong>navigation mode</strong> — the input blurs and arrow keys take over:</p>
+    <ul>
+      <li><span class="key">↑</span> / <span class="key">↓</span> — move the selection through every line in the script, across scenes and acts</li>
+      <li><span class="key">Enter</span> — open the selected line for inline editing</li>
+      <li><span class="key">Tab</span> — return to write mode with Dialogue active</li>
+      <li><span class="key">`</span> then <span class="key">1/2/3</span> — return to write mode with a specific pill</li>
+      <li><span class="key">↓</span> past the last line — return to write mode at end of script</li>
+      <li><span class="key">Esc</span> with a line selected — deselect, stay in nav</li>
+    </ul>
+    <p style="margin-top:8px;">After saving or canceling an inline edit, you stay in navigation mode. Works the same in Smart Input mode — <span class="key">Tab</span> returns focus to the unified text box. The full shortcut reference is always one click away via the <strong>?</strong> button in the top bar.</p>
   </div>
 
   <div class="feature">
@@ -185,7 +201,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Insert cursor</h3>
-    <p>By default, new lines are added to the end of the current scene. To insert a line in the middle, <strong>click any existing line</strong> — it'll be highlighted and new lines will be inserted after it. Click an empty area of the script to deselect and go back to appending at the end.</p>
+    <p>By default, new lines are added to the end of the current scene. To insert a line in the middle, <strong>click any existing line</strong> — it'll be highlighted and new lines will be inserted after it. You can also use <span class="key">Esc</span> to enter navigation mode and move the cursor with <span class="key">↑</span>/<span class="key">↓</span>, then press <span class="key">Tab</span> to return to writing after the selected line. Click an empty area of the script (or press <span class="key">Esc</span> in nav mode) to deselect and go back to appending at the end.</p>
   </div>
 
   <div class="feature">
@@ -228,8 +244,8 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Inline editing</h3>
-    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. For Stage Direction lines, you get a simple text area. For Dialogue, you get the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens so you can adjust entrances and exits.</p>
-    <p style="margin-top:6px;">Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
+    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. You can also navigate to a line with <span class="key">↑</span>/<span class="key">↓</span> (after pressing <span class="key">Esc</span> to enter navigation mode) and press <span class="key">Enter</span> to open it for editing — no mouse required.</p>
+    <p style="margin-top:6px;">For Stage Direction lines you get a simple text area. For Dialogue, the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens. Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
   </div>
 
   <div class="feature">
