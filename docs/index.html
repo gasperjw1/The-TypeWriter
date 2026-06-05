@@ -1396,6 +1396,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 <script>
 let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};
 let activeTab='edit',cType='direction',pendingPill=null,pendingPillKey=null;
+/* navMode: true when the writer has pressed Escape to leave the input bar
+   and is navigating through lines with arrow keys. Tab or ` +pill returns
+   to write mode. */
+let navMode=false;
 let insertAfter=null,undoStack=[],undoCursor=-1,dragSrc=null;
 let hasFilename=false,lastSavedJSON='';
 let fileHandle=null;
@@ -1978,43 +1982,111 @@ document.addEventListener('keydown',e=>{
   if(editingLine)return;
   if(e.key==='?'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){const tag=document.activeElement?.tagName;if(tag!=='INPUT'&&tag!=='TEXTAREA'&&tag!=='SELECT'){e.preventDefault();openKBRef();return;}}
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){inputMode==='auto'?submitAutoLine():submitLine();return;}
+  /* ─── Escape ───────────────────────────────────────────────────────
+     In write mode (input focused)  → enter nav mode (blur input)
+     In nav mode with line selected  → deselect, stay in nav
+     In nav mode with nothing selected → no-op                      */
+  if(e.key==='Escape'&&!e.ctrlKey&&!e.metaKey){
+    const tag=document.activeElement?.tagName;
+    const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
+    /* If a modal / find bar is open those handlers fire first (above),
+       so we only reach here for editor-level Escape */
+    if(inInput&&activeTab==='edit'&&S.title){
+      e.preventDefault();
+      enterNavMode();
+      return;
+    }
+    if(navMode&&insertAfter){
+      e.preventDefault();
+      insertAfter=null;updateCtx();render();
+      return;
+    }
+  }
+
+  /* ─── Tab ───────────────────────────────────────────────────────────
+     In nav mode → enter write mode, default to Dialogue              */
+  if(e.key==='Tab'&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&navMode&&activeTab==='edit'&&S.title){
+    e.preventDefault();
+    navMode=false;
+    enterWriteMode('dialogue');
+    return;
+  }
+
+  /* ─── ` backtick ─────────────────────────────────────────────────── */
   if(e.key==='`'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();pendingPillKey=true;return;}
   if(pendingPillKey){
-    /* ` + 1/2/3 → activate pill (existing) */
+    /* ` + 1/2/3 → activate pill; also exits nav mode */
     const hkType=Object.keys(pillHotkeys).find(t=>pillHotkeys[t]===e.key);
-    if(hkType){e.preventDefault();pendingPillKey=false;const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);return;}
+    if(hkType){
+      e.preventDefault();pendingPillKey=false;
+      if(navMode){navMode=false;enterWriteMode(hkType);}
+      else{const pill=document.querySelector(`.tpill[data-t="${hkType}"]`);if(pill)selPill(pill,hkType);}
+      return;
+    }
     /* ` + 4 → New Scene */
     if(e.key==='4'){e.preventDefault();pendingPillKey=false;if(S.title)openSceneModal();return;}
     /* ` + 5 → New Act */
     if(e.key==='5'){e.preventDefault();pendingPillKey=false;if(S.title)openActModal();return;}
     pendingPillKey=false;return;
   }
-  /* ↑ / ↓ arrow key navigation through script lines when no input is active */
+
+  /* ─── Arrow keys — line navigation (nav mode or body focused) ──────
+     Active when no input is focused OR navMode is explicitly on.     */
   if((e.key==='ArrowUp'||e.key==='ArrowDown')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
     const tag=document.activeElement?.tagName;
     const inInput=tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';
-    if(!inInput&&activeTab==='edit'&&S.title){
+    if((!inInput||navMode)&&activeTab==='edit'&&S.title){
       e.preventDefault();
       const direction=e.key==='ArrowUp'?-1:1;
-      /* Build flat ordered list of all lines */
       const lines=[];
       S.acts.forEach((a,ai)=>a.scenes.forEach((sc,si)=>sc.lines.forEach((l,li)=>lines.push({ai,si,li}))));
       if(!lines.length)return;
       if(!insertAfter){
-        /* Nothing selected — ↑ selects last line, ↓ selects first */
         const idx=direction===-1?lines.length-1:0;
-        const {ai,si,li}=lines[idx];selLine(ai,si,li);
+        const{ai,si,li}=lines[idx];selLine(ai,si,li);
       }else{
         const cur=lines.findIndex(x=>x.ai===insertAfter.actIdx&&x.si===insertAfter.sceneIdx&&x.li===insertAfter.lineIdx);
-        const next=Math.max(0,Math.min(lines.length-1,cur+direction));
-        const {ai,si,li}=lines[next];selLine(ai,si,li);
+        const next=cur+direction;
+        if(next<0||next>=lines.length){
+          /* Past boundary going down → exit nav, return to write mode */
+          if(direction===1){insertAfter=null;updateCtx();render();enterWriteMode('dialogue');}
+          return;
+        }
+        const{ai,si,li}=lines[next];selLine(ai,si,li);
       }
-      /* Scroll selected line into view */
-      setTimeout(()=>{const el=document.querySelector('.line-item.sel-barrier, .line-item.sel-highlight');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},30);
+      setTimeout(()=>{const el=document.querySelector('.line-item.sel-barrier,.line-item.sel-highlight');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},30);
       return;
     }
   }
+
+  /* ─── Enter in nav mode + line selected → inline edit ─────────────  */
+  if(e.key==='Enter'&&navMode&&insertAfter&&activeTab==='edit'){
+    e.preventDefault();
+    const{actIdx:ai,sceneIdx:si,lineIdx:li}=insertAfter;
+    navMode=false;
+    startInlineEdit(ai,si,li);
+    return;
+  }
 });
+
+/* ── Nav / Write mode helpers ── */
+function enterNavMode(){
+  navMode=true;
+  /* Blur whichever input is focused so arrow keys engage */
+  const a=document.activeElement;
+  if(a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT'))a.blur();
+}
+function enterWriteMode(type){
+  navMode=false;
+  /* Default to dialogue when called from nav mode with no explicit type */
+  const t=type||'dialogue';
+  if(inputMode==='auto'){
+    const ta=$('auto-ta');if(ta){ta.focus();return;}
+  }
+  /* Activate the requested pill and focus its input */
+  activatePillByType(t);
+  updateInputMode();
+}
 
 function hasInput(){if(inputMode==='auto')return $('auto-ta').value.trim();if(cType==='dialogue')return($('dlg-char-ta').value.trim()||$('dlg-act-ta').value.trim()||$('dlg-text-ta').value.trim());if(cType==='direction')return $('dir-desc-ta').value.trim()||pendingCues.enters.length||pendingCues.exits.length;return $('simple-ta').value.trim();}
 function clearInput(){$('simple-ta').value='';$('dlg-char-ta').value='';$('dlg-act-ta').value='';$('dlg-text-ta').value='';$('dir-desc-ta').value='';$('auto-ta').value='';pendingCues={enters:[],exits:[]};ghostMatch='';$('char-ghost').textContent='';$('auto-suggest').style.display='none';[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta'),$('auto-ta')].forEach(el=>{if(el)as(el);});}
@@ -2413,8 +2485,15 @@ function saveInlineEdit(){
     if(daEl){const da=daEl.value.trim();line.dialogueAction=da||undefined;}
   }
   editingLine=null;autoSave();render();
+  /* Stay in nav mode after saving — keep focus off inputs */
+  navMode=true;
 }
-function cancelInlineEdit(){if(!editingLine)return;editingLine=null;render();}
+function cancelInlineEdit(){
+  if(!editingLine)return;
+  editingLine=null;render();
+  /* Stay in nav mode after cancel */
+  navMode=true;
+}
 function ieKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveInlineEdit();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieCharKey(e){if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();const da=document.getElementById('ie-da');if(da)da.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieMidKey(e){if((e.key==='Tab'||e.key==='Enter')&&!e.shiftKey){e.preventDefault();const v=document.getElementById('ie-val');if(v)v.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
@@ -4597,10 +4676,15 @@ function openKBRef(){
   h+=row('Next match',k('Enter'));
   h+=row('Previous match',k('Shift')+' + '+k('Enter'));
   h+=row('Close',k('Esc'));
-  h+=sec('Navigation');
-  h+=row('Select a line','Click on it');
-  h+=row('Move selection up / down',k('↑')+' / '+k('↓')+' (when input is empty)');
-  h+=row('Deselect','Click selected line again');
+  h+=sec('Navigation mode — press Esc to enter, Tab to return to writing');
+  h+=row('Enter nav mode (from input)',k('Esc'));
+  h+=row('Move selection up / down',k('↑')+' / '+k('↓'));
+  h+=row('Edit selected line',k('Enter'));
+  h+=row('Return to write mode (Dialogue)',k('Tab'));
+  h+=row('Return to write mode (pick pill)',k('`')+' then '+k('1')+'/'+k('2')+'/'+k('3'));
+  h+=row('Deselect (stay in nav)',k('Esc')+' again');
+  h+=row('Exit nav → write (via ↓ past last line)',k('↓'));
+  h+=row('Select a line with mouse','Click on it');
   h+=row('Jump from character panel','Click a dialogue line');
   h+=`</div>`;
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
