@@ -48,7 +48,6 @@
   ]
 }
 </script>
-<script src="vendor/jszip.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -972,7 +971,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </style>
 </head>
 <body>
-<div id="root">
+<main id="root">
 <div id="topbar">
   <div id="tb-left">
     <span id="script-title-text" onclick="goHome()" title="Home">The Scriptwriter</span>
@@ -1049,7 +1048,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="scroll-back-btn"><button onclick="scrollToSelected()">↑ Return to selected line</button></div>
       <div id="setup-screen">
         <h1 class="setup-brand">The Scriptwriter</h1>
-        <div class="setup-tagline">A free stage play editor. Your scripts save to real files on your computer — no cloud, no accounts.<br>Install as a desktop app for distraction-free writing offline.<br><a href="guide.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Feature guide</a> · <a href="compare.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Compare editors</a> · <a href="blog/" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Blog</a> · <a href="privacy.html" style="font-size:12px;color:var(--tx3);text-decoration:underline;">Privacy</a></div>
+        <div class="setup-tagline">A free stage play editor. Your scripts save to real files on your computer — no cloud, no accounts.<br>Install as a desktop app for distraction-free writing offline.<br><a href="guide.html" style="font-size:12px;color:var(--tx2);text-decoration:underline;">Feature guide</a> · <a href="compare.html" style="font-size:12px;color:var(--tx2);text-decoration:underline;">Compare editors</a> · <a href="blog/" style="font-size:12px;color:var(--tx2);text-decoration:underline;">Blog</a> · <a href="privacy.html" style="font-size:12px;color:var(--tx2);text-decoration:underline;">Privacy</a></div>
         <div id="resume-card">
           <div class="setup-card" onclick="resumeFromLS()">
             <div class="setup-card-icon">▶</div>
@@ -1391,7 +1390,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </div>
 
 <div id="mlayer"><div class="mbox" id="mbox"><div id="mcontent"></div></div></div>
-</div>
+</main>
 
 <script>
 let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};
@@ -3731,7 +3730,21 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 }
 
 /* ── Metadata ZIP download ── */
+let _jszipPromise=null;
+function loadJSZip(){
+  if(typeof JSZip!=='undefined')return Promise.resolve();
+  if(_jszipPromise)return _jszipPromise;
+  _jszipPromise=new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='vendor/jszip.min.js';
+    s.onload=resolve;
+    s.onerror=()=>reject(new Error('Failed to load JSZip'));
+    document.head.appendChild(s);
+  });
+  return _jszipPromise;
+}
 async function buildMetadataZip(){
+  await loadJSZip();
   const zip=new JSZip();
   const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'_metadata');
   folder.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
@@ -3754,6 +3767,7 @@ async function exportPDFWithMeta(){
   closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   try{
+    await loadJSZip();
     const zip=new JSZip();
     const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_'));
     /* add the PDF as HTML (user prints from the window) */
