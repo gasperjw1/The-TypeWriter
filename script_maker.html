@@ -988,6 +988,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
       <div id="file-dd">
         <div class="fdd-item" onclick="menuSave()">Save<span class="fdd-key">Ctrl+S</span></div>
         <div class="fdd-item" onclick="menuSaveAs()">Save as new file</div>
+        <div class="fdd-item" onclick="menuDownloadCopy()">Download a copy (.json)</div>
         <div class="fdd-sep"></div>
         <div class="fdd-item" onclick="menuOpen()">Open file</div>
         <input type="file" id="file-open-in" accept=".json" style="display:none" onchange="loadFile(event)"/>
@@ -1546,7 +1547,7 @@ function updateSaveIndicator(){
   const dot=$('save-indicator'),tip=$('si-tip-text');
   if(!S.title){dot.style.background='#888780';tip.textContent='No file opened yet';return;}
   if(fileHandle){dot.style.background='#4CAF50';tip.textContent='Saved to disk: '+fileHandle.name;return;}
-  dot.style.background='#378ADD';tip.textContent='Saved in browser only — click File → Save to keep a copy on your computer';
+  dot.style.background='#378ADD';tip.textContent=window.showSaveFilePicker?'Saved in browser only — click File → Save to keep a copy on your computer':'Saved in your browser — use File → Download a copy to export a file';
 }
 async function writeToFileHandle(json){
   if(!fileHandle)return;
@@ -1596,6 +1597,7 @@ function applyAutoFormat(line){
   return line;
 }
 function triggerDownload(title,json){const b=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json';a.click();}
+function menuDownloadCopy(){closeFDD();if(!S.title)return;lastSavedJSON=stateJSON();lsSaveScript();triggerDownload(S.title,lastSavedJSON);}
 function pushUndo(){
   undoStack.splice(undoCursor+1);
   undoStack.push(cloneState());
@@ -1741,12 +1743,12 @@ async function menuSave(){
   if(fileHandle){await writeToFileHandle(lastSavedJSON);}
   else if(window.showSaveFilePicker){
     try{const h=await showSaveFilePicker({suggestedName:'raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',types:[{description:'JSON',accept:{'application/json':['.json']}}]});setFileHandle(h);await writeToFileHandle(lastSavedJSON);}catch(e){if(e.name!=='AbortError')console.warn(e);}
-  }else{triggerDownload(S.title,lastSavedJSON);}
+  }
   updateSaveIndicator();
 }
 function menuSaveAs(){closeFDD();if(!S.title)return;openModal(`<h3>Save as new file</h3><div class="mf"><label>File title</label><input class="minput" id="sa-title" value="${esc(S.title)}"/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmSaveAs()">Save</button></div>`,null);setTimeout(()=>{const el=$('sa-title');if(el)el.focus();},50);}
 async function confirmSaveAs(){const t=$('sa-title').value.trim()||S.title;S.title=t;$('script-title-text').textContent=t;hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();closeModal();
-  if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:'raw_script_'+t.toLowerCase().replace(/ /g,'_')+'.json',types:[{description:'JSON',accept:{'application/json':['.json']}}]});setFileHandle(h);await writeToFileHandle(lastSavedJSON);}catch(e){if(e.name!=='AbortError')console.warn(e);}}else{triggerDownload(t,lastSavedJSON);}
+  if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:'raw_script_'+t.toLowerCase().replace(/ /g,'_')+'.json',types:[{description:'JSON',accept:{'application/json':['.json']}}]});setFileHandle(h);await writeToFileHandle(lastSavedJSON);}catch(e){if(e.name!=='AbortError')console.warn(e);}}
   updateSaveIndicator();}
 async function menuOpen(){
   closeFDD();
