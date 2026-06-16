@@ -1095,7 +1095,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
         <div class="setup-version">v1.30 · June 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
-        <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="docs/badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
+        <div style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
+          <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="docs/badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
+          <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="docs/badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
+        </div>
         <div id="install-hint" class="setup-install-hint" style="display:none;">
           <span class="setup-install-icon">⤓</span>
           <span class="setup-install-text">Install for offline use: <span id="install-hint-action">click the install icon in your browser's address bar</span>.</span>
@@ -5255,7 +5258,7 @@ function showInstallHint(){
   }else if(/safari/.test(ua)&&!/chrome|chromium|edg/.test(ua)){
     if(actionEl)actionEl.textContent="open the Share menu and choose 'Add to Dock' (macOS) or 'Add to Home Screen' (iOS)";
   }else if(/firefox/.test(ua)){
-    if(actionEl)actionEl.textContent='use a Chromium-based browser (Chrome, Edge, Brave, Arc) to install — Firefox does not support PWA install on desktop';
+    if(actionEl)actionEl.textContent='use a Chromium-based browser (Chrome, Edge, Brave, Arc) to install — Firefox does not support desktop install';
   }else{
     if(actionEl)actionEl.textContent="click the install icon in your browser's address bar";
   }
