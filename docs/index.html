@@ -1117,7 +1117,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.40 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.41 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
           <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
           <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
@@ -1309,7 +1309,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.40 · July 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.41 · July 2026</div>
       </div>
     </div>
 
@@ -1630,7 +1630,24 @@ function applyAutoFormat(line){
   }
   return line;
 }
-function triggerDownload(title,json){const b=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json';a.click();}
+/* iOS Safari and WKWebView ignore the `download` attribute on anchor tags.
+   Use the Web Share API (share sheet → Save to Files) when available, and
+   fall back to anchor-click for desktop browsers that support it. */
+async function downloadFile(blob,filename){
+  const file=new File([blob],filename,{type:blob.type||'application/octet-stream'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:filename});return;}
+    catch(e){if(e.name==='AbortError')return;} // user dismissed — not an error
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function triggerDownload(title,json){
+  downloadFile(new Blob([json],{type:'application/json'}),'raw_script_'+title.toLowerCase().replace(/ /g,'_')+'.json');
+}
 function menuDownloadCopy(){closeFDD();if(!S.title)return;lastSavedJSON=stateJSON();lsSaveScript();triggerDownload(S.title,lastSavedJSON);}
 function pushUndo(){
   undoStack.splice(undoCursor+1);
@@ -3635,7 +3652,12 @@ function exportPDF(){
   closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   const win=window.open('','_blank');
-  if(!win){alert('Pop-up blocked — please allow pop-ups and try again.');return;}
+  if(!win){
+    /* WKWebView / popup-blocked: share the PDF HTML so user can open in Safari and print */
+    downloadFile(new Blob([buildPDFHTML()],{type:'text/html'}),
+      S.title.toLowerCase().replace(/ /g,'_')+'_print.html');
+    return;
+  }
   win.document.write(buildPDFHTML());
   win.document.close();
   win.focus();
@@ -3818,10 +3840,7 @@ async function downloadMetadata(){
   if(!S.title){alert('Open or create a script first.');return;}
   try{
     const blob=await buildMetadataZip();
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=S.title.toLowerCase().replace(/ /g,'_')+'_metadata.zip';
-    a.click();URL.revokeObjectURL(a.href);
+    await downloadFile(blob,S.title.toLowerCase().replace(/ /g,'_')+'_metadata.zip');
   }catch(e){alert('Failed to create metadata ZIP: '+e.message);}
 }
 async function exportPDFWithMeta(){
@@ -3838,10 +3857,7 @@ async function exportPDFWithMeta(){
     meta.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
     meta.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The Scriptwriter'},null,2));
     const blob=await zip.generateAsync({type:'blob'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=S.title.toLowerCase().replace(/ /g,'_')+'_export.zip';
-    a.click();URL.revokeObjectURL(a.href);
+    await downloadFile(blob,S.title.toLowerCase().replace(/ /g,'_')+'_export.zip');
   }catch(e){alert('Failed to create export ZIP: '+e.message);}
 }
 
@@ -3915,15 +3931,12 @@ function buildFountain(){
   return out.trimEnd()+'\n';
 }
 
-function exportFountain(){
+async function exportFountain(){
   closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
   const text=buildFountain();
   const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=S.title.toLowerCase().replace(/ /g,'_')+'.fountain';
-  a.click();URL.revokeObjectURL(a.href);
+  await downloadFile(blob,S.title.toLowerCase().replace(/ /g,'_')+'.fountain');
 }
 
 function importFountain(){
@@ -4445,16 +4458,11 @@ function buildFDXText(){
   return xml;
 }
 
-function exportFDX(){
+async function exportFDX(){
   closeFDD();
   const xml=buildFDXText();
   const blob=new Blob([xml],{type:'application/xml'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.fdx';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  await downloadFile(blob,(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.fdx');
 }
 
 /* ── Rehearsal Sides Export ── */
@@ -4472,7 +4480,7 @@ function openRehearsalSidesModal(){
   h+='<div class="mbtns" style="margin-top:12px;"><button class="mb-c" onclick="closeModal()">Cancel</button></div>';
   openModal(h,null);
 }
-function exportRehearsalSides(charName){
+async function exportRehearsalSides(charName){
   closeModal();
   const lines=[];
   lines.push(S.title||'Untitled');
@@ -4539,12 +4547,7 @@ function exportRehearsalSides(charName){
 
   const text=lines.join('\n');
   const blob=new Blob([text],{type:'text/plain'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='sides_'+charName.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.txt';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  await downloadFile(blob,'sides_'+charName.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.txt');
 }
 
 /* ── Revision tracking ── */
