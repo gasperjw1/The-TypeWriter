@@ -884,18 +884,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #mob-panel-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:699;}
   #mob-panel-backdrop.open{display:block;}
 
-  /* Panel toggle — inline in pills row on mobile */
-  #mob-panel-btn{
-    display:flex;align-items:center;justify-content:center;
-    padding:5px 11px;font-size:11px;font-weight:500;font-family:var(--sans);
-    border-radius:20px;border:1.5px solid var(--bd2);
-    background:var(--bg2);color:var(--tx2);
-    cursor:pointer;white-space:nowrap;
-    margin-left:auto;
-    transition:all .15s;
-  }
-  #mob-panel-btn:active{background:var(--bg3);}
-
   /* ── Input bar ── */
   #input-bar{padding:8px 10px calc(10px + env(safe-area-inset-bottom));}
   #type-pills{flex-wrap:wrap;gap:5px;margin-bottom:6px;}
@@ -1027,6 +1015,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
     <button class="tb-btn" onclick="openKBRef()" title="Help" style="font-size:13px;margin-left:2px;">?</button>
+    <button class="tb-btn" id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel" title="Side panel">Panel</button>
   </div>
   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
 </div>
@@ -1302,7 +1291,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           <div class="pill-tip"><strong>Stage Direction</strong> &nbsp;·&nbsp; Shortcut: <code>` 2</code><br>Describes physical action, movement, or<br>stage business. Attributed to a specific<br>character — appears alongside their name.</div>
         </div>
         <button class="bookmark-btn" onclick="insertBookmark()" title="Insert bookmark at cursor">🔖</button>
-        <button id="mob-panel-btn" onclick="openMobilePanel()" aria-label="Open side panel">Panel</button>
       </div>
       <div id="input-box">
         <!-- Auto-detect unified textbox -->
@@ -5071,6 +5059,7 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
 function toggleMobileMenu(){$('tb-tabs').classList.toggle('mob-open');}
 function openMobilePanel(){
   const wrap=$('right-panel-wrap');
+  wrap.style.display='flex';
   wrap.classList.add('mob-visible');
   $('mob-panel-backdrop').classList.add('open');
 }
