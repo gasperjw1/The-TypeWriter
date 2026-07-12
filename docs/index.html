@@ -429,6 +429,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
 /* ── Print styles ── */
 @media (display-mode:standalone){.store-badges{display:none !important;}.view-print-btn{display:none !important;}}
+/* WKWebView (iOS app) doesn't support display-mode:standalone in CSS;
+   detect via PWAShell UA / app-platform cookie and add .is-app to <html> */
 .is-app .store-badges{display:none !important;}
 .is-app .view-print-btn{display:none !important;}
 @media print{
@@ -970,6 +972,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </head>
 <body>
 <script>
+/* Runs before first paint — add is-app class when inside WKWebView iOS wrapper.
+   display-mode:standalone CSS media query doesn't work in WKWebView, so we
+   detect via the PWAShell suffix the Xcode project injects into the UA,
+   or the app-platform cookie it sets, or navigator.standalone as a fallback. */
 (function(){
   var ua=navigator.userAgent||'';
   var cookie=document.cookie||'';
@@ -1105,7 +1111,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.37 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.38 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
           <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
           <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
@@ -1287,7 +1293,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.37 · July 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.38 · July 2026</div>
       </div>
     </div>
 
