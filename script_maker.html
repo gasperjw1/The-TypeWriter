@@ -1023,9 +1023,10 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     <span id="rev-chip" style="display:none;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--bd2);border-radius:12px;font-size:11px;color:var(--tx2);cursor:pointer;margin-right:4px;" onclick="openRevisionHistory()" title="View revision history"><span class="rev-chip-dot" style="width:8px;height:8px;border-radius:50%;"></span><span class="rev-chip-label"></span></span>
     <button class="tb-btn" id="rev-toggle" style="display:none;font-size:11px;padding:2px 6px;" onclick="toggleRevMarks()" title="Toggle revision marks — shows colored borders and ✱ indicators on lines changed since the last revision snapshot">✱</button>
     <button class="tb-btn" id="notes-toggle" style="font-size:12px;padding:2px 6px;" onclick="toggleShowNotes()" title="Toggle notes visibility">📝</button>
+    <button class="tb-btn" id="find-tb-btn" onclick="openFindBar()" title="Find & Replace" style="font-size:14px;">⌕</button>
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
-    <button class="tb-btn" onclick="openKBRef()" title="Keyboard shortcuts" style="font-size:13px;margin-left:2px;">?</button>
+    <button class="tb-btn" onclick="openKBRef()" title="Help" style="font-size:13px;margin-left:2px;">?</button>
   </div>
   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
 </div>
@@ -3257,7 +3258,7 @@ function touchDS(e,type,...idx){
 
   function onMove(ev){
     const t=ev.touches[0];
-    if(Math.abs(t.clientX-startX)>8||Math.abs(t.clientY-startY)>8){moved=true;clearTimeout(holdTimer);cleanup();}
+    if(Math.abs(t.clientX-startX)>15||Math.abs(t.clientY-startY)>15){moved=true;clearTimeout(holdTimer);cleanup();}
   }
   function cleanup(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);document.removeEventListener('touchcancel',onEnd);}
   function onEnd(){clearTimeout(holdTimer);cleanup();}
@@ -4667,48 +4668,61 @@ function closeGenericModal(){
 
 /* ── Keyboard shortcuts reference ── */
 function openKBRef(){
+  const isMob=window.innerWidth<=768;
   const mod=navigator.platform.indexOf('Mac')>-1?'Cmd':'Ctrl';
   const k=(label)=>`<span class="kb-ref-key">${label}</span>`;
   const row=(action,keys)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${keys}</div>`;
   const sec=(title)=>`<div class="kb-ref-section">${title}</div>`;
   const hk=typeof pillHotkeys!=='undefined'?pillHotkeys:{dialogue:'1',action:'2',direction:'3'};
-  const hkBtn=(type,label)=>`<div class="kb-ref-action">${label}</div><div class="kb-ref-keys"><span class="kb-ref-key">\`</span> then <span class="kb-ref-key kb-hk-capture" data-hk-type="${type}" onclick="startHkCaptureInModal(this,'${type}')" title="Click to change">${esc(hk[type])}</span></div>`;
-  let h=`<h3 style="margin:0 0 14px;font-size:15px;color:var(--tx1);">Keyboard Shortcuts</h3>`;
+
+  let h=`<h3 style="margin:0 0 14px;font-size:15px;color:var(--tx1);">Help</h3>`;
   h+=`<div class="kb-ref-grid">`;
-  h+=sec('General');
-  h+=row('Save',k(mod)+' + '+k('S'));
-  h+=row('Undo',k(mod)+' + '+k('Z'));
-  h+=row('Redo',k(mod)+' + '+k('Shift')+' + '+k('Z'));
-  h+=row('Find &amp; Replace',k(mod)+' + '+k('F'));
-  h+=row('Submit line',k('Enter')+' or '+k(mod)+' + '+k('Enter'));
-  h+=row('New line in input',k('Shift')+' + '+k('Enter'));
-  h+=row('Close dialog / find bar',k('Esc'));
-  h+=sec('Line-type pills — click a key to customize');
-  h+=hkBtn('dialogue','Activate Dialogue');
-  h+=hkBtn('action','Activate Stage Direction');
-  h+=hkBtn('direction','Activate Cue');
-  h+=row('New Scene',k('`')+' then '+k('4'));
-  h+=row('New Act',k('`')+' then '+k('5'));
-  h+=`<div class="kb-ref-action" style="grid-column:1/-1;text-align:right;padding-top:4px;"><button onclick="resetHotkeys();openKBRef()" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--sans);">Reset to defaults</button></div>`;
-  h+=sec('Inline editing');
-  h+=row('Start editing a line','Double-click or Edit button');
-  h+=row('Save edit',k('Enter'));
-  h+=row('Cancel edit',k('Esc'));
-  h+=row('Tab through dialogue fields',k('Tab'));
-  h+=sec('Find bar');
-  h+=row('Next match',k('Enter'));
-  h+=row('Previous match',k('Shift')+' + '+k('Enter'));
-  h+=row('Close',k('Esc'));
-  h+=sec('Navigation mode — press Esc to enter, Tab to return to writing');
-  h+=row('Enter nav mode (from input)',k('Esc'));
-  h+=row('Move selection up / down',k('↑')+' / '+k('↓'));
-  h+=row('Edit selected line',k('Enter'));
-  h+=row('Return to write mode (Dialogue)',k('Tab'));
-  h+=row('Return to write mode (pick pill)',k('`')+' then '+k('1')+'/'+k('2')+'/'+k('3'));
-  h+=row('Deselect (stay in nav)',k('Esc')+' again');
-  h+=row('Exit nav → write (via ↓ past last line)',k('↓'));
-  h+=row('Select a line with mouse','Click on it');
-  h+=row('Jump from character panel','Click a dialogue line');
+
+  h+=sec('Top bar buttons');
+  h+=row('☰ &nbsp;File menu','Save, open, and export your script');
+  h+=row('⌕ &nbsp;Find','Search and replace text');
+  h+=row('↩ &nbsp;Undo / ↪ Redo','Step backward or forward through changes');
+  h+=row('📝 &nbsp;Notes','Show or hide notes attached to lines');
+  h+=row('? &nbsp;Help','This panel');
+
+  h+=sec('Adding lines');
+  h+=row('Pick a line type','Tap a pill: Dialogue · Stage Dir. · Cue');
+  h+=row('Fill in the fields, then submit','Tap the Add button'+(isMob?'':` or press ${k('Enter')}`));
+
+  h+=sec('Editing &amp; moving lines');
+  h+=row('Select a line',isMob?'Tap the line':'Click the line');
+  h+=row('Edit a line',isMob?'Tap <strong>Edit</strong> (appears on selection)':'Double-click or tap <strong>Edit</strong>');
+  h+=row('Delete a line','Tap <strong>Delete</strong> (appears on selection)');
+  h+=row('Add a note','Tap 🗒 (appears on selection)');
+  h+=row('Reorder a line',isMob?'Hold the ⠿ grip on the left, then drag':'Drag the ⠿ handle on the left');
+
+  h+=sec('Acts &amp; scenes');
+  h+=row('Edit name or setting','Tap the <strong>Edit</strong> button on the header');
+  h+=row('Reorder',isMob?'Hold the ⠿ grip on the header, then drag':'Drag the ⠿ handle on the header');
+  h+=row('Jump to a scene','Tap it in the table of contents (side panel)');
+
+  if(!isMob){
+    h+=sec(`Keyboard shortcuts`);
+    h+=row('Save',k(mod)+' + '+k('S'));
+    h+=row('Undo',k(mod)+' + '+k('Z'));
+    h+=row('Redo',k(mod)+' + '+k('Shift')+' + '+k('Z'));
+    h+=row('Find &amp; Replace',k(mod)+' + '+k('F'));
+    h+=row('Submit line',k('Enter'));
+    h+=row('New line in input',k('Shift')+' + '+k('Enter'));
+    h+=row('Cancel / close',k('Esc'));
+    h+=row('This help panel',k('?'));
+    h+=sec('Pill shortcuts — click a key below to customize');
+    const hkBtn=(type,label)=>`<div class="kb-ref-action">${label}</div><div class="kb-ref-keys"><span class="kb-ref-key">\`</span> then <span class="kb-ref-key kb-hk-capture" data-hk-type="${type}" onclick="startHkCaptureInModal(this,'${type}')" title="Click to change">${esc(hk[type])}</span></div>`;
+    h+=hkBtn('dialogue','Activate Dialogue');
+    h+=hkBtn('action','Activate Stage Direction');
+    h+=hkBtn('direction','Activate Cue');
+    h+=`<div class="kb-ref-action" style="grid-column:1/-1;text-align:right;padding-top:4px;"><button onclick="resetHotkeys();openKBRef()" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--sans);">Reset to defaults</button></div>`;
+    h+=sec('Inline editing');
+    h+=row('Save edit',k('Enter'));
+    h+=row('Cancel edit',k('Esc'));
+    h+=row('Tab through dialogue fields',k('Tab'));
+  }
+
   h+=`</div>`;
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
   openGenericModal(h);
