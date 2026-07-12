@@ -4666,52 +4666,79 @@ function closeGenericModal(){
   if(o)o.style.display='none';
 }
 
-/* ── Keyboard shortcuts reference ── */
+/* ── Help panel (buttons/gestures + keyboard shortcuts tabs) ── */
+function kbrefTab(tab){
+  ['ui','keys'].forEach(p=>{
+    const panel=document.getElementById('kbref-'+p);
+    const btn=document.getElementById('kbtab-'+p);
+    if(!panel||!btn)return;
+    const active=p===tab;
+    panel.style.display=active?'':'none';
+    btn.style.borderBottom=active?'2px solid var(--tx1)':'2px solid transparent';
+    btn.style.color=active?'var(--tx1)':'var(--tx3)';
+    btn.style.fontWeight=active?'500':'400';
+  });
+}
 function openKBRef(){
   const isMob=window.innerWidth<=768;
   const mod=navigator.platform.indexOf('Mac')>-1?'Cmd':'Ctrl';
   const k=(label)=>`<span class="kb-ref-key">${label}</span>`;
-  const row=(action,keys)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${keys}</div>`;
+  const row=(action,desc)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${desc}</div>`;
   const sec=(title)=>`<div class="kb-ref-section">${title}</div>`;
   const hk=typeof pillHotkeys!=='undefined'?pillHotkeys:{dialogue:'1',action:'2',direction:'3'};
+  const tabBtn=(id,label,active)=>`<button id="kbtab-${id}" onclick="kbrefTab('${id}')" style="padding:8px 16px;font-size:12px;cursor:pointer;font-family:var(--sans);background:transparent;border:none;border-bottom:2px solid ${active?'var(--tx1)':'transparent'};color:${active?'var(--tx1)':'var(--tx3)'};font-weight:${active?500:400};">${label}</button>`;
 
-  let h=`<h3 style="margin:0 0 14px;font-size:15px;color:var(--tx1);">Help</h3>`;
-  h+=`<div class="kb-ref-grid">`;
+  let h=`<h3 style="margin:0 0 0;font-size:15px;color:var(--tx1);">Help</h3>`;
 
-  h+=sec('Top bar buttons');
+  // Tab bar
+  h+=`<div style="display:flex;border-bottom:1px solid var(--bd2);margin:10px 0 14px;">`;
+  h+=tabBtn('ui','Buttons &amp; Gestures',true);
+  if(!isMob) h+=tabBtn('keys','Keyboard Shortcuts',false);
+  h+=`</div>`;
+
+  // ── Tab 1: Buttons & Gestures ──
+  h+=`<div id="kbref-ui"><div class="kb-ref-grid">`;
+
+  h+=sec('Top bar');
   h+=row('☰ &nbsp;File menu','Save, open, and export your script');
-  h+=row('⌕ &nbsp;Find','Search and replace text');
-  h+=row('↩ &nbsp;Undo / ↪ Redo','Step backward or forward through changes');
+  h+=row('⌕ &nbsp;Find','Open the Find &amp; Replace bar');
+  h+=row('↩ &nbsp;Undo','Reverse the last change');
+  h+=row('↪ &nbsp;Redo','Re-apply a reversed change');
   h+=row('📝 &nbsp;Notes','Show or hide notes attached to lines');
-  h+=row('? &nbsp;Help','This panel');
+  h+=row('? &nbsp;Help','Open this panel');
 
-  h+=sec('Adding lines');
-  h+=row('Pick a line type','Tap a pill: Dialogue · Stage Dir. · Cue');
-  h+=row('Fill in the fields, then submit','Tap the Add button'+(isMob?'':` or press ${k('Enter')}`));
+  h+=sec('Writing');
+  h+=row('Dialogue · Stage Dir. · Cue','Pick a line type pill, fill in the fields');
+  h+=row('Add button','Submit the line and add it to the script'+(isMob?'':` &nbsp;<em>(or press ${k('Enter')})</em>`));
 
-  h+=sec('Editing &amp; moving lines');
-  h+=row('Select a line',isMob?'Tap the line':'Click the line');
-  h+=row('Edit a line',isMob?'Tap <strong>Edit</strong> (appears on selection)':'Double-click or tap <strong>Edit</strong>');
-  h+=row('Delete a line','Tap <strong>Delete</strong> (appears on selection)');
-  h+=row('Add a note','Tap 🗒 (appears on selection)');
-  h+=row('Reorder a line',isMob?'Hold the ⠿ grip on the left, then drag':'Drag the ⠿ handle on the left');
+  h+=sec('Lines');
+  h+=row(isMob?'Tap a line':'Click a line','Select it — Edit, Delete, and 🗒 Note buttons appear');
+  h+=row('Edit button','Edit the line inline');
+  h+=row('Delete button','Remove the line (asks to confirm)');
+  h+=row('🗒 button','Attach a note or comment to the line');
+  h+=row('⠿ &nbsp;Grip handle','The six-dot icon on the left of each line. '+
+    (isMob?'Hold it and drag to reorder the line.':'Drag it to reorder the line.'));
 
-  h+=sec('Acts &amp; scenes');
-  h+=row('Edit name or setting','Tap the <strong>Edit</strong> button on the header');
-  h+=row('Reorder',isMob?'Hold the ⠿ grip on the header, then drag':'Drag the ⠿ handle on the header');
-  h+=row('Jump to a scene','Tap it in the table of contents (side panel)');
+  h+=sec('Acts &amp; Scenes');
+  h+=row('Edit button on header','Rename or change the setting');
+  h+=row('⠿ &nbsp;Grip on header',(isMob?'Hold and drag':'Drag')+' to reorder the act or scene');
+  h+=row('Table of contents','Tap a scene in the side panel to jump to it');
 
+  h+=`</div></div>`;
+
+  // ── Tab 2: Keyboard Shortcuts (desktop only) ──
   if(!isMob){
-    h+=sec(`Keyboard shortcuts`);
+    h+=`<div id="kbref-keys" style="display:none"><div class="kb-ref-grid">`;
+    h+=sec('General');
     h+=row('Save',k(mod)+' + '+k('S'));
     h+=row('Undo',k(mod)+' + '+k('Z'));
     h+=row('Redo',k(mod)+' + '+k('Shift')+' + '+k('Z'));
     h+=row('Find &amp; Replace',k(mod)+' + '+k('F'));
     h+=row('Submit line',k('Enter'));
-    h+=row('New line in input',k('Shift')+' + '+k('Enter'));
+    h+=row('New line without submitting',k('Shift')+' + '+k('Enter'));
     h+=row('Cancel / close',k('Esc'));
-    h+=row('This help panel',k('?'));
-    h+=sec('Pill shortcuts — click a key below to customize');
+    h+=row('Open this help panel',k('?'));
+    h+=sec('Pill shortcuts — click a key below to reassign');
     const hkBtn=(type,label)=>`<div class="kb-ref-action">${label}</div><div class="kb-ref-keys"><span class="kb-ref-key">\`</span> then <span class="kb-ref-key kb-hk-capture" data-hk-type="${type}" onclick="startHkCaptureInModal(this,'${type}')" title="Click to change">${esc(hk[type])}</span></div>`;
     h+=hkBtn('dialogue','Activate Dialogue');
     h+=hkBtn('action','Activate Stage Direction');
@@ -4721,9 +4748,9 @@ function openKBRef(){
     h+=row('Save edit',k('Enter'));
     h+=row('Cancel edit',k('Esc'));
     h+=row('Tab through dialogue fields',k('Tab'));
+    h+=`</div></div>`;
   }
 
-  h+=`</div>`;
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
   openGenericModal(h);
 }
