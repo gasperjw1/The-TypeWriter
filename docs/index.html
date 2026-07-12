@@ -429,6 +429,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
 /* ── Print styles ── */
 @media (display-mode:standalone){.store-badges{display:none !important;}.view-print-btn{display:none !important;}}
+.is-app .store-badges{display:none !important;}
+.is-app .view-print-btn{display:none !important;}
 @media print{
   body{background:#fff !important;color:#000 !important;}
   #top-bar,#input-bar,#right-panel-wrap,#mob-panel-backdrop,#mob-fdd-backdrop,.outline-toolbar,#save-nudge{display:none !important;}
@@ -963,6 +965,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var ua=navigator.userAgent||'';
+  var cookie=document.cookie||'';
+  if(ua.indexOf('PWAShell')>-1||cookie.indexOf('app-platform=')>-1||navigator.standalone===true){
+    document.documentElement.classList.add('is-app');
+  }
+})();
+</script>
 <main id="root">
 <div id="topbar">
   <div id="tb-left">
