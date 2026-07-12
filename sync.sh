@@ -17,9 +17,10 @@ sed -i '' 's|href="docs/manifest.json"|href="manifest.json"|;s|href="docs/icon-1
 sed -i '' "s|register('docs/sw.js'|register('sw.js'|" docs/index.html 2>/dev/null \
   || sed -i "s|register('docs/sw.js'|register('sw.js'|" docs/index.html
 
-# Rewrite vendored JS paths (vendor/ is a sibling of index.html inside docs/)
-sed -i '' 's|src="docs/vendor/|src="vendor/|g' docs/index.html 2>/dev/null \
-  || sed -i 's|src="docs/vendor/|src="vendor/|g' docs/index.html
+# Rewrite vendored paths — catches both HTML src attributes and JS strings
+# (e.g. loadJSZip sets s.src='docs/vendor/jszip.min.js' which needs the same rewrite)
+sed -i '' 's|docs/vendor/|vendor/|g' docs/index.html 2>/dev/null \
+  || sed -i 's|docs/vendor/|vendor/|g' docs/index.html
 
 # Rewrite badge paths (badges/ is a sibling of index.html inside docs/)
 sed -i '' 's|src="docs/badges/|src="badges/|g' docs/index.html 2>/dev/null \
