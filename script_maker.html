@@ -897,7 +897,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #mob-panel-btn:active{background:var(--bg3);}
 
   /* ── Input bar ── */
-  #input-bar{padding:8px 10px 10px;}
+  #input-bar{padding:8px 10px calc(10px + env(safe-area-inset-bottom));}
   #type-pills{flex-wrap:wrap;gap:5px;margin-bottom:6px;}
   .tpill{padding:5px 11px;font-size:11px;}
   .pill-tip{display:none!important;}
@@ -3650,8 +3650,7 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
   /* Title page */
   html+=`<div class="title-page">
 <div class="tp-title">${esc2(title)}</div>
-<div class="tp-by">by</div>
-<div class="tp-author">${esc2(S.author||'[Author]')}</div>
+${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}</div>`:''}
 </div>`;
 
   /* Characters page */
@@ -4684,6 +4683,8 @@ function openKBRef(){
   const mod=navigator.platform.indexOf('Mac')>-1?'Cmd':'Ctrl';
   const k=(label)=>`<span class="kb-ref-key">${label}</span>`;
   const row=(action,desc)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys">${desc}</div>`;
+  // brow: wrapping left-aligned cell for the Buttons & Gestures tab
+  const brow=(action,desc)=>`<div class="kb-ref-action">${action}</div><div class="kb-ref-keys" style="white-space:normal;text-align:left;color:var(--tx2);">${desc}</div>`;
   const sec=(title)=>`<div class="kb-ref-section">${title}</div>`;
   const hk=typeof pillHotkeys!=='undefined'?pillHotkeys:{dialogue:'1',action:'2',direction:'3'};
   const tabBtn=(id,label,active)=>`<button id="kbtab-${id}" onclick="kbrefTab('${id}')" style="padding:8px 16px;font-size:12px;cursor:pointer;font-family:var(--sans);background:transparent;border:none;border-bottom:2px solid ${active?'var(--tx1)':'transparent'};color:${active?'var(--tx1)':'var(--tx3)'};font-weight:${active?500:400};">${label}</button>`;
@@ -4697,32 +4698,32 @@ function openKBRef(){
   h+=`</div>`;
 
   // ── Tab 1: Buttons & Gestures ──
-  h+=`<div id="kbref-ui"><div class="kb-ref-grid">`;
+  h+=`<div id="kbref-ui"><div class="kb-ref-grid" style="grid-template-columns:auto 1fr;">`;
 
   h+=sec('Top bar');
-  h+=row('☰ &nbsp;File menu','Save, open, and export your script');
-  h+=row('⌕ &nbsp;Find','Open the Find &amp; Replace bar');
-  h+=row('↩ &nbsp;Undo','Reverse the last change');
-  h+=row('↪ &nbsp;Redo','Re-apply a reversed change');
-  h+=row('📝 &nbsp;Notes','Show or hide notes attached to lines');
-  h+=row('? &nbsp;Help','Open this panel');
+  h+=brow('☰ &nbsp;File menu','Save, open, and export your script');
+  h+=brow('⌕ &nbsp;Find','Open the Find &amp; Replace bar');
+  h+=brow('↩ &nbsp;Undo','Reverse the last change');
+  h+=brow('↪ &nbsp;Redo','Re-apply a reversed change');
+  h+=brow('📝 &nbsp;Notes','Show or hide notes attached to lines');
+  h+=brow('? &nbsp;Help','Open this panel');
 
   h+=sec('Writing');
-  h+=row('Dialogue · Stage Dir. · Cue','Pick a line type pill, fill in the fields');
-  h+=row('Add button','Submit the line and add it to the script'+(isMob?'':` &nbsp;<em>(or press ${k('Enter')})</em>`));
+  h+=brow('Dialogue · Stage Dir. · Cue','Pick a line type pill, fill in the fields');
+  h+=brow('Add button','Submit the line and add it to the script'+(isMob?'':` &nbsp;<em>(or press ${k('Enter')})</em>`));
 
   h+=sec('Lines');
-  h+=row(isMob?'Tap a line':'Click a line','Select it — Edit, Delete, and 🗒 Note buttons appear');
-  h+=row('Edit button','Edit the line inline');
-  h+=row('Delete button','Remove the line (asks to confirm)');
-  h+=row('🗒 button','Attach a note or comment to the line');
-  h+=row('⠿ &nbsp;Grip handle','The six-dot icon on the left of each line. '+
+  h+=brow(isMob?'Tap a line':'Click a line','Select it — Edit, Delete, and 🗒 Note buttons appear');
+  h+=brow('Edit button','Edit the line inline');
+  h+=brow('Delete button','Remove the line (asks to confirm)');
+  h+=brow('🗒 button','Attach a note or comment to the line');
+  h+=brow('⠿ &nbsp;Grip handle','The six-dot icon on the left of each line. '+
     (isMob?'Hold it and drag to reorder the line.':'Drag it to reorder the line.'));
 
   h+=sec('Acts &amp; Scenes');
-  h+=row('Edit button on header','Rename or change the setting');
-  h+=row('⠿ &nbsp;Grip on header',(isMob?'Hold and drag':'Drag')+' to reorder the act or scene');
-  h+=row('Table of contents','Tap a scene in the side panel to jump to it');
+  h+=brow('Edit button on header','Rename or change the setting');
+  h+=brow('⠿ &nbsp;Grip on header',(isMob?'Hold and drag':'Drag')+' to reorder the act or scene');
+  h+=brow('Table of contents','Tap a scene in the side panel to jump to it');
 
   h+=`</div></div>`;
 
@@ -4753,6 +4754,8 @@ function openKBRef(){
 
   h+=`<div style="text-align:right;margin-top:14px;"><button onclick="closeGenericModal()" style="font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">Close</button></div>`;
   openGenericModal(h);
+  const gm=document.getElementById('generic-modal');
+  if(gm)gm.style.maxWidth=isMob?'95vw':'600px';
 }
 function resetHotkeys(){pillHotkeys={dialogue:'1',action:'2',direction:'3'};updatePillLabels();lsSaveSettings();}
 function startHkCaptureInModal(el,type){
