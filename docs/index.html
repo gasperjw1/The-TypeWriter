@@ -821,7 +821,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   /* Tabs: hidden by default, shown as a full-width row when toggled */
   #tb-tabs{display:none;width:100%;border-left:none;border-top:1px solid var(--bd3);order:10;overflow-x:auto;-webkit-overflow-scrolling:touch;}
   #tb-tabs.mob-open{display:flex;}
-  .tab{padding:0 12px;height:40px;font-size:12px;flex-shrink:0;}
+  .tab{padding:0 8px;height:40px;font-size:11px;flex-shrink:0;}
 
   /* Undo/Redo: icon-only on mobile */
   #tb-right{padding:0 6px;gap:4px;border-left:1px solid var(--bd3);}
@@ -1021,12 +1021,12 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   </div>
   <div id="tb-right">
     <span id="rev-chip" style="display:none;align-items:center;gap:4px;padding:2px 8px;border:1px solid var(--bd2);border-radius:12px;font-size:11px;color:var(--tx2);cursor:pointer;margin-right:4px;" onclick="openRevisionHistory()" title="View revision history"><span class="rev-chip-dot" style="width:8px;height:8px;border-radius:50%;"></span><span class="rev-chip-label"></span></span>
-    <button class="tb-btn" id="rev-toggle" style="display:none;font-size:11px;padding:2px 6px;" onclick="toggleRevMarks()" title="Toggle revision marks — shows colored borders and ✱ indicators on lines changed since the last revision snapshot">✱</button>
-    <button class="tb-btn" id="notes-toggle" style="font-size:12px;padding:2px 6px;" onclick="toggleShowNotes()" title="Toggle notes visibility">📝</button>
-    <button class="tb-btn" id="find-tb-btn" onclick="openFindBar()" title="Find & Replace" style="font-size:14px;">⌕</button>
+    <button class="tb-btn" id="rev-toggle" style="display:none;" onclick="toggleRevMarks()" title="Toggle revision marks">✱</button>
+    <button class="tb-btn" id="notes-toggle" onclick="toggleShowNotes()" title="Toggle notes visibility">📝</button>
+    <button class="tb-btn" id="find-tb-btn" onclick="openFindBar()" title="Find & Replace">⌕</button>
     <button class="tb-btn" id="undo-btn" disabled onclick="doUndo()">↩<span class="tb-btn-label"> Undo</span></button>
     <button class="tb-btn" id="redo-btn" disabled onclick="doRedo()">↪<span class="tb-btn-label"> Redo</span></button>
-    <button class="tb-btn" onclick="openKBRef()" title="Help" style="font-size:13px;margin-left:2px;">?</button>
+    <button class="tb-btn" onclick="openKBRef()" title="Help">?</button>
   </div>
   <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">&#9776;</button>
 </div>
@@ -1399,6 +1399,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </div>
 
 <div id="mlayer"><div class="mbox" id="mbox"><div id="mcontent"></div></div></div>
+<!-- Backdrops inside #root so z-indices work correctly when #root is position:fixed -->
+<div id="mob-panel-backdrop" onclick="closeMobilePanel()"></div>
+<div id="mob-fdd-backdrop" onclick="toggleFileDd()"></div>
 </main>
 
 <script>
@@ -5126,10 +5129,6 @@ document.querySelectorAll('#file-dd .fdd-item').forEach(item=>{
   });
 })();
 </script>
-
-<!-- Mobile-only elements (hidden on desktop via CSS) -->
-<div id="mob-panel-backdrop" onclick="closeMobilePanel()"></div>
-<div id="mob-fdd-backdrop" onclick="toggleFileDd()"></div>
 
 <script>
 if('serviceWorker' in navigator){
