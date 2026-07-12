@@ -428,7 +428,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 @media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
 
 /* ── Print styles ── */
-@media (display-mode:standalone){.store-badges{display:none !important;}}
+@media (display-mode:standalone){.store-badges{display:none !important;}.view-print-btn{display:none !important;}}
 @media print{
   body{background:#fff !important;color:#000 !important;}
   #top-bar,#input-bar,#right-panel-wrap,#mob-panel-backdrop,#mob-fdd-backdrop,.outline-toolbar,#save-nudge{display:none !important;}
@@ -959,6 +959,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
     height:3px;background:var(--accent);border-radius:2px;
     margin:0 8px;pointer-events:none;transition:opacity .1s;
   }
+
+  /* Prevent iOS auto-zoom when focusing inputs smaller than 16px */
+  input, textarea, select { font-size: 16px !important; }
 
 }
 
