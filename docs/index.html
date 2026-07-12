@@ -946,7 +946,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 
   /* ── Touch drag-and-drop ── */
   .drag-handle{padding:8px 6px;cursor:grab;touch-action:none;}
-  .line-drag-handle{display:inline-block;position:absolute;left:0;top:50%;transform:translateY(-50%);padding:8px 4px;font-size:11px;}
+  .line-drag-handle{display:inline-block;position:absolute;left:0;top:50%;transform:translateY(-50%);padding:8px 4px;font-size:13px;color:var(--tx2);opacity:1;}
   .line-item{position:relative;padding-left:22px!important;}
   .touch-drag-ghost{
     position:fixed;pointer-events:none;z-index:900;
@@ -3079,7 +3079,7 @@ function outlineTouchStart(e){
   const touch=e.touches[0];
   const startX=touch.clientX,startY=touch.clientY;
   let holdTimer=null,moved=false;
-  function onMove(ev){const t=ev.touches[0];if(Math.abs(t.clientX-startX)>15||Math.abs(t.clientY-startY)>15){moved=true;clearTimeout(holdTimer);cleanup();}}
+  function onMove(ev){const t=ev.touches[0];if(Math.abs(t.clientX-startX)>8||Math.abs(t.clientY-startY)>8){moved=true;clearTimeout(holdTimer);cleanup();}}
   function cleanup(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onEnd);document.removeEventListener('touchcancel',onEnd);}
   function onEnd(){clearTimeout(holdTimer);cleanup();}
   document.addEventListener('touchmove',onMove,{passive:true});
