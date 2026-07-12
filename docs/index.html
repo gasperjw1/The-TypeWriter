@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta name="referrer" content="strict-origin-when-cross-origin"/>
 <title>The Scriptwriter — Free Stage Play Editor</title>
 <meta name="description" content="A free, open-source stage play editor. Saves to real files on your computer — no cloud, no accounts. Install as a desktop app for offline writing."/>
@@ -81,11 +81,11 @@
   --panel-border:1px solid rgba(255,255,255,0.18);
   --pill-active-bg:#f0ede8;--pill-active-fg:#1a1a18;
 }
-body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);}
+body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);overflow-x:hidden;}
 #root{display:flex;flex-direction:column;height:100vh;min-height:680px;background:var(--bg1);}
 
 /* ── Topbar ── */
-#topbar{display:flex;align-items:center;border-bottom:var(--panel-border);flex-shrink:0;min-height:44px;}
+#topbar{display:flex;align-items:center;border-bottom:var(--panel-border);flex-shrink:0;min-height:44px;padding-top:env(safe-area-inset-top);}
 #tb-left{display:flex;align-items:center;gap:8px;padding:0 14px;flex:1;min-width:0;overflow:hidden;}
 #script-title-text{font-size:13px;font-weight:500;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;cursor:pointer;border-radius:4px;padding:2px 6px;margin:-2px -6px;transition:background .15s;}
 #script-title-text:hover{background:var(--bg3);}
@@ -487,7 +487,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .theme-btn.active{border-color:var(--bd1);background:var(--bg1);color:var(--tx1);font-weight:500;}
 
 /* ── INPUT BAR ── */
-#input-bar{flex-shrink:0;border-top:var(--panel-border);padding:8px 12px 10px;background:var(--bg1);}
+#input-bar{flex-shrink:0;border-top:var(--panel-border);padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:var(--bg1);}
 #type-alert{font-size:12px;color:#A32D2D;background:#FCEBEB;border:1px solid #F09595;border-radius:var(--rm);padding:6px 12px;margin-bottom:7px;display:none;}
 #type-pills{display:flex;gap:5px;margin-bottom:6px;align-items:center;}
 
