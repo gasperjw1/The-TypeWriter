@@ -88,6 +88,14 @@ a:hover{text-decoration:underline;}
   .features{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));}
 }
 
+/* Responsive utility classes */
+.mobile-only{display:none;}
+/* keyboard-only sections are visible by default; hidden on touch screens */
+@media(hover:none)and(pointer:coarse){
+  .keyboard-only{display:none;}
+  .mobile-only{display:block;}
+}
+
 /* Mobile — single column, TOC becomes a collapsible top section */
 @media(max-width:720px){
   .page{padding:24px 16px 60px;}
@@ -141,6 +149,19 @@ a:hover{text-decoration:underline;}
 <div class="section" id="writing">
   <h2>Writing</h2>
 
+  <div class="feature mobile-only" style="border-color:var(--accent);background:var(--bg2);">
+    <h3>Using on mobile / touch</h3>
+    <ul>
+      <li><strong>Tap</strong> any line to set the insert point (new lines go after it)</li>
+      <li><strong>Double-tap</strong> a line to edit it in place</li>
+      <li><strong>Hold &amp; drag</strong> the ≡ handle to reorder lines, scenes, or acts</li>
+      <li><strong>File options</strong> — tap the tab in <strong>☰</strong> to open a slide-out panel</li>
+      <li><strong>Stats &amp; Notes</strong> — tap the tab in <strong>☰</strong> to open the side panel</li>
+      <li><strong>Find</strong> — tap the ⌕ button in the top bar</li>
+      <li>Keyboard shortcuts (<code>` 1/2/3</code>, <code>Ctrl+F</code>, <code>Esc</code> nav mode) require a physical keyboard</li>
+    </ul>
+  </div>
+
   <div class="feature">
     <h3>Two input modes <span class="badge">Choose at setup</span></h3>
     <p>When you create a new script, you choose between two ways to write:</p>
@@ -175,7 +196,7 @@ a:hover{text-decoration:underline;}
     <p style="margin-top:8px;">The 1/2/3 keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
   </div>
 
-  <div class="feature">
+  <div class="feature keyboard-only">
     <h3>Navigation mode <span class="badge">Keyboard</span></h3>
     <p>Press <span class="key">Esc</span> from the input bar to enter <strong>navigation mode</strong> — the input blurs and arrow keys take over:</p>
     <ul>
@@ -201,7 +222,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Insert cursor</h3>
-    <p>By default, new lines are added to the end of the current scene. To insert a line in the middle, <strong>click any existing line</strong> — it'll be highlighted and new lines will be inserted after it. You can also use <span class="key">Esc</span> to enter navigation mode and move the cursor with <span class="key">↑</span>/<span class="key">↓</span>, then press <span class="key">Tab</span> to return to writing after the selected line. Click an empty area of the script (or press <span class="key">Esc</span> in nav mode) to deselect and go back to appending at the end.</p>
+    <p>By default, new lines are added to the end of the current scene. To insert a line in the middle, <strong>tap (or click) any existing line</strong> — it'll be highlighted and new lines will be inserted after it. On desktop, you can also press <span class="key">Esc</span> to enter navigation mode and move with <span class="key">↑</span>/<span class="key">↓</span>, then <span class="key">Tab</span> to return to writing. Tap an empty area of the script to deselect.</p>
   </div>
 
   <div class="feature">
@@ -244,14 +265,14 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Inline editing</h3>
-    <p><strong>Double-click</strong> any line to edit it in place, or click the <strong>Edit</strong> button that appears on hover. You can also navigate to a line with <span class="key">↑</span>/<span class="key">↓</span> (after pressing <span class="key">Esc</span> to enter navigation mode) and press <span class="key">Enter</span> to open it for editing — no mouse required.</p>
-    <p style="margin-top:6px;">For Stage Direction lines you get a simple text area. For Dialogue, the character dropdown, parenthetical field, and text. For Cue lines, the full cue editor modal opens. Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Clicking away auto-saves.</p>
+    <p><strong>Double-tap (or double-click)</strong> any line to edit it in place, or tap the <strong>Edit</strong> button that appears when a line is selected. On desktop you can also navigate with <span class="key">↑</span>/<span class="key">↓</span> and press <span class="key">Enter</span> to open.</p>
+    <p style="margin-top:6px;">For Stage Direction lines you get a text area. For Dialogue, the character dropdown, parenthetical, and text. For Cue lines, the full cue editor opens. Press <span class="key">Enter</span> to save or <span class="key">Esc</span> to cancel. Tapping away auto-saves.</p>
   </div>
 
   <div class="feature">
-    <h3>Find &amp; Replace <span class="badge">Ctrl+F</span></h3>
-    <p>Press <span class="key">Ctrl</span>+<span class="key">F</span> to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Cue, Dialogue, Stage Dir.) to limit which line types are searched.</p>
-    <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong> (or <span class="key">Enter</span>/<span class="key">Shift+Enter</span>). Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and parentheticals, not the character name.</p>
+    <h3>Find &amp; Replace <span class="badge">⌕ button · Ctrl+F</span></h3>
+    <p>Tap the <strong>⌕</strong> button in the top bar (or press <span class="key">Ctrl</span>+<span class="key">F</span> on desktop) to open the find bar. Type a query to highlight matches across the entire script. Use the <strong>filter chips</strong> (Cue, Dialogue, Stage Dir.) to limit which line types are searched.</p>
+    <p style="margin-top:6px;">Navigate matches with <strong>Prev/Next</strong>. Replace individually or use <strong>Replace All</strong>. Dialogue search covers the spoken text and parentheticals, not the character name.</p>
   </div>
 
   <div class="feature">

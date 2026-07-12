@@ -803,10 +803,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .hk-reset{font-size:11px;padding:3px 8px;border:1px solid var(--bd3);border-radius:var(--rm);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);}
 .hk-reset:hover{background:var(--bg2);color:var(--tx1);}
 
+/* Responsive utility — flip visibility between mobile and desktop */
+.mobile-only{display:none!important;}
+
 /* ══════════════════════════════════════════════════════════
    MOBILE / RESPONSIVE  (max-width: 768px)
    ══════════════════════════════════════════════════════════ */
 @media(max-width:768px){
+  .desktop-only{display:none!important;}
+  .mobile-only{display:block!important;}
 
   /* ── Root ── */
   /* overflow:hidden on html/body prevents iOS from page-scrolling when the
@@ -834,8 +839,9 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   .tb-btn{padding:6px 10px;font-size:14px;}
   .tb-btn-label{display:none;}
 
-  /* File dropdown: fixed full-width bottom sheet on mobile */
-  #file-dd{position:fixed;top:auto;bottom:0;left:0;right:0;min-width:unset;border-radius:var(--rl) var(--rl) 0 0;z-index:810;box-shadow:0 -4px 20px rgba(0,0,0,.25);max-height:60vh;overflow-y:auto;}
+  /* File options: left-side slide panel on mobile (mirrors Stats & Notes from the right) */
+  #file-dd{display:block;position:fixed;top:0;left:0;bottom:0;right:auto;width:min(280px,85vw);min-width:unset;border-radius:0;border-right:var(--panel-border);z-index:810;box-shadow:4px 0 20px rgba(0,0,0,.25);max-height:none;overflow-y:auto;transform:translateX(-100%);transition:transform .2s ease;}
+  #file-dd.open{transform:translateX(0);}
   .fdd-item{padding:14px 18px;font-size:15px;}
   .fdd-key{display:none;}
   #mob-fdd-backdrop{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.35);z-index:805;}
@@ -1111,7 +1117,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.38 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.39 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
           <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="docs/badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
           <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="docs/badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
@@ -1277,14 +1283,24 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         </div>
       </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
-      <div class="setting-row">
+      <div class="setting-row desktop-only">
         <div class="setting-label">Keyboard shortcuts</div>
         <div class="setting-desc">Full reference for all keyboard shortcuts, including navigation mode (<span style="font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 4px;">Esc</span> to enter, <span style="font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 4px;">↑↓</span> to move, <span style="font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 4px;">Enter</span> to edit, <span style="font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 4px;">Tab</span> to write).</div>
         <button onclick="openKBRef()" style="margin-top:8px;font-size:12px;padding:5px 14px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx2);cursor:pointer;font-family:var(--sans);">View shortcuts</button>
       </div>
+      <div class="setting-row mobile-only">
+        <div class="setting-label">Touch controls</div>
+        <div class="setting-desc" style="line-height:1.8;">
+          <strong>Tap</strong> a line to set the insert point — new lines go after it.<br>
+          <strong>Double-tap</strong> a line to edit it in place.<br>
+          <strong>Hold &amp; drag</strong> the ≡ handle to reorder lines, scenes, or acts.<br>
+          <strong>File options</strong> — tap the tab to open a slide-out panel from the left.<br>
+          <strong>Stats &amp; Notes</strong> — tap the tab in the <span style="font-family:'Courier New',monospace;font-size:11px;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:1px 4px;">☰</span> menu.
+        </div>
+      </div>
       <div class="setting-row">
         <div class="setting-label">Feature guide</div>
-        <div class="setting-desc">Covers pill shortcuts, cues, inline editing, find &amp; replace, saving, drag-and-drop, and more.</div>
+        <div class="setting-desc">Covers input modes, cues, inline editing, find &amp; replace, saving, drag-and-drop, and more. Includes mobile tips.</div>
         <a href="docs/guide.html" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">Open feature guide →</a>
       </div>
       <div class="setting-row" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--bd3);">
@@ -1293,7 +1309,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.38 · July 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.39 · July 2026</div>
       </div>
     </div>
 
@@ -1748,8 +1764,12 @@ function switchTab(t){
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='320px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
 
 function toggleFileDd(){
-  $('file-dd').classList.toggle('open');
-  const bd=$('mob-fdd-backdrop');if(bd&&window.innerWidth<=768)bd.classList.toggle('open',$('file-dd').classList.contains('open'));
+  const isOpen=$('file-dd').classList.toggle('open');
+  const bd=$('mob-fdd-backdrop');
+  if(bd&&window.innerWidth<=768){
+    bd.classList.toggle('open',isOpen);
+    if(isOpen)$('tb-tabs').classList.remove('mob-open');
+  }
 }
 function closeFDD(){$('file-dd').classList.remove('open');const bd=$('mob-fdd-backdrop');if(bd)bd.classList.remove('open');}
 function resetEditorState(){undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};$('undo-btn').disabled=true;$('redo-btn').disabled=true;}
