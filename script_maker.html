@@ -809,7 +809,11 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 @media(max-width:768px){
 
   /* ── Root ── */
-  #root{min-height:unset;height:100dvh;position:fixed;top:0;left:0;width:100%;}
+  /* overflow:hidden on html/body prevents iOS from page-scrolling when the
+     keyboard appears, without putting #root in position:fixed (which creates
+     a stacking context that breaks the file-dropdown z-index on WKWebView). */
+  html,body{overflow:hidden;height:100%;}
+  #root{min-height:unset;height:100dvh;}
 
   /* ── Topbar ── */
   #topbar{flex-wrap:wrap;min-height:unset;}
@@ -5114,7 +5118,7 @@ document.querySelectorAll('#file-dd .fdd-item').forEach(item=>{
   if(window.visualViewport){
     function onVVResize(){
       root.style.height=window.visualViewport.height+'px';
-      /* Counteract iOS auto-scroll that misaligns position:fixed #root */
+      /* Belt-and-suspenders: keep page scroll at 0 on iOS */
       window.scrollTo(0,0);
       /* After the viewport settles, scroll the focused element into view */
       const el=document.activeElement;
