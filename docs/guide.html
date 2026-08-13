@@ -247,6 +247,12 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
+    <h3>Multi-character (unison) dialogue <span class="badge">New</span></h3>
+    <p>Up to two characters can share a single dialogue line — for unison speech, call-and-response, or lines delivered together. After choosing the first character, click the <strong>+</strong> button next to the character field to add a second.</p>
+    <p style="margin-top:6px;">The line displays as <strong>ALICE &amp; BOB</strong> above the shared text. In Fountain export, the second character gets the <code>CHARACTER ^</code> dual-dialogue marker. In Final Draft (FDX) export, the line is wrapped in a <code>&lt;DualDialogue&gt;</code> block — both formats round-trip correctly on import.</p>
+  </div>
+
+  <div class="feature">
     <h3>Auto-formatting</h3>
     <p>Enable in <strong>Settings → Auto-formatting</strong>. When toggled on, formatting conventions are applied automatically as you submit lines. Four options can be individually toggled:</p>
     <ul>
@@ -416,7 +422,13 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>PDF + metadata export</h3>
-    <p><strong>File → Export PDF + metadata</strong> creates a single ZIP containing both the print-ready script (as an HTML file you can print or save as PDF) and the metadata folder with the raw JSON. One download, both the shareable output and the editable source.</p>
+    <p><strong>File → Export PDF + metadata</strong> opens a modal where you choose what to include, then downloads a ZIP with the print-ready script and the raw JSON metadata. Options in the modal:</p>
+    <ul>
+      <li><strong>Copyright page</strong> — included when you have copyright text set (edit in Settings → Production)</li>
+      <li><strong>Production notes</strong> — included when you have notes set</li>
+      <li><strong>Attachments</strong> — attach any files (design mockups, cast lists, director notes) to an <code>attachments/</code> folder inside the ZIP</li>
+    </ul>
+    <p style="margin-top:6px;">The regular <strong>File → Export PDF</strong> also auto-includes the copyright and production notes pages when those fields are filled in — no modal needed.</p>
   </div>
 
   <div class="feature">
@@ -525,6 +537,16 @@ a:hover{text-decoration:underline;}
   <div class="feature">
     <h3>Print from View tab</h3>
     <p>The View tab includes a <strong>Print</strong> button (also works with <span class="key">Ctrl</span>+<span class="key">P</span>). All editor chrome is hidden — you get a clean black-on-white formatted script ready for paper.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Production notes &amp; copyright <span class="badge">New</span></h3>
+    <p>Under <strong>Settings → Production</strong>, two text areas let you write content for optional PDF pages:</p>
+    <ul>
+      <li><strong>Production notes</strong> — freetext for the director and crew. Appears as a page just before the script body.</li>
+      <li><strong>Copyright text</strong> — your rights statement. Appears between the title page and the character list. Click <strong>Reset to default</strong> to auto-fill standard boilerplate using your author name and the current year — then edit it to match your situation.</li>
+    </ul>
+    <p style="margin-top:6px;">Both pages are included in PDF export automatically when the fields are non-empty, and can be toggled individually in the <strong>Export PDF + metadata</strong> modal.</p>
   </div>
 </div>
 
