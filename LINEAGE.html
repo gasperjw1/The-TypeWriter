@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Scriptwriter — Feature Lineage Reference</title>
+<style>
+:root {
+  --ink: #1A1714;
+  --paper: #F4F0E8;
+  --amber: #AA7900;
+  --fog: #847C6E;
+  --surface: #EDE8DE;
+  --border: #CFC8B4;
+  --code-bg: #E4DED0;
+  --code-text: #1A1714;
+  --sidebar-w: 215px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #EAE4D8; --paper: #181512; --amber: #C49010;
+    --fog: #8A8276; --surface: #221F1A; --border: #332E27;
+    --code-bg: #272320; --code-text: #D8D2C4;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #EAE4D8; --paper: #181512; --amber: #C49010;
+  --fog: #8A8276; --surface: #221F1A; --border: #332E27;
+  --code-bg: #272320; --code-text: #D8D2C4;
+}
+:root[data-theme="light"] {
+  --ink: #1A1714; --paper: #F4F0E8; --amber: #AA7900;
+  --fog: #847C6E; --surface: #EDE8DE; --border: #CFC8B4;
+  --code-bg: #E4DED0; --code-text: #1A1714;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  scrollbar-width: thin;
+}
+.sidebar-brand {
+  padding: 18px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.sidebar-brand span {
+  display: block;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--fog);
+  font-size: 10.5px;
+  margin-top: 2px;
+}
+.sidebar nav { padding: 6px 0 20px; }
+.nav-group {
+  padding: 12px 16px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fog);
+}
+.sidebar a {
+  display: block;
+  padding: 4px 16px;
+  font-size: 12.5px;
+  color: var(--fog);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  line-height: 1.4;
+  transition: color 0.12s;
+}
+.sidebar a:hover { color: var(--ink); }
+.sidebar a.active { color: var(--amber); border-left-color: var(--amber); }
+
+.content {
+  max-width: 880px;
+  padding: 44px 44px 80px;
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  padding-top: 52px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  text-wrap: balance;
+  scroll-margin-top: 20px;
+}
+h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 28px 0 10px;
+}
+h4 {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fog);
+  margin: 22px 0 8px;
+}
+p { margin: 0 0 12px; max-width: 66ch; }
+
+.page-header {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+.subtitle {
+  font-size: 13px;
+  color: var(--fog);
+  max-width: 58ch;
+  margin: 6px 0 0;
+  line-height: 1.6;
+}
+
+code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 14px 18px;
+  overflow-x: auto;
+  margin: 10px 0 18px;
+  border-left: 2px solid var(--amber);
+}
+pre code { background: none; padding: 0; font-size: 12px; }
+
+.tw { overflow-x: auto; margin: 0 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th {
+  text-align: left;
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fog);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: var(--surface); }
+td code { font-size: 11.5px; }
+
+.note {
+  background: var(--surface);
+  border-left: 3px solid var(--amber);
+  padding: 10px 14px;
+  margin: 0 0 18px;
+  font-size: 13px;
+}
+.note strong { color: var(--amber); }
+
+.b { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+.b-a { background: rgba(170,121,0,0.13); color: var(--amber); }
+.b-w { background: rgba(180,50,0,0.12); color: #B03500; }
+.b-x { background: rgba(120,120,120,0.12); color: var(--fog); }
+
+.chain {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 10px 0 18px;
+  font-size: 12px;
+  font-family: "Courier New", Courier, monospace;
+}
+.cs {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.ca { color: var(--amber); padding: 0 7px; font-size: 10px; }
+
+.cl { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-direction: column; gap: 5px; }
+.cl li { display: flex; gap: 10px; align-items: baseline; font-size: 13px; }
+.cm { flex-shrink: 0; font-family: "Courier New", monospace; color: var(--amber); font-size: 11px; width: 18px; }
+
+ul { padding-left: 20px; margin: 0 0 14px; }
+ul li { font-size: 13px; margin-bottom: 4px; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 40px 0 0; }
+.meta { font-size: 11px; color: var(--fog); margin-top: 12px; }
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .content { padding: 24px 20px 60px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-brand">The Scriptwriter<span>Feature Lineage Reference</span></div>
+  <nav>
+    <div class="nav-group">Foundation</div>
+    <a href="#s-object">S: Data Model</a>
+    <a href="#load-path">Load Path Contract</a>
+    <a href="#render">Render Pipeline</a>
+
+    <div class="nav-group">High Fanout</div>
+    <a href="#dialogue">Dialogue Line</a>
+    <a href="#characters">Character Registry</a>
+    <a href="#cues">Direction Cues</a>
+
+    <div class="nav-group">Contracts</div>
+    <a href="#undo">Undo / Redo</a>
+    <a href="#persist">Persistence</a>
+    <a href="#exports">Export Formats</a>
+    <a href="#find">Find &amp; Replace</a>
+    <a href="#revisions">Revision Tracking</a>
+
+    <div class="nav-group">Adding Features</div>
+    <a href="#new-type">New Line Type</a>
+    <a href="#new-field">New S Field</a>
+    <a href="#deploy">Deployment</a>
+  </nav>
+</aside>
+
+<main class="content">
+
+<div class="page-header">
+  <div class="eyebrow">Internal Reference — script_maker.html</div>
+  <h1>Feature Lineage Reference</h1>
+  <p class="subtitle">Maps how features and mechanics are interlinked. Goal: understand ripple effects of changing any one thing without re-exploring the codebase from scratch. Update this document at the end of every session when new features or data model changes are introduced.</p>
+</div>
+
+<section>
+<h2 id="s-object">S: The State Object</h2>
+<p><code>S</code> is the single source of truth. No component holds its own state. Every mutation writes to it; every display reads from it.</p>
+
+<pre><code>let S = {
+  // Script metadata
+  title:            string,
+  author:           string,
+  productionNotes:  string,    // Settings textarea; no pushUndo (Session 17)
+  copyrightText:    string,    // Settings textarea; no pushUndo (Session 17)
+
+  // Master character list
+  characters: [{ name, description, archived }],
+
+  // Content tree
+  acts: [{
+    name, description,
+    notes: [],                 // Session 16
+    scenes: [{
+      name, description,
+      setting:     string,     // promoted from line type (Session 13)
+      lockedNum:   string,     // overrides sceneLabel() when set (Session 10)
+      colorLabel:  string,     // outline card color (Session 15/17)
+      status:      string,     // Outline/Draft/Revised/Final (Session 15)
+      notes: [],               // Session 16
+      lines: [{
+        type:           'direction'|'dialogue'|'action'|'bookmark',
+        value:          string,
+        characters:     [{name,description}],  // dialogue only; max 2 (Session 17)
+        dialogueAction: string,                // dialogue parenthetical
+        cues:           {enters:[], exits:[]}, // direction only — string arrays
+        label:          string,                // bookmark only
+        notes:          [],                    // any type (Session 16)
+        colorLabel:     string
+      }]
+    }]
+  }],
+
+  revisions:    [{name, colorIdx, timestamp, snapshot}], // Session 9
+  scenesLocked: boolean,     // Session 10
+  colorLabels:  {}           // label names for color dots (Session 17)
+};</code></pre>
+
+<h3>Display helpers — never expose raw fields</h3>
+<div class="tw"><table>
+  <thead><tr><th>Helper</th><th>Reads</th><th>Used by</th></tr></thead>
+  <tbody>
+    <tr><td><code>actLabel(ai)</code></td><td><code>act.name</code>, index</td><td>Editor headers, TOC, breadcrumb, PDF, filter dropdowns, outline</td></tr>
+    <tr><td><code>sceneLabel(ai,si)</code></td><td><code>scene.lockedNum</code> (preferred) or index + <code>scene.name</code></td><td>Same as above; respects locked numbers</td></tr>
+    <tr><td><code>typeLabel(t)</code></td><td>Line type string</td><td>Pill labels, find chips, color swatches, settings labels</td></tr>
+    <tr><td><code>numWord(n)</code></td><td>Integer 1–20</td><td>Used by <code>actLabel</code> and <code>sceneLabel</code></td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<section>
+<h2 id="load-path">Load Path Contract</h2>
+<p>Every new field added to <code>S</code> must be threaded through all eight locations. Missing one causes silent data loss or default-stomping on load.</p>
+
+<div class="tw"><table>
+  <thead><tr><th>#</th><th>Location</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>let S = {...}</code></td><td>Initial declaration with default value</td></tr>
+    <tr><td>2</td><td><code>stateJSON()</code></td><td>Serialization for localStorage + disk file</td></tr>
+    <tr><td>3</td><td><code>loadFromData(data)</code></td><td>Restore when opening a .json file</td></tr>
+    <tr><td>4</td><td><code>resumeFromLS()</code></td><td>Restore from localStorage on page load</td></tr>
+    <tr><td>5</td><td><code>doNewScript()</code></td><td>Reset when creating a new empty script</td></tr>
+    <tr><td>6</td><td><code>loadSample()</code></td><td>Reset when loading the demo script</td></tr>
+    <tr><td>7</td><td><code>parseFountain()</code></td><td>Reset on Fountain file import</td></tr>
+    <tr><td>8</td><td><code>parseFDX()</code></td><td>Reset on Final Draft .fdx import</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Migration functions</h3>
+<p>Run inside load paths 3–8 to upgrade data from older versions. Call them after <code>S.acts = ...</code>, before the first <code>render()</code>.</p>
+<div class="tw"><table>
+  <thead><tr><th>Function</th><th>Upgrades</th><th>Session</th></tr></thead>
+  <tbody>
+    <tr><td><code>migrateSettingLines()</code></td><td>Promotes first <code>type:'setting'</code> line → <code>scene.setting</code></td><td>13</td></tr>
+    <tr><td><code>migrateCharacterToCharacters()</code></td><td>Renames singular <code>l.character:{}</code> → <code>l.characters:[{}]</code>; caps array at 2</td><td>17</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<section>
+<h2 id="render">Render Pipeline</h2>
+
+<h3>Standard mutation sequence</h3>
+<div class="chain">
+  <span class="cs">pushUndo()</span><span class="ca">→</span>
+  <span class="cs">modify S</span><span class="ca">→</span>
+  <span class="cs">autoSave()</span><span class="ca">→</span>
+  <span class="cs">render()</span>
+</div>
+
+<h3>autoSave() expands to</h3>
+<div class="chain">
+  <span class="cs">lsSaveScript()</span><span class="ca">+</span>
+  <span class="cs">writeToFileHandle()</span><span class="ca">+</span>
+  <span class="cs">updateSaveIndicator()</span><span class="ca">+</span>
+  <span class="cs">computeRevisionChanges()</span>
+</div>
+
+<h3>What render() calls</h3>
+<ul>
+  <li><code>renderScene(ai, si)</code> for each visible scene</li>
+  <li><code>updateDirCues()</code> — only when the direction/cue pill is active</li>
+  <li><code>updateUndoRedoBtns()</code>, <code>updateSaveIndicator()</code></li>
+  <li><code>renderRPNotes()</code>, <code>renderRPBookmarks()</code></li>
+  <li><code>renderStats()</code> — only when the stats panel is open</li>
+</ul>
+
+<h3>What render() does NOT call — triggered by switchTab() instead</h3>
+<ul>
+  <li><code>renderView()</code> — View tab (computed on demand)</li>
+  <li><code>renderOutline()</code> — Outline tab</li>
+  <li><code>syncProductionSettings()</code> — Settings tab; restores textarea values from S</li>
+</ul>
+
+<div class="note"><strong>Decision rule:</strong> If new state must stay live during editing, put its render call inside <code>render()</code>. If it's computed on demand when the user opens a specific tab, put it in <code>switchTab()</code>.</div>
+</section>
+
+<section>
+<h2 id="dialogue">Dialogue Line — Full Fan-out</h2>
+<p>The <code>characters</code> array touches more systems than any other field. This table is exhaustive — consult it before changing any aspect of the dialogue line shape.</p>
+
+<div class="note">
+  <strong>Invariants:</strong> <code>characters</code> is always a non-empty array on dialogue lines (after migration). <code>characters[0]</code> is the "lead" for <code>isCont()</code> and <code>validateMoveLine()</code>. Hard cap: 2 elements (enforced in migration + <code>addExtraChar()</code>). <code>lineFingerprint()</code> sorts names before joining — array order is irrelevant to revision tracking.
+</div>
+
+<div class="tw"><table>
+  <thead><tr><th>System</th><th>Function</th><th>What it reads</th><th>Impact if characters array changes</th></tr></thead>
+  <tbody>
+    <tr><td>Editor display</td><td><code>renderScene()</code></td><td><code>(characters||[]).map(c=&gt;c.name).join(' &amp; ')</code></td><td>Display name above dialogue text</td></tr>
+    <tr><td>View tab</td><td><code>renderView()</code></td><td>same join</td><td>Character heading in View tab</td></tr>
+    <tr><td>PDF export</td><td><code>buildPDFHTML()</code></td><td>same join</td><td>Character heading in PDF pages</td></tr>
+    <tr><td>Inline edit render</td><td><code>renderInlineEditLine()</code></td><td>one <code>&lt;select class="ie-dlg-char"&gt;</code> per <code>characters[i]</code></td><td>Number of character selects shown</td></tr>
+    <tr><td>Inline edit save</td><td><code>saveInlineEdit()</code></td><td>all <code>.ie-dlg-char</code> selects</td><td>What gets written back to the line</td></tr>
+    <tr><td>Cont. detection</td><td><code>isCont()</code></td><td><code>characters[0].name</code></td><td>Whether (cont.) appears; lead char only</td></tr>
+    <tr><td>Archive guard</td><td><code>charHasUsage()</code></td><td><code>characters.some(c=&gt;c.name===name)</code></td><td>Whether archiving the character is blocked</td></tr>
+    <tr><td>Delete / archive</td><td><code>removeCharUsage()</code></td><td><code>characters</code> array length</td><td>Sole char → remove line; 2 chars → remove from array, keep line</td></tr>
+    <tr><td>Rename propagation</td><td><code>saveCharEdit()</code></td><td><code>characters.forEach(c=&gt;...)</code></td><td>Name + description updated in every matching element</td></tr>
+    <tr><td>Auto-format</td><td><code>applyAutoFormat()</code></td><td><code>characters.forEach(ch=&gt;ch.name.toUpperCase())</code></td><td>Case normalization applied to all chars</td></tr>
+    <tr><td>Scene char list</td><td><code>getAllSceneChars()</code></td><td><code>characters.forEach(c=&gt;a.add(c.name))</code></td><td>Filter dropdown population in character panel</td></tr>
+    <tr><td>Outline cards</td><td><code>getSceneCharsList()</code></td><td><code>characters.forEach(c=&gt;names.add(c.name))</code></td><td>Character chips on scene cards</td></tr>
+    <tr><td>Relationship matrix</td><td><code>buildCoAppearanceData()</code></td><td><code>characters.forEach(c=&gt;present.add(c.name))</code></td><td>Co-appearance counts</td></tr>
+    <tr><td>Stats</td><td><code>getCharStats()</code></td><td><code>characters.some(c=&gt;c.name===name)</code></td><td>Line and word counts per character</td></tr>
+    <tr><td>Character panel</td><td><code>renderCharDlgList()</code></td><td><code>characters.some(c=&gt;c.name===name)</code></td><td>Dialogue list in expandable panel</td></tr>
+    <tr><td>Drag validation</td><td><code>validateMoveLine()</code></td><td><code>characters[0].name</code></td><td>Entrance-state check uses lead character only</td></tr>
+    <tr><td>Rehearsal sides</td><td><code>exportRehearsalSides()</code></td><td><code>characters.some(c=&gt;c.name===charName)</code></td><td>5 call sites — both characters see the line</td></tr>
+    <tr><td>Revision tracking</td><td><code>lineFingerprint()</code></td><td><code>characters.map(c=&gt;c.name).sort().join('&amp;')</code></td><td>Sorted — array order doesn't affect change detection</td></tr>
+    <tr><td>Fountain export</td><td><code>buildFountain()</code></td><td><code>characters[0]</code>, <code>characters[1]</code></td><td>Second char gets <code>CHARACTER ^</code> dual-dialogue notation</td></tr>
+    <tr><td>Fountain import</td><td><code>parseFountain()</code></td><td>Detects <code>^</code> suffix on second block</td><td>Two adjacent char blocks → one line with <code>characters:[a,b]</code></td></tr>
+    <tr><td>FDX export</td><td><code>buildFDXText()</code></td><td><code>characters[0]</code>, <code>characters[1]</code></td><td>2 chars → <code>&lt;DualDialogue&gt;</code> wrapper with two full pairs</td></tr>
+    <tr><td>FDX import</td><td><code>parseFDX()</code></td><td><code>DualDialogue</code> element</td><td>Merges into one line: <code>characters:[c1,c2]</code></td></tr>
+    <tr><td>Input bar submit</td><td><code>submitLine()</code></td><td><code>dlg-char-ta</code> + <code>.dlg-extra-char</code> selects</td><td><code>characters:[]</code> array built at submission time</td></tr>
+    <tr><td>New char confirm</td><td><code>confirmNewChar()</code></td><td>Single char object</td><td>Always creates single-element array</td></tr>
+    <tr><td>Auto-detect submit</td><td><code>submitAutoLine()</code></td><td>Single char</td><td>Always creates single-element array</td></tr>
+    <tr><td>Find &amp; Replace</td><td><code>buildFindMatches()</code>, <code>doReplace()</code></td><td><strong>Not affected</strong> — searches <code>value</code>/<code>dialogueAction</code> only</td><td>No changes needed; characters intentionally excluded</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<section>
+<h2 id="characters">Character Registry — Mutation Chains</h2>
+<p><code>S.characters[]</code> is the authoritative registry. Lines store <em>copies</em> of name + description, not references. Mutations to the registry must manually propagate to all lines.</p>
+
+<h3>Character CREATED</h3>
+<pre><code>→ S.characters.push({name, description, archived:false})
+→ autoSave() → render()
+→ direction cue chips refresh (updateDirCues() if pill is active)
+→ character dropdown in input bar regenerates on next render</code></pre>
+
+<h3>Character RENAMED — saveCharEdit()</h3>
+<pre><code>pushUndo()
+
+S.characters[i].name = newName;
+S.characters[i].description = newDesc;
+
+// Propagate to all dialogue lines
+S.acts.forEach(a =&gt; a.scenes.forEach(sc =&gt; sc.lines.forEach(l =&gt; {
+  if (l.characters) l.characters.forEach(c =&gt; {
+    if (c.name === oldName) { c.name = newName; c.description = newDesc; }
+  });
+})));
+
+// Propagate to direction cue arrays (string copies, not references!)
+S.acts.forEach(a =&gt; a.scenes.forEach(sc =&gt; sc.lines.forEach(l =&gt; {
+  if (l.type === 'direction' &amp;&amp; l.cues) {
+    l.cues.enters = l.cues.enters.map(n =&gt; n === oldName ? newName : n);
+    l.cues.exits  = l.cues.exits.map(n  =&gt; n === oldName ? newName : n);
+  }
+})));
+
+autoSave() → render()</code></pre>
+
+<div class="note"><strong>Trap:</strong> Character names in <code>cues.enters[]</code> and <code>cues.exits[]</code> are string copies. A rename must update <em>both</em> <code>S.characters[]</code> AND all cue arrays. Missing the cue update leaves stale names in direction lines.</div>
+
+<h3>Character ARCHIVED</h3>
+<pre><code>charHasUsage(name) check — blocks if any lines reference this character
+
+→ S.characters[i].archived = true
+→ Disappears from input bar autocomplete and direction cue chips
+→ Existing lines REMAIN — archived chars stay in all dialogue lines
+→ pushUndo() → autoSave() → render()</code></pre>
+
+<h3>Character DELETED</h3>
+<pre><code>removeCharUsage(name):  // called first
+  for each dialogue line:
+    if characters.length === 1 → remove entire line
+    if characters.length === 2 → filter from array, keep line
+  for each direction line:
+    l.cues.enters = l.cues.enters.filter(n =&gt; n !== name);
+    l.cues.exits  = l.cues.exits.filter(n  =&gt; n !== name);
+
+S.characters.splice(idx, 1)
+pushUndo() → autoSave() → render()</code></pre>
+</section>
+
+<section>
+<h2 id="cues">Direction Cues — Second Character Registry</h2>
+<p>Direction lines track character names independently as string arrays in <code>cues.enters[]</code> and <code>cues.exits[]</code>. This is a parallel registry — not references to <code>S.characters[]</code>.</p>
+
+<div class="tw"><table>
+  <thead><tr><th>Function</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>getSceneCharsAt(scene, lineIdx)</code></td><td>Replays all enters/exits up to <code>lineIdx</code> to compute who is currently on stage. O(n) per call.</td></tr>
+    <tr><td><code>validateMoveLine(scene, fromIdx, toIdx)</code></td><td>Uses <code>getSceneCharsAt</code> to block drags that create invalid cue sequences.</td></tr>
+    <tr><td><code>updateDirCues()</code></td><td>Refreshes chip UI when the direction pill is active. Called by <code>render()</code> when cue input is open. Grays out chips for chars already on/off stage.</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note"><strong>Invariant:</strong> A character cannot enter if already on stage; cannot exit if not on stage. Any feature that moves dialogue lines must respect this — use <code>validateMoveLine()</code>.</div>
+
+<h3>Export encoding</h3>
+<div class="tw"><table>
+  <thead><tr><th>Format</th><th>Cue encoding</th></tr></thead>
+  <tbody>
+    <tr><td>Fountain</td><td>Cue data as <code>[[ENTER NAME]]</code> / <code>[[EXIT NAME]]</code> within the direction block value</td></tr>
+    <tr><td>FDX</td><td>Direction lines map to <code>&lt;Paragraph Type="Transition"&gt;</code>; cue text embedded in value</td></tr>
+    <tr><td>PDF / View</td><td>Cue data rendered inline as formatted chip-style text</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<section>
+<h2 id="undo">Undo / Redo Contract</h2>
+
+<h3>pushUndo() mechanics</h3>
+<pre><code>1. JSON snapshot of S via stateJSON()
+2. Splice future states from undoStack (if undoCursor &lt; length-1)
+3. Push snapshot; cap at 50 entries
+4. If stack hits 51: shift() oldest entry; set undoCursor = length-2
+5. Update undoCursor</code></pre>
+
+<h3>doUndo() / doRedo()</h3>
+<pre><code>→ Restore S from snapshot at new cursor position
+→ Restore S.revisions unconditionally: p.revisions || []
+→ render()
+→ computeRevisionChanges()</code></pre>
+
+<h3>Stack reset — these 6 paths wipe undo history</h3>
+<ul>
+  <li><code>loadFromData()</code> — opening a file</li>
+  <li><code>resumeFromLS()</code> — restore from browser storage</li>
+  <li><code>loadSample()</code> — demo script</li>
+  <li><code>doNewScript()</code> — new script</li>
+  <li><code>parseFountain()</code> — Fountain import</li>
+  <li><code>parseFDX()</code> — FDX import</li>
+</ul>
+
+<h3>Does NOT call pushUndo() — cannot be undone</h3>
+<ul>
+  <li><code>updateProductionNotes()</code>, <code>updateCopyrightText()</code></li>
+  <li>Title and author edits from the title bar</li>
+  <li>All Settings changes (font, colors, hotkeys, etc.)</li>
+</ul>
+
+<div class="note"><strong>Rule:</strong> Any new mutation that changes <code>S.acts</code> content MUST call <code>pushUndo()</code> first. Forgetting means the change cannot be undone.</div>
+</section>
+
+<section>
+<h2 id="persist">Persistence Contract</h2>
+<p>Two separate localStorage keys with distinct lifecycles. Never mix content into the settings key or vice versa.</p>
+
+<div class="tw"><table>
+  <thead><tr><th>Field</th><th>Key</th><th>Cleared on new script?</th><th>In .json file?</th></tr></thead>
+  <tbody>
+    <tr><td><code>S.acts</code>, <code>S.characters</code>, etc.</td><td><code>tw_script</code></td><td>Yes</td><td>Yes</td></tr>
+    <tr><td><code>S.productionNotes</code>, <code>S.copyrightText</code></td><td><code>tw_script</code></td><td>Yes</td><td>Yes</td></tr>
+    <tr><td><code>S.revisions</code>, <code>S.scenesLocked</code></td><td><code>tw_script</code></td><td>Yes</td><td>Yes</td></tr>
+    <tr><td><code>pillHotkeys</code>, <code>inputMode</code></td><td><code>tw_settings</code></td><td>No</td><td>No</td></tr>
+    <tr><td><code>ltColors</code>, <code>ltEnabled</code></td><td><code>tw_settings</code></td><td>No</td><td>No</td></tr>
+    <tr><td><code>lineAlign</code>, <code>dlgFormat</code>, <code>viewSubMode</code></td><td><code>tw_settings</code></td><td>No</td><td>No</td></tr>
+    <tr><td><code>fontSize</code>, <code>fontFamily</code>, <code>lineSpacing</code></td><td><code>tw_settings</code></td><td>No</td><td>No</td></tr>
+    <tr><td><code>rpCollapsed</code>, <code>rpWidth</code>, <code>autosaveEnabled</code></td><td><code>tw_settings</code></td><td>No</td><td>No</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note"><strong>Decision rule:</strong> Field belongs to the <em>script</em> (content, authorship, production info) → <code>stateJSON()</code> → <code>tw_script</code>. Field belongs to the user's <em>editing preferences</em> → <code>lsSaveSettings()</code> → <code>tw_settings</code>.</div>
+
+<h3>File System Access API + IndexedDB</h3>
+<p>When a user links a disk file, <code>fileHandle</code> is stored in IndexedDB via <code>fhIdbSet()</code> and restored on load via <code>fhIdbGet()</code>. <code>autoSave()</code> calls <code>writeToFileHandle()</code> to overwrite. <code>doNewScript()</code> resets via <code>setFileHandle(null)</code> to prevent overwriting the old file with empty data.</p>
+</section>
+
+<section>
+<h2 id="exports">Export Format Contracts</h2>
+
+<div class="tw"><table>
+  <thead><tr><th>Line type</th><th>Fountain</th><th>FDX</th><th>PDF</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>direction</code> (Cue)</td>
+      <td>Transition or <code>&gt;</code> forced prefix; cues as <code>[[ENTER X]]</code></td>
+      <td><code>Transition</code> paragraph</td>
+      <td>Stage direction style</td>
+    </tr>
+    <tr>
+      <td><code>dialogue</code> — 1 char</td>
+      <td><code>CHARACTER</code> (uppercase) + parenthetical + text</td>
+      <td><code>Character</code> + <code>Dialogue</code> paragraphs</td>
+      <td>Character heading + body</td>
+    </tr>
+    <tr>
+      <td><code>dialogue</code> — 2 chars</td>
+      <td>First: <code>CHARACTER</code>, second: <code>CHARACTER ^</code></td>
+      <td><code>&lt;DualDialogue&gt;</code> wrapping two full char+dialogue pairs</td>
+      <td>Joined name heading (<code>ALICE &amp; BOB</code>)</td>
+    </tr>
+    <tr>
+      <td><code>action</code> (Stage Direction)</td>
+      <td><code>!</code> forced prefix (prevents misread as character name)</td>
+      <td><code>Action</code> paragraph</td>
+      <td>Italic parenthetical style</td>
+    </tr>
+    <tr>
+      <td><code>bookmark</code></td>
+      <td><span class="b b-w">Excluded</span></td>
+      <td><span class="b b-w">Excluded</span></td>
+      <td><span class="b b-w">Excluded</span></td>
+    </tr>
+    <tr>
+      <td><code>scene.setting</code></td>
+      <td>Scene heading (<code>INT/EXT</code> auto or <code>.</code> forced)</td>
+      <td><code>Scene Heading</code> paragraph</td>
+      <td>Italic heading above scene body</td>
+    </tr>
+    <tr>
+      <td>Act/scene structure</td>
+      <td><code>#</code>/<code>##</code> sections; descriptions as <code>[[note]]</code></td>
+      <td><code>Act Break</code> paragraph for acts</td>
+      <td>Numbered headings in TOC + script</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<h3>PDF page order</h3>
+<pre><code>Title page
+↓ Copyright page     — only if S.copyrightText non-empty AND includeCopyright !== false
+↓ Characters page
+↓ Table of contents  — page numbers OFFSET by count of optional pages above
+↓ Production notes   — only if S.productionNotes non-empty AND includeProductionNotes !== false
+↓ Script body        — currentPage also offset accordingly</code></pre>
+
+<div class="note">Inside <code>buildFDXText()</code>, use <code>xmlEsc()</code> — NOT the global <code>esc()</code>. <code>xmlEsc</code> is a separate alias scoped inside that function to avoid shadowing.</div>
+
+<h3>ZIP export structure</h3>
+<pre><code>&lt;title&gt;/
+  &lt;title&gt;.html          → PDF HTML (built via buildPDFHTML())
+  metadata/
+    raw_script.json      → stateJSON() output
+    manifest.json        → title, author, version, timestamp
+  attachments/
+    &lt;filename&gt;           → user-attached files from modal file picker (f.arrayBuffer())</code></pre>
+</section>
+
+<section>
+<h2 id="find">Find &amp; Replace — Intentional Isolation</h2>
+<p>Find &amp; replace is deliberately isolated from character data. This is by design.</p>
+
+<div class="tw"><table>
+  <thead><tr><th>Searches</th><th>Never searches</th></tr></thead>
+  <tbody>
+    <tr><td><code>l.value</code> (main text body)</td><td>Character names (<code>l.characters[*].name</code>)</td></tr>
+    <tr><td><code>l.dialogueAction</code> (parenthetical)</td><td>Scene settings (<code>scene.setting</code>)</td></tr>
+    <tr><td></td><td>Act/scene names and descriptions</td></tr>
+    <tr><td></td><td>Bookmark labels</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note"><strong>Implication:</strong> Renaming a character via Find &amp; Replace is impossible by design. Renames must go through <code>saveCharEdit()</code>, which propagates to all dialogue lines AND direction cue arrays.</div>
+
+<p>To make a new line type searchable: add a filter chip in find bar HTML, add an entry to <code>findFilters</code>, add a case in <code>buildFindMatches()</code>, and add cases in <code>doReplace()</code> + <code>doReplaceAll()</code>.</p>
+</section>
+
+<section>
+<h2 id="revisions">Revision Tracking</h2>
+
+<h3>Flow</h3>
+<div class="chain">
+  <span class="cs">autoSave()</span><span class="ca">→</span>
+  <span class="cs">computeRevisionChanges()</span><span class="ca">→</span>
+  <span class="cs">lineFingerprint() per line</span><span class="ca">→</span>
+  <span class="cs">revisionChanges map</span><span class="ca">→</span>
+  <span class="cs">render() → colored borders</span>
+</div>
+
+<h3>lineFingerprint() composition</h3>
+<div class="tw"><table>
+  <thead><tr><th>Field</th><th>Included?</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>type</code></td><td><span class="b b-a">Always</span></td><td></td></tr>
+    <tr><td><code>value</code></td><td><span class="b b-a">Always</span></td><td></td></tr>
+    <tr><td><code>characters[*].name</code></td><td><span class="b b-a">Dialogue only</span></td><td>Sorted before joining: <code>.sort().join('&amp;')</code> — order-independent</td></tr>
+    <tr><td><code>dialogueAction</code></td><td><span class="b b-a">Dialogue only</span></td><td></td></tr>
+    <tr><td><code>cues</code></td><td><span class="b b-a">Direction only</span></td><td>Serialized with JSON.stringify</td></tr>
+    <tr><td><code>label</code></td><td><span class="b b-a">Bookmark only</span></td><td></td></tr>
+  </tbody>
+</table></div>
+
+<h3>Lifecycle</h3>
+<ul>
+  <li><strong>Survives</strong> undo/redo — restored unconditionally: <code>p.revisions || []</code></li>
+  <li><strong>Reset</strong> on Fountain import, FDX import, <code>loadSample()</code></li>
+  <li>Toggle on/off without recalculating</li>
+  <li>Six colors cycle: White, Blue, Pink, Yellow, Green, Goldenrod</li>
+</ul>
+
+<p>When adding a new line type: add its distinguishing fields to <code>lineFingerprint()</code> so changes register correctly.</p>
+</section>
+
+<section>
+<h2 id="new-type">Adding a New Line Type — Checklist</h2>
+<p>Example: adding <code>'song'</code>. Missing any item creates a silent gap.</p>
+
+<h4>Data &amp; Submission</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add pill HTML to <code>#type-pills</code> with <code>data-t="song"</code></li>
+  <li><span class="cm">[ ]</span>Add input fields (or reuse <code>#simple-ta</code>)</li>
+  <li><span class="cm">[ ]</span>Add case in <code>submitLine()</code> to build the line object</li>
+  <li><span class="cm">[ ]</span>Add case in <code>clearInput()</code> to reset relevant fields</li>
+  <li><span class="cm">[ ]</span>Add entry in <code>pillHotkeys</code> default object</li>
+  <li><span class="cm">[ ]</span>Add hotkey label in Settings → Keyboard shortcuts section</li>
+  <li><span class="cm">[ ]</span>Update <code>updatePillLabels()</code> to include the new pill</li>
+</ul>
+
+<h4>Display</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add case in <code>renderScene()</code> for editor display</li>
+  <li><span class="cm">[ ]</span>Add case in <code>renderView()</code> for View tab</li>
+  <li><span class="cm">[ ]</span>Add case in <code>buildPDFHTML()</code> or explicitly exclude</li>
+  <li><span class="cm">[ ]</span>Add CSS for <code>.l-song</code> (editor) and PDF equivalent</li>
+  <li><span class="cm">[ ]</span>Add color swatch in Settings → Line colors section</li>
+  <li><span class="cm">[ ]</span>Add entry to <code>ltColors</code> / <code>ltEnabled</code> defaults</li>
+</ul>
+
+<h4>Find &amp; Replace</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add filter chip in find bar HTML (or explicitly exclude)</li>
+  <li><span class="cm">[ ]</span>Add entry to <code>findFilters</code> default object</li>
+  <li><span class="cm">[ ]</span>Add case in <code>buildFindMatches()</code></li>
+  <li><span class="cm">[ ]</span>Add cases in <code>doReplace()</code> and <code>doReplaceAll()</code></li>
+</ul>
+
+<h4>Exports</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add case in <code>buildFountain()</code> or confirm excluded (like bookmarks)</li>
+  <li><span class="cm">[ ]</span>Add case in <code>parseFountain()</code> to reconstruct</li>
+  <li><span class="cm">[ ]</span>Add case in <code>buildFDXText()</code> — which FDX paragraph type?</li>
+  <li><span class="cm">[ ]</span>Add case in <code>parseFDX()</code> — which FDX paragraph type maps back?</li>
+</ul>
+
+<h4>Revision &amp; Stats</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add case in <code>lineFingerprint()</code> — which fields distinguish this type?</li>
+  <li><span class="cm">[ ]</span>Decide: counted in <code>renderStats()</code> line totals?</li>
+  <li><span class="cm">[ ]</span>Decide: counted in <code>getCharStats()</code> per-character counts?</li>
+</ul>
+
+<h4>Inline Editing</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Add case in <code>renderInlineEditLine()</code> (or reuse simple textarea)</li>
+  <li><span class="cm">[ ]</span>Add case in <code>saveInlineEdit()</code></li>
+  <li><span class="cm">[ ]</span>If complex, add case in <code>openEditLine()</code> modal</li>
+</ul>
+
+<h4>Outline &amp; Keyboard Reference</h4>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>Decide: counted in scene card line totals? (bookmarks are excluded)</li>
+  <li><span class="cm">[ ]</span>Add entry in <code>openKBRef()</code> modal under Line-type pills section</li>
+</ul>
+</section>
+
+<section>
+<h2 id="new-field">Adding a New S Field — Checklist</h2>
+
+<ul class="cl">
+  <li><span class="cm">1.</span>Declaration: <code>let S = {..., newField: defaultValue};</code></li>
+  <li><span class="cm">2.</span>Serialization: add <code>newField: S.newField||default</code> to <code>stateJSON()</code></li>
+  <li><span class="cm">3.</span>Load from file: <code>S.newField = data.newField || default</code> in <code>loadFromData()</code></li>
+  <li><span class="cm">4.</span>Load from LS: same pattern in <code>resumeFromLS()</code></li>
+  <li><span class="cm">5.</span>Reset in <code>doNewScript()</code></li>
+  <li><span class="cm">6.</span>Reset in <code>loadSample()</code></li>
+  <li><span class="cm">7.</span>Reset in <code>parseFountain()</code></li>
+  <li><span class="cm">8.</span>Reset in <code>parseFDX()</code></li>
+  <li><span class="cm">9.</span>UI sync: if it has a UI element (textarea, toggle), sync it in the relevant tab render function</li>
+</ul>
+
+<h3>Which fields need pushUndo?</h3>
+<div class="tw"><table>
+  <thead><tr><th>Field type</th><th>pushUndo required?</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td>Structural — modifies <code>S.acts</code> content</td><td><span class="b b-a">Yes</span></td><td>New per-line attribute the user edits in the script</td></tr>
+    <tr><td>Script metadata</td><td><span class="b b-x">No</span></td><td><code>productionNotes</code>, <code>copyrightText</code>, title, author</td></tr>
+    <tr><td>UI preferences (settings)</td><td><span class="b b-x">No</span></td><td><code>fontSize</code>, <code>pillHotkeys</code>, <code>inputMode</code></td></tr>
+  </tbody>
+</table></div>
+
+<div class="note">If existing scripts on disk lack the new field, write a <code>migrate&lt;FieldName&gt;()</code> function that fills in the default, and call it from load paths 3–8 after <code>S.acts = ...</code>.</div>
+</section>
+
+<section>
+<h2 id="deploy">Deployment Contract</h2>
+<p>After any change to <code>script_maker.html</code>, before pushing to GitHub:</p>
+
+<ul class="cl">
+  <li><span class="cm">1.</span>Run <code>./sync.sh</code> — regenerates <code>docs/index.html</code> with docs/ paths rewritten to site-relative</li>
+  <li><span class="cm">2.</span>Bump <code>CACHE_NAME</code> in <code>docs/sw.js</code> to <code>scriptwriter-v1.XX</code> — forces PWA cache invalidation</li>
+  <li><span class="cm">3.</span>Bump version string in HTML (setup-version div + Settings panel description)</li>
+  <li><span class="cm">4.</span>Commit and push → GitHub Pages auto-deploys from <code>docs/</code></li>
+  <li><span class="cm">5.</span>Update <code>LINEAGE.html</code> if any data model, load path, or fanout relationships changed</li>
+</ul>
+
+<div class="note"><strong>Never edit <code>docs/index.html</code> directly.</strong> It is overwritten by <code>sync.sh</code> on the next run.</div>
+
+<h3>sync.sh path rewrites (docs/index.html)</h3>
+<div class="tw"><table>
+  <thead><tr><th>Source path (script_maker.html)</th><th>Rewritten to (docs/index.html)</th></tr></thead>
+  <tbody>
+    <tr><td><code>href="docs/guide.html"</code></td><td><code>href="guide.html"</code></td></tr>
+    <tr><td><code>href="docs/compare.html"</code></td><td><code>href="compare.html"</code></td></tr>
+    <tr><td><code>src="docs/vendor/jszip.min.js"</code></td><td><code>src="vendor/jszip.min.js"</code></td></tr>
+    <tr><td><code>href="docs/manifest.json"</code></td><td><code>href="manifest.json"</code></td></tr>
+    <tr><td><code>href="docs/icon-*.png"</code></td><td><code>href="icon-*.png"</code></td></tr>
+    <tr><td>SW registration path</td><td>Rewritten to site-relative</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Standard test checklist (after every feature)</h3>
+<ul class="cl">
+  <li><span class="cm">[ ]</span>JS syntax validation — no parse errors</li>
+  <li><span class="cm">[ ]</span>Every <code>onclick</code> references a defined function</li>
+  <li><span class="cm">[ ]</span>Every <code>$('id')</code> has a matching element (static or dynamically created)</li>
+  <li><span class="cm">[ ]</span>Key functions exist: <code>render</code>, <code>pushUndo</code>, <code>doUndo</code>, <code>doRedo</code>, <code>autoSave</code>, <code>buildFountain</code>, <code>buildFDXText</code>, <code>buildPDFHTML</code>, <code>parseFountain</code>, <code>parseFDX</code>, <code>renderView</code>, <code>renderOutline</code>, <code>buildFindMatches</code>, <code>renderRPNotes</code>, <code>renderRPBookmarks</code></li>
+  <li><span class="cm">[ ]</span>Bookmarks excluded from Fountain, FDX, PDF</li>
+  <li><span class="cm">[ ]</span>Undo reverses the new mutation cleanly</li>
+  <li><span class="cm">[ ]</span>New state saves and restores from localStorage</li>
+  <li><span class="cm">[ ]</span>No overflow or broken layout on mobile</li>
+  <li><span class="cm">[ ]</span>No functions defined but never called</li>
+</ul>
+</section>
+
+<hr>
+<p class="meta">Last updated: Session 17 &middot; v1.44 &middot; thescriptwriter.app</p>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const sections = document.querySelectorAll('h2[id]');
+  const links = document.querySelectorAll('.sidebar a[href^="#"]');
+  if(!sections.length || !links.length) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const id = e.target.id;
+        links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
+      }
+    });
+  }, {rootMargin: '-10% 0px -80% 0px'});
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+</body>
+</html>

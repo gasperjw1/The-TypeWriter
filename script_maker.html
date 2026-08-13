@@ -1117,7 +1117,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.44 · August 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.45 · August 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
           <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="docs/badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
           <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="docs/badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
@@ -1320,7 +1320,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.44 · August 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.45 · August 2026</div>
       </div>
     </div>
 
@@ -3564,6 +3564,7 @@ function saveSceneEdit(ai,si){const n=$('es-n').value.trim();const d=$('es-d').v
 function openEditLine(ai,si,li){
   const l=S.acts[ai].scenes[si].lines[li];
   const isDlg=l.type==='dialogue';const isDir=l.type==='direction';
+  if(isDlg){startInlineEdit(ai,si,li);return;}
   if(isDir){
     /* set up modal cue state */
     modalCues={enters:[...(l.cues?.enters||[])],exits:[...(l.cues?.exits||[])]};
@@ -3615,7 +3616,7 @@ function saveDirEdit(ai,si,li){
   closeModal();autoSave();render();
 }
 
-function saveLineEdit(ai,si,li,isDlg){const l=S.acts[ai].scenes[si].lines[li];const v=$('el-v').value.trim();if(!v)return;pushUndo();l.value=v;if(isDlg){const cn=$('el-c').value.trim().toUpperCase();if(cn){const ch=S.characters.find(c=>c.name===cn);if(ch)l.characters=[{name:ch.name,description:ch.description}];delete l.character;}const da=$('el-da').value.trim();l.dialogueAction=da||undefined;}closeModal();autoSave();render();}
+function saveLineEdit(ai,si,li,isDlg){const l=S.acts[ai].scenes[si].lines[li];const v=$('el-v').value.trim();if(!v)return;pushUndo();l.value=v;if(isDlg){const cn=$('el-c').value.trim().toUpperCase();if(cn){const ch=S.characters.find(c=>c.name===cn);if(ch)l.characters=[{name:ch.name,description:ch.description},...(l.characters||[]).slice(1)];delete l.character;}const da=$('el-da').value.trim();l.dialogueAction=da||undefined;}closeModal();autoSave();render();}
 function openEditChar(name){const ch=findCharAny(name);if(!ch)return;openModal(`<h3>Edit character</h3><div class="mf"><label>Name</label><input class="minput" id="ec-n" value="${esc(ch.name)}"/></div><div class="mf"><label>Description</label><input class="minput" id="ec-d" value="${esc(ch.description||'')}"/></div><div class="mtoggle-row"><label>Archived</label><div class="mtoggle${ch.archived?' on':''}" id="ec-archive-tog" onclick="this.classList.toggle('on')"></div></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveCharEdit('${escJs(name)}')">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('ec-n');if(el)el.focus();},50);}
 function saveCharEdit(old){const nn=$('ec-n').value.trim().toUpperCase()||old;const nd=$('ec-d').value.trim();const arch=$('ec-archive-tog').classList.contains('on');pushUndo();const ch=findCharAny(old);if(!ch)return;ch.name=nn;ch.description=nd;ch.archived=arch;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{if(l.characters)l.characters.forEach(c=>{if(c.name===old){c.name=nn;c.description=nd;}});if(l.cues){l.cues.enters=(l.cues.enters||[]).map(n=>n===old?nn:n);l.cues.exits=(l.cues.exits||[]).map(n=>n===old?nn:n);}})));closeModal();autoSave();render();}
 function openNewCharStandalone(){openModal(`<h3>New character</h3><div class="mf"><label>Name</label><input class="minput" id="nc-n" placeholder="e.g. SARAH"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="nc-d" placeholder="Brief description..."/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmNewCharStandalone()">Add</button></div>`,null);setTimeout(()=>{const el=$('nc-n');if(el)el.focus();},50);}
@@ -4304,7 +4305,6 @@ function parseFountain(text){
   if(!acts.length){acts=[{name:'',description:'',scenes:[{name:'',description:'',lines:[]}]}];}
 
   /* Load into app */
-  pushUndo();
   S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};S.productionNotes='';S.copyrightText='';
   revisionChanges={};
   migrateCharacterToCharacters();resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
@@ -4532,7 +4532,6 @@ function parseFDX(xmlText){
   /* If title is still Untitled, try to extract from first Action line that looks like a title */
 
   /* Load into app */
-  pushUndo();
   S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};S.productionNotes='';S.copyrightText='';
   revisionChanges={};
   migrateCharacterToCharacters();resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
