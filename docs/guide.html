@@ -248,7 +248,8 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Multi-character (unison) dialogue <span class="badge">New</span></h3>
-    <p>Up to two characters can share a single dialogue line — for unison speech, call-and-response, or lines delivered together. After choosing the first character, click the <strong>+</strong> button next to the character field to add a second.</p>
+    <p>Up to two characters can share a single dialogue line — for unison speech, call-and-response, or lines delivered together. The <strong>+</strong> button sits immediately to the right of the first character's name. Click it to reveal a second character dropdown.</p>
+    <p style="margin-top:6px;">Once a second character is added, a <strong>−</strong> button appears next to their name. Click it to remove the second speaker and return to a single-character line. This works both in the input bar (when composing a new line) and in inline editing (when editing an existing line).</p>
     <p style="margin-top:6px;">The line displays as <strong>ALICE &amp; BOB</strong> above the shared text. In Fountain export, the second character gets the <code>CHARACTER ^</code> dual-dialogue marker. In Final Draft (FDX) export, the line is wrapped in a <code>&lt;DualDialogue&gt;</code> block — both formats round-trip correctly on import.</p>
   </div>
 
@@ -398,6 +399,16 @@ a:hover{text-decoration:underline;}
     </ul>
     <p style="margin-top:6px;">Useful for tracking ensemble dynamics, spotting isolated characters, or verifying that subplot characters actually overlap where you intend.</p>
   </div>
+
+  <div class="feature">
+    <h3>Production Notes &amp; Copyright</h3>
+    <p>At the bottom of the Outline tab, below the scene cards and character relationship section, is a <strong>Production Details</strong> panel with two fields:</p>
+    <ul>
+      <li><strong>Production Notes</strong> — a split-pane editor: type on the left, see a live formatted preview on the right. Supports markdown: <code># Heading</code>, <code>- bullet</code>, <code>**bold**</code>, <code>*italic*</code>. Use this for director's notes, staging intentions, design guidance, or casting notes.</li>
+      <li><strong>Copyright Page Text</strong> — plain text that auto-grows as you type. Click <strong>"Reset to default"</strong> to auto-fill standard copyright boilerplate from your author name (set in the top bar). Edit freely for your jurisdiction or licensing arrangement.</li>
+    </ul>
+    <p style="margin-top:6px;">Both fields are included as dedicated pages in PDF exports when non-empty — the copyright page between the title and cast list, and the production notes page before the script body.</p>
+  </div>
 </div>
 
 <!-- ─── SAVING & EXPORT ─── -->
@@ -421,14 +432,23 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
+    <h3>Additional PDF pages</h3>
+    <p>When certain script-level fields are filled in, the PDF export gains extra pages automatically — no extra steps required:</p>
+    <ul>
+      <li><strong>Copyright page</strong> — appears between the title page and the cast list. Set the text in <strong>Outline → Production Details → Copyright Page Text</strong>. Click "Reset to default" to auto-fill standard boilerplate from your author name.</li>
+      <li><strong>Production notes page</strong> — appears before the script body. Set the notes in <strong>Outline → Production Details → Production Notes</strong>. Markdown formatting (headings, bullets, bold, italic) is preserved in the PDF.</li>
+    </ul>
+    <p style="margin-top:6px;">Both pages are included in the plain <strong>File → Export PDF</strong> as well as the <strong>File → Export PDF + metadata</strong> ZIP. In the ZIP modal you can toggle each page off if you want a version without them.</p>
+  </div>
+
+  <div class="feature">
     <h3>PDF + metadata export</h3>
     <p><strong>File → Export PDF + metadata</strong> opens a modal where you choose what to include, then downloads a ZIP with the print-ready script and the raw JSON metadata. Options in the modal:</p>
     <ul>
-      <li><strong>Copyright page</strong> — included when you have copyright text set (edit in Settings → Production)</li>
-      <li><strong>Production notes</strong> — included when you have notes set</li>
+      <li><strong>Copyright page</strong> — toggle off to omit even if text is set in Outline → Production Details</li>
+      <li><strong>Production notes</strong> — toggle off to omit even if notes are set</li>
       <li><strong>Attachments</strong> — attach any files (design mockups, cast lists, director notes) to an <code>attachments/</code> folder inside the ZIP</li>
     </ul>
-    <p style="margin-top:6px;">The regular <strong>File → Export PDF</strong> also auto-includes the copyright and production notes pages when those fields are filled in — no modal needed.</p>
   </div>
 
   <div class="feature">

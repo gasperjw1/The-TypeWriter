@@ -426,6 +426,25 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .outline-empty{text-align:center;color:var(--tx3);padding:48px 0;font-size:14px;}
 @media(max-width:768px){.outline-grid{grid-template-columns:1fr 1fr;gap:10px;}.outline-card{padding:10px;}}
 @media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
+/* ── Production Details panel (bottom of Outline tab) ── */
+.production-details-panel{margin:40px auto 32px;max-width:900px;padding:0 8px;}
+.pd-section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
+.pd-block{margin-bottom:8px;}
+.pd-label{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.pd-desc{font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.5;}
+.pd-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.pd-ta{width:100%;min-height:140px;resize:vertical;padding:10px;font-family:var(--sans);font-size:13px;line-height:1.6;border:1px solid var(--bd2);border-radius:6px;background:var(--bg2);color:var(--tx1);box-sizing:border-box;overflow:hidden;}
+.pd-ta:focus{outline:none;border-color:var(--accent,#4a9eff);}
+.pd-preview{min-height:140px;padding:10px;border:1px solid var(--bd2);border-radius:6px;background:var(--bg2);font-size:13px;line-height:1.6;color:var(--tx1);overflow-y:auto;}
+.pd-preview h1,.pd-preview h2,.pd-preview h3{margin:.4em 0 .2em;font-weight:600;}
+.pd-preview h1{font-size:16px;}.pd-preview h2{font-size:14px;}.pd-preview h3{font-size:13px;}
+.pd-preview ul,.pd-preview ol{margin:.3em 0;padding-left:1.4em;}.pd-preview li{margin:.1em 0;}
+.pd-preview p{margin:.2em 0;}
+.pd-preview code{background:var(--bg3,var(--bd2));border-radius:3px;padding:0 3px;font-family:'Courier New',monospace;font-size:12px;}
+.pd-reset-btn{font-size:11px;padding:2px 8px;border:1px solid var(--bd2);border-radius:4px;background:none;color:var(--tx2);cursor:pointer;font-family:var(--sans);}
+.pd-reset-btn:hover{background:var(--bg3,var(--bd2));}
+.pd-copyright-ta{min-height:80px;}
+@media(max-width:640px){.pd-split{grid-template-columns:1fr;}}
 
 /* ── Print styles ── */
 @media (display-mode:standalone){.store-badges{display:none !important;}.view-print-btn{display:none !important;}}
@@ -1282,17 +1301,6 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </div>
         </div>
       </div>
-      <div class="psec-title" style="margin-top:28px;">Production</div>
-      <div class="setting-row">
-        <div class="setting-label">Production Notes</div>
-        <div class="setting-desc">Notes for the director, cast, and crew. Included as a separate page in PDF exports if non-empty.</div>
-        <textarea id="production-notes-ta" oninput="updateProductionNotes(this.value)" placeholder="Casting notes, design intentions, production history…" style="margin-top:8px;width:100%;min-height:80px;font-size:12px;padding:8px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);font-family:var(--sans);resize:vertical;line-height:1.5;"></textarea>
-      </div>
-      <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-label">Copyright Page Text</div>
-        <div class="setting-desc">Included as a separate page in PDF exports. Edit freely for your jurisdiction or licensing arrangement. <button onclick="resetCopyrightText()" style="font-size:11px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:none;color:var(--tx2);cursor:pointer;font-family:var(--sans);">Reset to default</button></div>
-        <textarea id="copyright-text-ta" oninput="updateCopyrightText(this.value)" placeholder="Fill in your author name on the Script Details tab first, then click «Reset to default» to generate standard copyright language." style="margin-top:8px;width:100%;min-height:100px;font-size:12px;padding:8px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);font-family:var(--sans);resize:vertical;line-height:1.5;"></textarea>
-      </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
       <div class="setting-row desktop-only">
         <div class="setting-label">Keyboard shortcuts</div>
@@ -1611,13 +1619,9 @@ function defaultCopyrightText(){
 function resetCopyrightText(){
   S.copyrightText=defaultCopyrightText();
   autoSave();
-  const ta=$('copyright-text-ta');
-  if(ta)ta.value=S.copyrightText;
+  renderOutline();
 }
-function syncProductionSettings(){
-  const pn=$('production-notes-ta');if(pn)pn.value=S.productionNotes||'';
-  const ct=$('copyright-text-ta');if(ct)ct.value=S.copyrightText||'';
-}
+
 function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
 function toggleAutoFormat(){
   autoFormat=!autoFormat;
@@ -1807,7 +1811,7 @@ function switchTab(t){
   $('right-panel-wrap').style.display=(t==='settings'||t==='outline')?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
   if(t==='outline')renderOutline();
-  if(t==='settings'){renderAlignSettings();renderStats();syncProductionSettings();}
+  if(t==='settings'){renderAlignSettings();renderStats();}
   closeFDD();
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='320px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
@@ -2225,7 +2229,18 @@ function addExtraChar(){
     sel.appendChild(o);
   });
   container.appendChild(sel);
+  const rb=document.createElement('button');
+  rb.type='button';
+  rb.style.cssText='font-size:14px;padding:0 5px;border:1px solid var(--bd2);border-radius:4px;background:none;color:var(--tx3);cursor:pointer;margin-left:2px;line-height:1.4;flex-shrink:0;font-family:var(--sans);';
+  rb.textContent='−';
+  rb.setAttribute('onclick','removeExtraChar()');
+  rb.title='Remove second character';
+  container.appendChild(rb);
   const ab=$('dlg-add-char-btn');if(ab)ab.style.display='none';
+}
+function removeExtraChar(){
+  const c=$('extra-chars-container');if(c)c.innerHTML='';
+  const ab=$('dlg-add-char-btn');if(ab)ab.style.display='';
 }
 function selPill(el,t){if(t===cType&&!pendingPill)return;if(hasInput()&&pendingPill!==t){pendingPill=t;document.querySelectorAll('.tpill').forEach(p=>{p.classList.remove('warn');if(p.dataset.t===t)p.classList.add('warn');});$('type-alert').textContent='You have unsaved text. Select the same option again to switch and discard it.';$('type-alert').style.display='block';return;}pendingPill=null;$('type-alert').style.display='none';document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function activatePillByType(t){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));const el=document.querySelector(`.tpill[data-t="${t}"]`);if(el)el.classList.add('active');cType=t;clearInput();updateInputMode();}
@@ -2584,12 +2599,20 @@ function renderInlineEditLine(line,ai,si,li){
     inner=`<div class="l-direction"><textarea class="ie-ta ie-direction" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea>${cueHtml}</div>`;
   }else if(line.type==='dialogue'){
     const existingChars=(line.characters||[{name:'',description:''}]);
-    const charSelects=existingChars.map((ch,i)=>{
+    const charElements=existingChars.map((ch,i)=>{
       const opts=S.characters.filter(c=>!c.archived).map(c=>`<option value="${esc(c.name)}"${c.name===ch.name?' selected':''}>${esc(c.name)}</option>`).join('');
-      return`<select class="ie-input ie-dlg-char" data-idx="${i}" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()" style="max-width:160px;">${opts}</select>`;
+      const sel=`<select class="ie-input ie-dlg-char" data-idx="${i}" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()" style="max-width:160px;">${opts}</select>`;
+      if(i===0&&existingChars.length===1){
+        /* Single char: + button immediately after char0 */
+        return sel+`<button type="button" onmousedown="event.preventDefault()" onclick="ieAddChar(this)" title="Add second character" style="font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;">+</button>`;
+      }
+      if(i===1){
+        /* Second char: − button immediately after char1 */
+        return sel+`<button type="button" onmousedown="event.preventDefault()" onclick="ieRemoveChar(this)" title="Remove second character" style="font-size:14px;padding:0 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx3);cursor:pointer;line-height:1.4;">−</button>`;
+      }
+      return sel;
     }).join('');
-    const addCharBtn=existingChars.length<2?`<button type="button" onmousedown="event.preventDefault()" onclick="ieAddChar(this)" style="font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;margin-left:4px;">+</button>`:'';
-    inner=`<div class="l-dialogue"><div class="dl-char-line" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${charSelects}${addCharBtn}</div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
+    inner=`<div class="l-dialogue"><div class="dl-char-line" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${charElements}</div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
   }else if(line.type==='action'){
     inner=`<div class="l-action"><textarea class="ie-ta" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div>`;
   }else if(line.type==='bookmark'){
@@ -2627,9 +2650,38 @@ function ieAddChar(btn){
   (S.characters||[]).filter(c=>!c.archived).forEach(c=>{
     const o=document.createElement('option');o.value=c.name;o.textContent=c.name;sel.appendChild(o);
   });
+  const removeBtn=document.createElement('button');
+  removeBtn.type='button';
+  removeBtn.setAttribute('onmousedown','event.preventDefault()');
+  removeBtn.setAttribute('onclick','ieRemoveChar(this)');
+  removeBtn.title='Remove second character';
+  removeBtn.style.cssText='font-size:14px;padding:0 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx3);cursor:pointer;line-height:1.4;';
+  removeBtn.textContent='−';
+  /* Replace + btn with [char1-select][−btn] in-place */
   row.insertBefore(sel,btn);
+  row.insertBefore(removeBtn,btn);
   btn.remove();
   sel.focus();
+  setTimeout(()=>{ieAddingChar=false;},300);
+}
+function ieRemoveChar(btn){
+  ieAddingChar=true;
+  ieFocus();
+  const char1sel=btn.previousElementSibling;
+  /* Re-create + button and insert before char1 (i.e. right after char0) */
+  const addBtn=document.createElement('button');
+  addBtn.type='button';
+  addBtn.setAttribute('onmousedown','event.preventDefault()');
+  addBtn.setAttribute('onclick','ieAddChar(this)');
+  addBtn.title='Add second character';
+  addBtn.style.cssText='font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;';
+  addBtn.textContent='+';
+  char1sel.parentElement.insertBefore(addBtn,char1sel);
+  char1sel.remove();
+  btn.remove();
+  /* Return focus to char0 select */
+  const char0=addBtn.previousElementSibling;
+  if(char0)char0.focus();
   setTimeout(()=>{ieAddingChar=false;},300);
 }
 function saveInlineEdit(){
@@ -3054,10 +3106,35 @@ function renderOutline(){
   });
   /* Character relationship section */
   h+=renderRelationshipSection();
+  /* Production Details section */
+  h+=renderProductionDetailsSection();
   p.innerHTML=h;
   /* Draw relationship graph if visible */
   if(showRelGraph&&relViewMode==='graph')setTimeout(drawRelGraph,0);
+  /* Auto-size copyright textarea after render */
+  setTimeout(()=>{const ta=$('copyright-text-ta');if(ta)autosizePdTa(ta);},0);
 }
+function renderProductionDetailsSection(){
+  return`<div class="production-details-panel">
+  <div class="pd-section-title">Production Details</div>
+  <div class="pd-block">
+    <div class="pd-label">Production Notes <span style="font-size:10px;font-weight:400;color:var(--tx3);">Supports markdown: **bold**, *italic*, # Heading, - bullet</span></div>
+    <div class="pd-desc">Notes for the director, cast, and crew. Included as a formatted page in PDF exports when non-empty.</div>
+    <div class="pd-split">
+      <textarea class="pd-ta" id="production-notes-ta" placeholder="# Production Notes&#10;&#10;- Staging notes&#10;- Costume notes&#10;- Design intentions" oninput="updateProductionNotes(this.value);updateMdPreview()">${esc(S.productionNotes||'')}</textarea>
+      <div class="pd-preview" id="pd-preview">${renderMarkdown(S.productionNotes||'')}</div>
+    </div>
+  </div>
+  <div class="pd-block" style="margin-top:24px;">
+    <div class="pd-label">Copyright Page Text <button class="pd-reset-btn" onclick="resetCopyrightText()">Reset to default</button></div>
+    <div class="pd-desc">Appears as a dedicated page in the PDF between the title page and the cast list. Click "Reset to default" to auto-fill standard boilerplate from your author name.</div>
+    <textarea class="pd-ta pd-copyright-ta" id="copyright-text-ta" placeholder="Fill in your author name first (top bar), then click &#34;Reset to default&#34; to generate standard copyright language." oninput="updateCopyrightText(this.value);autosizePdTa(this)">${esc(S.copyrightText||'')}</textarea>
+  </div>
+</div>`;
+}
+function updateMdPreview(){const p=document.getElementById('pd-preview');if(p)p.innerHTML=renderMarkdown(S.productionNotes||'');}
+function autosizePdTa(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+
 function setSceneColor(ai,si,color){pushUndo();S.acts[ai].scenes[si].color=color;autoSave();renderOutline();}
 function editColorLabel(color,el){
   const cur=(S.colorLabels||{})[color]||'';
@@ -3752,6 +3829,31 @@ function exportPDF(){
   setTimeout(()=>win.print(),600);
 }
 
+function renderMarkdown(text){
+  if(!text)return'<em style="color:var(--tx3)">No content yet.</em>';
+  function inlineFmt(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/`(.+?)`/g,'<code>$1</code>');
+  }
+  let html='',inUL=false,inOL=false;
+  function closeLists(){if(inUL){html+='</ul>';inUL=false;}if(inOL){html+='</ol>';inOL=false;}}
+  text.split('\n').forEach(line=>{
+    const hm=line.match(/^(#{1,3})\s+(.+)/);
+    if(hm){closeLists();html+=`<h${hm[1].length}>${inlineFmt(hm[2])}</h${hm[1].length}>`;return;}
+    const ulm=line.match(/^[-*•]\s+(.+)/);
+    if(ulm){if(!inUL){closeLists();html+='<ul>';inUL=true;}html+=`<li>${inlineFmt(ulm[1])}</li>`;return;}
+    const olm=line.match(/^\d+\.\s+(.+)/);
+    if(olm){if(!inOL){closeLists();html+='<ol>';inOL=true;}html+=`<li>${inlineFmt(olm[1])}</li>`;return;}
+    closeLists();
+    if(!line.trim()){html+='<p></p>';return;}
+    html+=inlineFmt(line)+'<br>';
+  });
+  closeLists();
+  return html;
+}
+
 function buildPDFHTML(opts={}){
   const includeCopyright = opts.includeCopyright !== false;
   const includeProductionNotes = opts.includeProductionNotes !== false;
@@ -3785,7 +3887,11 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 /* Production notes page */
 .prod-notes-page{page-break-after:always;padding-top:48pt;}
 .prod-notes-page h2{text-align:center;font-size:14pt;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24pt;font-weight:bold;}
-.prod-notes-body{padding-left:36pt;line-height:1.6;font-size:12pt;white-space:pre-wrap;}
+.prod-notes-body{padding-left:36pt;line-height:1.6;font-size:12pt;}
+.prod-notes-body h1,.prod-notes-body h2,.prod-notes-body h3{font-weight:bold;margin:.6em 0 .2em;}
+.prod-notes-body ul,.prod-notes-body ol{margin:.4em 0;padding-left:1.5em;}
+.prod-notes-body li{margin:.2em 0;}
+.prod-notes-body p{margin:.3em 0;}
 /* TOC page */
 .toc-page{page-break-after:always;padding-top:48pt;}
 .toc-page h2{text-align:center;font-size:14pt;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24pt;font-weight:bold;}
@@ -3871,7 +3977,7 @@ ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}<
 
   /* Production notes page (before script body) */
   if(includeProductionNotes&&S.productionNotes){
-    html+=`<div class="prod-notes-page"><h2>Production Notes</h2><div class="prod-notes-body">${esc2(S.productionNotes)}</div></div>`;
+    html+=`<div class="prod-notes-page"><h2>Production Notes</h2><div class="prod-notes-body">${renderMarkdown(S.productionNotes)}</div></div>`;
   }
 
   /* Script pages */
@@ -3972,11 +4078,11 @@ function exportPDFWithMeta(){
 <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
   <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
     <input type="checkbox" id="ep-copyright" ${hasCopyright?'':'disabled'} ${hasCopyright?'checked':''} style="width:14px;height:14px;">
-    <span>Include copyright page${hasCopyright?'':' <span style="color:var(--tx3);font-size:11px;">(add copyright text in Settings → Production first)</span>'}</span>
+    <span>Include copyright page${hasCopyright?'':' <span style="color:var(--tx3);font-size:11px;">(add copyright text in Outline → Production Details first)</span>'}</span>
   </label>
   <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
     <input type="checkbox" id="ep-notes" ${hasNotes?'':'disabled'} ${hasNotes?'checked':''} style="width:14px;height:14px;">
-    <span>Include production notes page${hasNotes?'':' <span style="color:var(--tx3);font-size:11px;">(add notes in Settings → Production first)</span>'}</span>
+    <span>Include production notes page${hasNotes?'':' <span style="color:var(--tx3);font-size:11px;">(add notes in Outline → Production Details first)</span>'}</span>
   </label>
   <div style="margin-top:4px;">
     <div style="font-size:13px;margin-bottom:6px;">Attach extra files <span style="font-size:11px;color:var(--tx3);">(riders, music cues, photos…)</span></div>
