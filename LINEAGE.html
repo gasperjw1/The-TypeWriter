@@ -300,8 +300,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0 0; }
   // Script metadata
   title:            string,
   author:           string,
-  productionNotes:  string,    // Settings textarea; no pushUndo (Session 17)
-  copyrightText:    string,    // Settings textarea; no pushUndo (Session 17)
+  productionNotes:  string,    // Outline → Production Details; split-pane markdown editor; no pushUndo (Session 18)
+  copyrightText:    string,    // Outline → Production Details; auto-grows; no pushUndo (Session 18)
 
   // Master character list
   characters: [{ name, description, archived }],
@@ -407,8 +407,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0 0; }
 <h3>What render() does NOT call — triggered by switchTab() instead</h3>
 <ul>
   <li><code>renderView()</code> — View tab (computed on demand)</li>
-  <li><code>renderOutline()</code> — Outline tab</li>
-  <li><code>syncProductionSettings()</code> — Settings tab; restores textarea values from S</li>
+  <li><code>renderOutline()</code> — Outline tab; includes <code>renderProductionDetailsSection()</code> at the bottom (Production Notes + Copyright textareas)</li>
 </ul>
 
 <div class="note"><strong>Decision rule:</strong> If new state must stay live during editing, put its render call inside <code>render()</code>. If it's computed on demand when the user opens a specific tab, put it in <code>switchTab()</code>.</div>
@@ -428,8 +427,9 @@ hr { border: none; border-top: 1px solid var(--border); margin: 40px 0 0; }
     <tr><td>Editor display</td><td><code>renderScene()</code></td><td><code>(characters||[]).map(c=&gt;c.name).join(' &amp; ')</code></td><td>Display name above dialogue text</td></tr>
     <tr><td>View tab</td><td><code>renderView()</code></td><td>same join</td><td>Character heading in View tab</td></tr>
     <tr><td>PDF export</td><td><code>buildPDFHTML()</code></td><td>same join</td><td>Character heading in PDF pages</td></tr>
-    <tr><td>Inline edit render</td><td><code>renderInlineEditLine()</code></td><td>one <code>&lt;select class="ie-dlg-char"&gt;</code> per <code>characters[i]</code></td><td>Number of character selects shown</td></tr>
-    <tr><td>Inline edit save</td><td><code>saveInlineEdit()</code></td><td>all <code>.ie-dlg-char</code> selects</td><td>What gets written back to the line</td></tr>
+    <tr><td>Inline edit render</td><td><code>renderInlineEditLine()</code></td><td>one <code>&lt;select class="ie-dlg-char"&gt;</code> per <code>characters[i]</code>; + button after char0 (1-char), − button after char1 (2-char)</td><td>Number of character selects and which add/remove button is shown</td></tr>
+    <tr><td>Inline edit save</td><td><code>saveInlineEdit()</code></td><td>all <code>.ie-dlg-char</code> selects; blank values filtered</td><td>What gets written back to the line; blank 2nd char → 1-element array</td></tr>
+    <tr><td>Inline edit + / −</td><td><code>ieAddChar()</code> / <code>ieRemoveChar()</code></td><td><code>ieAddingChar</code> flag (boolean)</td><td>Flag blocks <code>ieBlur</code> → <code>saveInlineEdit()</code> during the ~300ms DOM manipulation + focus shift; prevents spurious save/close on + or − click</td></tr>
     <tr><td>Cont. detection</td><td><code>isCont()</code></td><td><code>characters[0].name</code></td><td>Whether (cont.) appears; lead char only</td></tr>
     <tr><td>Archive guard</td><td><code>charHasUsage()</code></td><td><code>characters.some(c=&gt;c.name===name)</code></td><td>Whether archiving the character is blocked</td></tr>
     <tr><td>Delete / archive</td><td><code>removeCharUsage()</code></td><td><code>characters</code> array length</td><td>Sole char → remove line; 2 chars → remove from array, keep line</td></tr>
@@ -855,7 +855,7 @@ pushUndo() → autoSave() → render()</code></pre>
 </section>
 
 <hr>
-<p class="meta">Last updated: Session 17 &middot; v1.44 &middot; thescriptwriter.app</p>
+<p class="meta">Last updated: Session 18 &middot; v1.46 &middot; thescriptwriter.app</p>
 
 </main>
 </div>
