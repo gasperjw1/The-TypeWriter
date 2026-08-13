@@ -84,6 +84,8 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [ ] **Document styles** — Customizable page layout (fonts, margins) for the exported screenplay. Beat supports this.
 - [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.
 - [x] **Character panel act/scene filter** — Dialogue list respects act/scene dropdowns, line/word count badges, first/last appearance, sort by name/lines/appearance. *(Session 16)*
+- [x] **Multi-character (unison) dialogue** — Two characters can speak the same line simultaneously. `characters:[{name,description}]` array replaces singular `character:{}`. Cap at 2. Displays as `ALICE & RUTH`. Fountain uses `^` dual-dialogue notation; FDX uses `<DualDialogue>`. Includes migration for existing scripts. *(Session 17)*
+- [x] **Export pages** — Copyright page (with editable boilerplate, auto-populated from author + year) and production notes page added to PDF exports. Both controlled by a new "Production" section in Settings. Export PDF + metadata modal now supports file attachments (added to ZIP under `attachments/`). *(Session 17)*
 
 ## Standard Test Checklist (run after every new feature)
 

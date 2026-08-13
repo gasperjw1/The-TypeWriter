@@ -1117,7 +1117,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.43 · July 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div class="setup-version">v1.44 · August 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
         <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
           <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="docs/badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
           <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="docs/badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
@@ -1282,6 +1282,17 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </div>
         </div>
       </div>
+      <div class="psec-title" style="margin-top:28px;">Production</div>
+      <div class="setting-row">
+        <div class="setting-label">Production Notes</div>
+        <div class="setting-desc">Notes for the director, cast, and crew. Included as a separate page in PDF exports if non-empty.</div>
+        <textarea id="production-notes-ta" oninput="updateProductionNotes(this.value)" placeholder="Casting notes, design intentions, production history…" style="margin-top:8px;width:100%;min-height:80px;font-size:12px;padding:8px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);font-family:var(--sans);resize:vertical;line-height:1.5;"></textarea>
+      </div>
+      <div class="setting-row" style="margin-top:12px;">
+        <div class="setting-label">Copyright Page Text</div>
+        <div class="setting-desc">Included as a separate page in PDF exports. Edit freely for your jurisdiction or licensing arrangement. <button onclick="resetCopyrightText()" style="font-size:11px;padding:2px 8px;border:1px solid var(--bd2);border-radius:var(--rm);background:none;color:var(--tx2);cursor:pointer;font-family:var(--sans);">Reset to default</button></div>
+        <textarea id="copyright-text-ta" oninput="updateCopyrightText(this.value)" placeholder="Fill in your author name on the Script Details tab first, then click «Reset to default» to generate standard copyright language." style="margin-top:8px;width:100%;min-height:100px;font-size:12px;padding:8px;border:1px solid var(--bd2);border-radius:var(--rm);background:var(--bg2);color:var(--tx1);font-family:var(--sans);resize:vertical;line-height:1.5;"></textarea>
+      </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
       <div class="setting-row desktop-only">
         <div class="setting-label">Keyboard shortcuts</div>
@@ -1309,7 +1320,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.43 · July 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.44 · August 2026</div>
       </div>
     </div>
 
@@ -1350,6 +1361,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
                 <textarea id="dlg-char-ta" placeholder="Character name..." rows="1" oninput="onCI()" onfocus="showCDD()" onblur="hideCDDDelayed()" onkeydown="charKeyDown(event)"></textarea>
                 <div id="dlg-char-dd" style="display:none"></div>
               </div>
+              <button id="dlg-add-char-btn" onclick="addExtraChar()" title="Add second character (unison/group)" style="font-size:11px;padding:2px 6px;border:1px solid var(--bd2);border-radius:4px;background:none;color:var(--tx2);cursor:pointer;flex-shrink:0;">+</button>
+              <span id="extra-chars-container"></span>
             </div>
             <!-- Dialogue action below character name -->
             <textarea id="dlg-act-ta" placeholder="Dialogue action (optional)..." rows="1" oninput="as(this)" onkeydown="midFieldKey(event,'dlg-act-ta','dlg-text-ta')"></textarea>
@@ -1431,7 +1444,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 </main>
 
 <script>
-let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false};
+let S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false,productionNotes:'',copyrightText:''};
 let activeTab='edit',cType='direction',pendingPill=null,pendingPillKey=null;
 /* navMode: true when the writer has pressed Escape to leave the input bar
    and is navigating through lines with arrow keys. Tab or ` +pill returns
@@ -1574,7 +1587,7 @@ const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escBr(s){return esc(s).replace(/\n/g,'<br>');}
 function escJs(s){return String(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
-function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false,colorLabels:S.colorLabels||{}});}
+function stateJSON(){return JSON.stringify({title:S.title,author:S.author,acts:S.acts,characters:S.characters,revisions:S.revisions||[],scenesLocked:S.scenesLocked||false,colorLabels:S.colorLabels||{},productionNotes:S.productionNotes||'',copyrightText:S.copyrightText||''});}
 function cloneState(){return JSON.parse(stateJSON());}
 
 function updateSaveIndicator(){
@@ -1588,6 +1601,23 @@ async function writeToFileHandle(json){
   try{const w=await fileHandle.createWritable();await w.write(json);await w.close();}catch(e){console.warn('File write failed:',e);setFileHandle(null);updateSaveIndicator();}
 }
 function autoSave(){if(S.title)lsSaveScript();lastSavedJSON=stateJSON();if(fileHandle&&autosaveEnabled)writeToFileHandle(lastSavedJSON);updateSaveIndicator();computeRevisionChanges();}
+function updateProductionNotes(v){S.productionNotes=v;autoSave();}
+function updateCopyrightText(v){S.copyrightText=v;autoSave();}
+function defaultCopyrightText(){
+  const yr=new Date().getFullYear();
+  const author=S.author||'[Author]';
+  return `Copyright © ${yr} by ${author}. All Rights Reserved.\n\nCAUTION: Professionals and amateurs are hereby warned that performance of this play is subject to payment of a royalty. The play is fully protected under the copyright laws of the United States of America and all countries with which the United States has reciprocal copyright relations. All inquiries concerning performance rights should be addressed to the author.\n\nNo alterations, deletions or substitutions may be made in the work without the prior written consent of the author.`;
+}
+function resetCopyrightText(){
+  S.copyrightText=defaultCopyrightText();
+  autoSave();
+  const ta=$('copyright-text-ta');
+  if(ta)ta.value=S.copyrightText;
+}
+function syncProductionSettings(){
+  const pn=$('production-notes-ta');if(pn)pn.value=S.productionNotes||'';
+  const ct=$('copyright-text-ta');if(ct)ct.value=S.copyrightText||'';
+}
 function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
 function toggleAutoFormat(){
   autoFormat=!autoFormat;
@@ -1611,11 +1641,13 @@ function applyAutoFormat(line){
     if(line.value)line.value=line.value.replace(/[ \t]+/g,' ').replace(/\n /g,'\n').trim();
     if(line.dialogueAction)line.dialogueAction=line.dialogueAction.trim();
   }
-  if(afOptions.charCaps&&line.character){
-    line.character.name=line.character.name.toUpperCase();
-    /* Also update the character in S.characters to keep consistent */
-    const c=S.characters.find(ch=>ch.name.toUpperCase()===line.character.name.toUpperCase());
-    if(c)c.name=line.character.name;
+  if(afOptions.charCaps&&line.characters){
+    line.characters.forEach(ch=>{
+      ch.name=ch.name.toUpperCase();
+      /* Also update the character in S.characters to keep consistent */
+      const c=S.characters.find(sc=>sc.name.toUpperCase()===ch.name.toUpperCase());
+      if(c)c.name=ch.name;
+    });
   }
   if(afOptions.parenWrap&&line.dialogueAction){
     let da=line.dialogueAction.trim();
@@ -1692,12 +1724,12 @@ function getSceneCharsAt(scene,upTo){
 }
 function getAllSceneChars(scene){
   const a=new Set();
-  scene.lines.forEach(l=>{if(l.character)a.add(l.character.name);if(l.type==='direction'&&l.cues){(l.cues.enters||[]).forEach(n=>a.add(n));(l.cues.exits||[]).forEach(n=>a.add(n));}});
+  scene.lines.forEach(l=>{if(l.characters)l.characters.forEach(c=>a.add(c.name));if(l.type==='direction'&&l.cues){(l.cues.enters||[]).forEach(n=>a.add(n));(l.cues.exits||[]).forEach(n=>a.add(n));}});
   return a;
 }
 function isCont(scene,li){
   if(li===0)return false;const cur=scene.lines[li];if(cur.type!=='dialogue')return false;
-  for(let i=li-1;i>=0;i--){const prev=scene.lines[i];if(prev.type==='dialogue')return prev.character&&prev.character.name===cur.character.name;if(prev.type==='action'||prev.type==='setting'||prev.type==='direction')return false;}
+  for(let i=li-1;i>=0;i--){const prev=scene.lines[i];if(prev.type==='dialogue')return prev.characters&&prev.characters[0]&&cur.characters&&cur.characters[0]&&prev.characters[0].name===cur.characters[0].name;if(prev.type==='action'||prev.type==='setting'||prev.type==='direction')return false;}
   return false;
 }
 function nextPillAfter(t){if(t==='direction')return'dialogue';return'dialogue';}
@@ -1775,7 +1807,7 @@ function switchTab(t){
   $('right-panel-wrap').style.display=(t==='settings'||t==='outline')?'none':(S.title?'flex':'none');
   if(t==='view')renderView();
   if(t==='outline')renderOutline();
-  if(t==='settings'){renderAlignSettings();renderStats();}
+  if(t==='settings'){renderAlignSettings();renderStats();syncProductionSettings();}
   closeFDD();
 }
 function toggleRP(){rpCollapsed=!rpCollapsed;const w=$('right-panel-wrap');if(rpCollapsed){w.style.width='28px';$('rp-toggle').textContent='▶';}else{w.style.width='320px';$('rp-toggle').textContent='◀';}lsSaveSettings();}
@@ -1846,14 +1878,24 @@ function migrateSettingLines(){
     }
   }));
 }
+function migrateCharacterToCharacters(){
+  /* Migrate old singular character:{} to characters:[{}] array for unison/group dialogue */
+  S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{
+    if(l.type==='dialogue'&&l.character&&!l.characters){
+      l.characters=[l.character];
+      delete l.character;
+    }
+    if(l.characters)l.characters=l.characters.slice(0,2);
+  })));
+}
 function loadFromData(data){
-  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};
-  migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
+  S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};S.productionNotes=data.productionNotes||'';S.copyrightText=data.copyrightText||'';
+  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
-  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};
-  migrateSettingLines();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
+  try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};S.productionNotes=data.productionNotes||'';S.copyrightText=data.copyrightText||'';
+  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Garden Party',
@@ -1869,44 +1911,44 @@ const SAMPLE_SCRIPT={
       {name:'Preparations',description:'Helen sets the stage for a perfect afternoon.',setting:'The back garden of a large country house. Late afternoon, summer. A long table is set for tea under a canopy of fairy lights. Bunting hangs between the trees. Everything is immaculate.',lines:[
         {type:'direction',value:'HELEN arranges flowers in a vase at the centre of the table, stepping back to check the effect.',cues:{enters:['HELEN'],exits:[]}},
         {type:'action',value:'HELEN adjusts a napkin, then adjusts it again. She checks her watch.'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Four o\'clock. They\'ll be here any minute.'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'Four o\'clock. They\'ll be here any minute.'},
         {type:'action',value:'HELEN smooths her dress, takes a breath, composes her face into a warm smile.'},
         {type:'direction',value:'RUTH appears from the house, carrying a teapot.',cues:{enters:['RUTH'],exits:[]}},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'You\'ve rearranged the table three times. It\'s a garden party, not a state dinner.'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'It\'s the first time James has been home in two years. I want it to feel right.'},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'It\'s a garden. It feels like a garden.',dialogueAction:'setting the teapot down heavily'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'You know what I mean.'},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'I know exactly what you mean. And he\'ll see through it in about thirty seconds, same as always.'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'You\'ve rearranged the table three times. It\'s a garden party, not a state dinner.'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'It\'s the first time James has been home in two years. I want it to feel right.'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'It\'s a garden. It feels like a garden.',dialogueAction:'setting the teapot down heavily'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'You know what I mean.'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'I know exactly what you mean. And he\'ll see through it in about thirty seconds, same as always.'},
         {type:'action',value:'HELEN turns away and fusses with the flowers again. A silence sits between them.'}
       ]},
       {name:'The Return',description:'James arrives and old patterns resurface.',setting:'The same garden, moments later. The light has shifted slightly. A bird sings offstage.',lines:[
         {type:'direction',value:'JAMES enters from the side gate, carrying a small bag. He stops when he sees the garden.',cues:{enters:['JAMES'],exits:[]}},
-        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'You\'ve outdone yourself.',dialogueAction:'looking around'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'James!'},
+        {type:'dialogue',characters:[{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'}],value:'You\'ve outdone yourself.',dialogueAction:'looking around'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'James!'},
         {type:'action',value:'HELEN crosses to him quickly and embraces him. She holds on a moment too long. JAMES gently pulls back.'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Let me look at you. You\'re thin.'},
-        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'I\'m fine, Mum.'},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'He looks the same to me.',dialogueAction:'from her chair'},
-        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'Hello, Aunt Ruth.'},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'Sit down. Have some tea. Your mother\'s been preparing this since Tuesday.'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'Ruth.',dialogueAction:'a warning'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'Let me look at you. You\'re thin.'},
+        {type:'dialogue',characters:[{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'}],value:'I\'m fine, Mum.'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'He looks the same to me.',dialogueAction:'from her chair'},
+        {type:'dialogue',characters:[{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'}],value:'Hello, Aunt Ruth.'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'Sit down. Have some tea. Your mother\'s been preparing this since Tuesday.'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'Ruth.',dialogueAction:'a warning'},
         {type:'action',value:'JAMES sits. He picks up a teacup but doesn\'t drink. He looks at the garden as if seeing it for the first time, or the last.'}
       ]}
     ]},
     {name:'Revelations',description:'The party takes an unexpected turn.',scenes:[
       {name:'An Old Friend',description:'Claire arrives and shifts the balance.',setting:'The garden. The tea things are partly used. Late golden light.',lines:[
         {type:'direction',value:'CLAIRE enters through the garden gate, a bottle of wine in hand.',cues:{enters:['CLAIRE'],exits:[]}},
-        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'I brought something stronger than tea.',dialogueAction:'holding up the bottle'},
-        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'Claire.'},
+        {type:'dialogue',characters:[{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'}],value:'I brought something stronger than tea.',dialogueAction:'holding up the bottle'},
+        {type:'dialogue',characters:[{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'}],value:'Claire.'},
         {type:'action',value:'They look at each other. A beat. Then CLAIRE crosses to him and they embrace — brief, careful, aware of being watched.'},
-        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'Two years. You could have written.'},
-        {type:'dialogue',character:{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'},value:'I know. I\'m sorry.'},
-        {type:'dialogue',character:{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'},value:'Don\'t be sorry. Be here.',dialogueAction:'firmly'},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'Open that bottle, dear. I think we\'re all going to need it.'},
+        {type:'dialogue',characters:[{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'}],value:'Two years. You could have written.'},
+        {type:'dialogue',characters:[{name:'JAMES',description:'Helen\'s son, 30, recently returned home, restless and uncertain'}],value:'I know. I\'m sorry.'},
+        {type:'dialogue',characters:[{name:'CLAIRE',description:'James\'s old friend, 30, confident, the one who stayed in town'}],value:'Don\'t be sorry. Be here.',dialogueAction:'firmly'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'Open that bottle, dear. I think we\'re all going to need it.'},
         {type:'action',value:'HELEN watches JAMES and CLAIRE together. Something crosses her face — not jealousy, but the recognition that her son has a life she doesn\'t control.'},
-        {type:'dialogue',character:{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'},value:'I\'ll get some glasses.',dialogueAction:'quietly'},
+        {type:'dialogue',characters:[{name:'HELEN',description:'The hostess, 50s, gracious but controlling, hides worry behind a perfect smile'}],value:'I\'ll get some glasses.',dialogueAction:'quietly'},
         {type:'direction',value:'HELEN exits into the house.',cues:{enters:[],exits:['HELEN']}},
-        {type:'dialogue',character:{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'},value:'She\'ll be alright. Give her a moment.',dialogueAction:'to James, gently'},
+        {type:'dialogue',characters:[{name:'RUTH',description:'Helen\'s sister, 60s, sharp-tongued, sees through everyone'}],value:'She\'ll be alright. Give her a moment.',dialogueAction:'to James, gently'},
         {type:'action',value:'JAMES nods. CLAIRE takes his hand. The fairy lights begin to glow as the daylight fades.'}
       ]}
     ]}
@@ -1914,12 +1956,12 @@ const SAMPLE_SCRIPT={
 };
 function loadSample(){
   const data=JSON.parse(JSON.stringify(SAMPLE_SCRIPT));
-  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};revisionChanges={};
-  resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
+  S.title=data.title;S.author=data.author;S.acts=data.acts;S.characters=data.characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};S.productionNotes='';S.copyrightText='';revisionChanges={};
+  migrateCharacterToCharacters();resetEditorState();hasFilename=false;lastSavedJSON='';lsSaveScript();showEditor(S.title);render();
 }
 function menuNew(){closeFDD();if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Unsaved changes</h3><p>You have unsaved changes.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save first</button></div>`,null);}else doNewScript();}
 function goHome(){if(stateJSON()!==lastSavedJSON&&S.title){openModal(`<h3>Return to home?</h3><p>You have unsaved changes. Going back to the home page will close your current script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal();doNewScript()">Discard &amp; go home</button><button class="mb-ok" onclick="menuSave();closeModal();doNewScript()">Save &amp; go home</button></div>`,null);}else doNewScript();}
-function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false,colorLabels:{}};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';setFileHandle(null);$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
+function doNewScript(){lsClearScript();S={title:'',author:'',acts:[],characters:[],revisions:[],scenesLocked:false,colorLabels:{},productionNotes:'',copyrightText:''};revisionChanges={};resetEditorState();hasFilename=false;lastSavedJSON='';setFileHandle(null);$('setup-screen').style.display='flex';$('setup-cards').style.display='flex';$('new-title-wrap').style.display='none';$('resume-card').style.display='none';$('script-content').style.display='none';$('script-content').innerHTML='';$('input-bar').style.display='none';$('right-panel-wrap').style.display='none';$('script-title-text').textContent='The Scriptwriter';$('ctx-crumb').textContent='';updateSaveIndicator();switchTab('edit');}
 function showNewTitleInput(){$('setup-cards').style.display='none';$('new-title-wrap').style.display='flex';setTimeout(()=>$('setup-input').focus(),50);}
 function hideNewTitleInput(){$('new-title-wrap').style.display='none';$('setup-cards').style.display='flex';}
 /* beforeunload guard removed — all changes auto-save to localStorage */
@@ -2167,7 +2209,24 @@ function enterWriteMode(type){
 }
 
 function hasInput(){if(inputMode==='auto')return $('auto-ta').value.trim();if(cType==='dialogue')return($('dlg-char-ta').value.trim()||$('dlg-act-ta').value.trim()||$('dlg-text-ta').value.trim());if(cType==='direction')return $('dir-desc-ta').value.trim()||pendingCues.enters.length||pendingCues.exits.length;return $('simple-ta').value.trim();}
-function clearInput(){$('simple-ta').value='';$('dlg-char-ta').value='';$('dlg-act-ta').value='';$('dlg-text-ta').value='';$('dir-desc-ta').value='';$('auto-ta').value='';pendingCues={enters:[],exits:[]};ghostMatch='';$('char-ghost').textContent='';$('auto-suggest').style.display='none';[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta'),$('auto-ta')].forEach(el=>{if(el)as(el);});}
+function clearInput(){$('simple-ta').value='';$('dlg-char-ta').value='';$('dlg-act-ta').value='';$('dlg-text-ta').value='';$('dir-desc-ta').value='';$('auto-ta').value='';pendingCues={enters:[],exits:[]};ghostMatch='';$('char-ghost').textContent='';$('auto-suggest').style.display='none';const ec=$('extra-chars-container');if(ec)ec.innerHTML='';const ab=$('dlg-add-char-btn');if(ab)ab.style.display='';[$('simple-ta'),$('dlg-char-ta'),$('dlg-act-ta'),$('dlg-text-ta'),$('dir-desc-ta'),$('auto-ta')].forEach(el=>{if(el)as(el);});}
+function addExtraChar(){
+  const container=$('extra-chars-container');
+  if(!container||container.children.length>=1)return; /* max 1 extra = 2 total */
+  const sel=document.createElement('select');
+  sel.className='dlg-extra-char';
+  sel.style.cssText='font-size:11px;padding:2px 4px;border:1px solid var(--bd2);border-radius:4px;background:var(--bg2);color:var(--tx1);max-width:140px;margin-left:4px;';
+  const blank=document.createElement('option');
+  blank.value='';blank.textContent='— 2nd character —';
+  sel.appendChild(blank);
+  (S.characters||[]).filter(c=>!c.archived).forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.name;o.textContent=c.name;
+    sel.appendChild(o);
+  });
+  container.appendChild(sel);
+  const ab=$('dlg-add-char-btn');if(ab)ab.style.display='none';
+}
 function selPill(el,t){if(t===cType&&!pendingPill)return;if(hasInput()&&pendingPill!==t){pendingPill=t;document.querySelectorAll('.tpill').forEach(p=>{p.classList.remove('warn');if(p.dataset.t===t)p.classList.add('warn');});$('type-alert').textContent='You have unsaved text. Select the same option again to switch and discard it.';$('type-alert').style.display='block';return;}pendingPill=null;$('type-alert').style.display='none';document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function activatePillByType(t){document.querySelectorAll('.tpill').forEach(p=>p.classList.remove('active','warn'));const el=document.querySelector(`.tpill[data-t="${t}"]`);if(el)el.classList.add('active');cType=t;clearInput();updateInputMode();}
 function updateInputMode(){
@@ -2220,7 +2279,7 @@ function submitLine(){
   let line=null;
   if(t==='action'){const v=$('simple-ta').value.trim();if(!v)return;line={type:'action',value:v};}
   else if(t==='direction'){const v=$('dir-desc-ta').value.trim();if(!v)return;line={type:'direction',value:v};if(pendingCues.enters.length||pendingCues.exits.length)line.cues={enters:[...pendingCues.enters],exits:[...pendingCues.exits]};}
-  else if(t==='dialogue'){const cn=$('dlg-char-ta').value.trim(),da=$('dlg-act-ta').value.trim();const vRaw=$('dlg-text-ta').value.trim();if(!cn||!vRaw)return;const ex=findChar(cn);if(!ex){openNewCharModal(cn,da,vRaw);return;}/* inject newlines around parentheticals only after char is confirmed */const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};if(da)line.dialogueAction=da;}
+  else if(t==='dialogue'){const cn=$('dlg-char-ta').value.trim(),da=$('dlg-act-ta').value.trim();const vRaw=$('dlg-text-ta').value.trim();if(!cn||!vRaw)return;const ex=findChar(cn);if(!ex){openNewCharModal(cn,da,vRaw);return;}/* inject newlines around parentheticals only after char is confirmed */const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');const chars=[{name:ex.name,description:ex.description}];document.querySelectorAll('.dlg-extra-char').forEach(sel=>{if(sel.value){const ec=S.characters.find(c=>c.name===sel.value);if(ec&&!chars.find(x=>x.name===ec.name))chars.push({name:ec.name,description:ec.description});}});line={type:'dialogue',value:v,characters:chars};if(da)line.dialogueAction=da;}
   if(!line)return;
   applyAutoFormat(line);
   pushUndo();
@@ -2438,7 +2497,7 @@ function submitAutoLine(){
       return;
     }
     const v=det.parsed.dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
-    line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};
+    line={type:'dialogue',value:v,characters:[{name:ex.name,description:ex.description}]};
     if(det.parsed.dlgAction)line.dialogueAction=det.parsed.dlgAction;
   }else if(det.type==='direction'&&det.parsed){
     line={type:'direction',value:det.parsed.value||''};
@@ -2466,7 +2525,7 @@ function forceAutoSubmit(charName){
   const scene=insertAfter?insertAfter.scene:currentScene();if(!scene)return;
   const ex=getOrCreate(charName);
   const v=det.parsed.dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
-  const line={type:'dialogue',value:v,character:{name:ex.name,description:ex.description}};
+  const line={type:'dialogue',value:v,characters:[{name:ex.name,description:ex.description}]};
   if(det.parsed.dlgAction)line.dialogueAction=det.parsed.dlgAction;
   applyAutoFormat(line);
   pushUndo();
@@ -2488,7 +2547,7 @@ function confirmNewCharAuto(da,dlgText){
   /* Now submit the dialogue line */
   const scene=insertAfter?insertAfter.scene:currentScene();if(!scene)return;
   const v=dlgText.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');
-  const line={type:'dialogue',value:v,character:{name:c.name,description:c.description}};
+  const line={type:'dialogue',value:v,characters:[{name:c.name,description:c.description}]};
   if(da)line.dialogueAction=da;
   pushUndo();
   if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}
@@ -2524,8 +2583,13 @@ function renderInlineEditLine(line,ai,si,li){
     }
     inner=`<div class="l-direction"><textarea class="ie-ta ie-direction" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea>${cueHtml}</div>`;
   }else if(line.type==='dialogue'){
-    const charOpts=S.characters.filter(c=>!c.archived).map(c=>`<option value="${esc(c.name)}"${c.name===line.character?.name?' selected':''}>${esc(c.name)}</option>`).join('');
-    inner=`<div class="l-dialogue"><div class="dl-char-line"><select class="ie-input ie-dlg-char" id="ie-char" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()">${charOpts}</select></div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
+    const existingChars=(line.characters||[{name:'',description:''}]);
+    const charSelects=existingChars.map((ch,i)=>{
+      const opts=S.characters.filter(c=>!c.archived).map(c=>`<option value="${esc(c.name)}"${c.name===ch.name?' selected':''}>${esc(c.name)}</option>`).join('');
+      return`<select class="ie-input ie-dlg-char" data-idx="${i}" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()" style="max-width:160px;">${opts}</select>`;
+    }).join('');
+    const addCharBtn=existingChars.length<2?`<button type="button" onclick="ieAddChar(this)" style="font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;margin-left:4px;">+</button>`:'';
+    inner=`<div class="l-dialogue"><div class="dl-char-line" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${charSelects}${addCharBtn}</div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
   }else if(line.type==='action'){
     inner=`<div class="l-action"><textarea class="ie-ta" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div>`;
   }else if(line.type==='bookmark'){
@@ -2546,6 +2610,24 @@ function startInlineEdit(ai,si,li){
       const len=el.value.length;el.setSelectionRange(len,len);}
   },50);
 }
+function ieAddChar(btn){
+  const row=btn.closest('.dl-char-line')||btn.parentElement;
+  const sel=document.createElement('select');
+  sel.className='ie-input ie-dlg-char';
+  sel.dataset.idx='1';
+  sel.style.cssText='max-width:160px;';
+  sel.setAttribute('onkeydown','ieCharKey(event)');
+  sel.setAttribute('onblur','ieBlur()');
+  sel.setAttribute('onfocus','ieFocus()');
+  const blank=document.createElement('option');
+  blank.value='';blank.textContent='— 2nd character —';
+  sel.appendChild(blank);
+  (S.characters||[]).filter(c=>!c.archived).forEach(c=>{
+    const o=document.createElement('option');o.value=c.name;o.textContent=c.name;sel.appendChild(o);
+  });
+  row.insertBefore(sel,btn);
+  btn.remove();
+}
 function saveInlineEdit(){
   if(!editingLine)return;
   const{actIdx:ai,sceneIdx:si,lineIdx:li}=editingLine;
@@ -2557,9 +2639,12 @@ function saveInlineEdit(){
   if(!v){editingLine=null;render();return;}
   pushUndo();line.value=v;
   if(line.type==='dialogue'){
-    const charEl=document.getElementById('ie-char');
+    const charSels=document.querySelectorAll('.ie-dlg-char');
+    const newChars=[];
+    charSels.forEach(sel=>{if(sel.value){const ch=S.characters.find(c=>c.name===sel.value);if(ch&&!newChars.find(x=>x.name===ch.name))newChars.push({name:ch.name,description:ch.description});}});
+    if(newChars.length)line.characters=newChars;
+    delete line.character; /* clean up legacy field if present */
     const daEl=document.getElementById('ie-da');
-    if(charEl){const cn=charEl.value;if(cn){const ch=S.characters.find(c=>c.name===cn);if(ch)line.character={name:ch.name,description:ch.description};}}
     if(daEl){const da=daEl.value.trim();line.dialogueAction=da||undefined;}
   }
   editingLine=null;autoSave();render();
@@ -2575,18 +2660,18 @@ function cancelInlineEdit(){
 function ieKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveInlineEdit();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieCharKey(e){if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();const da=document.getElementById('ie-da');if(da)da.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieMidKey(e){if((e.key==='Tab'||e.key==='Enter')&&!e.shiftKey){e.preventDefault();const v=document.getElementById('ie-val');if(v)v.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
-function ieBlur(){if(ieBlurTimer)clearTimeout(ieBlurTimer);ieBlurTimer=setTimeout(()=>{const a=document.activeElement;if(a&&(a.id==='ie-val'||a.id==='ie-char'||a.id==='ie-da'))return;saveInlineEdit();},200);}
+function ieBlur(){if(ieBlurTimer)clearTimeout(ieBlurTimer);ieBlurTimer=setTimeout(()=>{const a=document.activeElement;if(a&&(a.id==='ie-val'||a.classList.contains('ie-dlg-char')||a.id==='ie-da'))return;saveInlineEdit();},200);}
 function ieFocus(){if(ieBlurTimer){clearTimeout(ieBlurTimer);ieBlurTimer=null;}}
 function ieAutosize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
 
-function charHasUsage(name){for(const a of S.acts)for(const sc of a.scenes)for(const l of sc.lines){if(l.character&&l.character.name===name)return true;if(l.cues&&((l.cues.enters||[]).includes(name)||(l.cues.exits||[]).includes(name)))return true;}return false;}
-function removeCharUsage(name){S.acts.forEach(a=>a.scenes.forEach(sc=>{sc.lines=sc.lines.filter(l=>!(l.character&&l.character.name===name));sc.lines.forEach(l=>{if(l.cues){l.cues.enters=(l.cues.enters||[]).filter(n=>n!==name);l.cues.exits=(l.cues.exits||[]).filter(n=>n!==name);if(!l.cues.enters.length&&!l.cues.exits.length)delete l.cues;}});}));}
+function charHasUsage(name){for(const a of S.acts)for(const sc of a.scenes)for(const l of sc.lines){if(l.characters&&l.characters.some(c=>c.name===name))return true;if(l.cues&&((l.cues.enters||[]).includes(name)||(l.cues.exits||[]).includes(name)))return true;}return false;}
+function removeCharUsage(name){S.acts.forEach(a=>a.scenes.forEach(sc=>{sc.lines=sc.lines.filter(l=>{if(l.type!=='dialogue'||!l.characters)return true;if(!l.characters.some(c=>c.name===name))return true;if(l.characters.length===1)return false;/* multi-char: remove this char from array, keep line */l.characters=l.characters.filter(c=>c.name!==name);return true;});sc.lines.forEach(l=>{if(l.cues){l.cues.enters=(l.cues.enters||[]).filter(n=>n!==name);l.cues.exits=(l.cues.exits||[]).filter(n=>n!==name);if(!l.cues.enters.length&&!l.cues.exits.length)delete l.cues;}});}));}
 function tryDeleteChar(name){const hasUsage=charHasUsage(name);if(hasUsage){openModal(`<h3>Delete ${esc(name)}</h3><p>${esc(name)} has lines or cues in the script.</p><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-neutral" onclick="doArchiveChar('${escJs(name)}')">Archive</button><button class="mb-warn" onclick="doDeleteCharWithUsage('${escJs(name)}')">Remove all &amp; delete</button></div>`,null);}else{openModal(`<h3>Delete ${esc(name)}</h3><p>${esc(name)} has no lines. Delete or archive?</p><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-neutral" onclick="doArchiveChar('${escJs(name)}')">Archive</button><button class="mb-warn" onclick="doDeleteCharNoUsage('${escJs(name)}')">Delete</button></div>`,null);}}
 function doArchiveChar(name){pushUndo();const ch=findCharAny(name);if(ch)ch.archived=true;closeModal();autoSave();render();}
 function doDeleteCharWithUsage(name){pushUndo();removeCharUsage(name);S.characters=S.characters.filter(c=>c.name!==name);closeModal();autoSave();render();}
 function doDeleteCharNoUsage(name){pushUndo();S.characters=S.characters.filter(c=>c.name!==name);closeModal();autoSave();render();}
 
-function validateMoveLine(fai,fsi,fli,tai,tsi,tli){if(fai!==tai||fsi!==tsi)return{ok:true};const scene=S.acts[fai].scenes[fsi],line=scene.lines[fli],errors=[];if(line.type==='direction'&&line.cues){const tl=[...scene.lines];tl.splice(fli,1);tl.splice(tli,0,line);const ni=tl.findIndex(l=>l===line),pb=getSceneCharsAt({lines:tl.slice(0,ni)},ni-1);(line.cues.enters||[]).forEach(n=>{if(pb.has(n))errors.push(`${n} cannot enter — already in scene.`);});(line.cues.exits||[]).forEach(n=>{if(!pb.has(n))errors.push(`${n} cannot exit — not in scene.`);});return{ok:errors.length===0,errors,hardBlock:false};}if(line.type==='dialogue'&&line.character){const cn=line.character.name,hasEntrance=scene.lines.some(l=>l.type==='direction'&&l.cues&&(l.cues.enters||[]).includes(cn));if(hasEntrance){const tl=[...scene.lines];tl.splice(fli,1);tl.splice(tli,0,line);const ni=tl.findIndex(l=>l===line),pa=getSceneCharsAt({lines:tl},ni-1);if(!pa.has(cn))return{ok:false,errors:[`${cn} has not entered or has already exited at the new position.`],hardBlock:true};}}return{ok:true};}
+function validateMoveLine(fai,fsi,fli,tai,tsi,tli){if(fai!==tai||fsi!==tsi)return{ok:true};const scene=S.acts[fai].scenes[fsi],line=scene.lines[fli],errors=[];if(line.type==='direction'&&line.cues){const tl=[...scene.lines];tl.splice(fli,1);tl.splice(tli,0,line);const ni=tl.findIndex(l=>l===line),pb=getSceneCharsAt({lines:tl.slice(0,ni)},ni-1);(line.cues.enters||[]).forEach(n=>{if(pb.has(n))errors.push(`${n} cannot enter — already in scene.`);});(line.cues.exits||[]).forEach(n=>{if(!pb.has(n))errors.push(`${n} cannot exit — not in scene.`);});return{ok:errors.length===0,errors,hardBlock:false};}if(line.type==='dialogue'&&line.characters&&line.characters[0]){const cn=line.characters[0].name,hasEntrance=scene.lines.some(l=>l.type==='direction'&&l.cues&&(l.cues.enters||[]).includes(cn));if(hasEntrance){const tl=[...scene.lines];tl.splice(fli,1);tl.splice(tli,0,line);const ni=tl.findIndex(l=>l===line),pa=getSceneCharsAt({lines:tl},ni-1);if(!pa.has(cn))return{ok:false,errors:[`${cn} has not entered or has already exited at the new position.`],hardBlock:true};}}return{ok:true};}
 
 function render(){
   const c=$('script-content');
@@ -2626,7 +2711,7 @@ function renderScene(act,ai,sc,si){
     const hl=(text,field)=>findQuery?highlightText(text,ai,si,li,field):escBr(text);
     if(line.type==='setting')inner=`<div class="l-setting">${hl(line.value,'value')}</div>`;
     else if(line.type==='direction'){let cueHtml='';if(line.cues&&((line.cues.enters||[]).length||(line.cues.exits||[]).length)){const enters=(line.cues.enters||[]).map(n=>`<span class="enter">${esc(n)} enters</span>`).join(', ');const exits=(line.cues.exits||[]).map(n=>`<span class="exit">${esc(n)} exits</span>`).join(', ');cueHtml=`<div class="lcues">${[enters,exits].filter(Boolean).join(' · ')}</div>`;}inner=`<div class="l-direction">(${hl(line.value,'value')})${cueHtml}</div>`;}
-    else if(line.type==='dialogue'){if(dlgFormat==='inline')inner=`<div class="l-dialogue l-dlg-inline"><span class="dl-inline-name">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</span>${line.dialogueAction?` <span class="dl-inline-paren">(${hl(line.dialogueAction,'dialogueAction')})</span>`:''} <span class="dl-inline-text">${hl(line.value,'value')}</span></div>`;else inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(line.character.name)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;}
+    else if(line.type==='dialogue'){const charName=(line.characters||[]).map(c=>c.name).join(' & ');if(dlgFormat==='inline')inner=`<div class="l-dialogue l-dlg-inline"><span class="dl-inline-name">${esc(charName)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</span>${line.dialogueAction?` <span class="dl-inline-paren">(${hl(line.dialogueAction,'dialogueAction')})</span>`:''} <span class="dl-inline-text">${hl(line.value,'value')}</span></div>`;else inner=`<div class="l-dialogue"><div class="dl-char-line">${esc(charName)}${cont?` <span class="dl-cont">(cont.)</span>`:''}</div>${line.dialogueAction?`<div class="dl-paren">(${hl(line.dialogueAction,'dialogueAction')})</div>`:''}<div class="dl-text">${hl(line.value,'value')}</div></div>`;}
     else if(line.type==='action')inner=`<div class="l-action">(${hl(line.value,'value')})</div>`;
     else if(line.type==='bookmark')inner=`<div class="l-bookmark"><span class="bm-flag">🔖</span><span class="bm-label${line.label?'':' bm-label-empty'}" onclick="event.stopPropagation();editBookmarkLabel(${ai},${si},${li})">${line.label?esc(line.label):'Click to add label'}</span></div>`;
     /* Inline icon now only acts as an at-a-glance indicator when notes exist;
@@ -2807,7 +2892,7 @@ function renderView(){
   }
   h+=`<div class="v-title">${esc(S.title)}</div>`;
   if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(l.character.name)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
+  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){const charName=(l.characters||[]).map(c=>c.name).join(' & ');if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
   p.innerHTML=h;
 }
 
@@ -2815,8 +2900,7 @@ function renderView(){
 function getSceneCharsList(sc){
   const chars=new Set();
   sc.lines.forEach(l=>{
-    if(l.type==='dialogue'&&l.character)chars.add(l.character.name);
-    if(l.type==='action'&&l.character)chars.add(l.character.name);
+    if(l.type==='dialogue'&&l.characters)l.characters.forEach(c=>chars.add(c.name));
     if(l.cues){(l.cues.enters||[]).forEach(n=>chars.add(n));(l.cues.exits||[]).forEach(n=>chars.add(n));}
   });
   return Array.from(chars).sort();
@@ -2998,8 +3082,7 @@ function buildCoAppearanceData(){
       /* Gather characters present in this scene */
       const present=new Set();
       sc.lines.forEach(l=>{
-        if(l.type==='dialogue'&&l.character)present.add(l.character.name);
-        if(l.type==='action'&&l.character)present.add(l.character.name);
+        if(l.type==='dialogue'&&l.characters)l.characters.forEach(c=>present.add(c.name));
         if(l.type==='direction'&&l.cues){
           (l.cues.enters||[]).forEach(n=>present.add(n));
           (l.cues.exits||[]).forEach(n=>present.add(n));
@@ -3242,7 +3325,7 @@ function getCharStats(name){
     a.scenes.forEach((sc,si)=>{
       if(scope.sceneIdx!==null&&si!==scope.sceneIdx)return;
       sc.lines.forEach(l=>{
-        if(l.type==='dialogue'&&l.character&&l.character.name===name){
+        if(l.type==='dialogue'&&l.characters&&l.characters.some(c=>c.name===name)){
           lines++;words+=l.value.trim().split(/\s+/).filter(Boolean).length;
           if(firstAi===null){firstAi=ai;firstSi=si;}
           lastAi=ai;lastSi=si;
@@ -3489,7 +3572,7 @@ function openEditLine(ai,si,li){
     setTimeout(()=>{const el=$('el-v');if(el)el.focus();},50);
     return;
   }
-  openModal(`<h3>Edit ${typeLabel(l.type)}</h3>${isDlg?`<div class="mf"><label>Character</label><input class="minput" id="el-c" value="${esc(l.character?.name||'')}"/></div>`:''}${isDlg?`<div class="mf"><label>Parenthetical <em>(optional)</em></label><input class="minput" id="el-da" value="${esc(l.dialogueAction||'')}"/></div>`:''}
+  openModal(`<h3>Edit ${typeLabel(l.type)}</h3>${isDlg?`<div class="mf"><label>Character</label><input class="minput" id="el-c" value="${esc(l.characters?.[0]?.name||'')}"/></div>`:''}${isDlg?`<div class="mf"><label>Parenthetical <em>(optional)</em></label><input class="minput" id="el-da" value="${esc(l.dialogueAction||'')}"/></div>`:''}
 <div class="mf"><label>${typeLabel(l.type)}</label><input class="minput" id="el-v" value="${esc(l.value)}"/></div>
 <div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveLineEdit(${ai},${si},${li},${isDlg})">Save</button></div>`,()=>closeModal());
   setTimeout(()=>{const el=$('el-v');if(el)el.focus();},50);
@@ -3532,13 +3615,13 @@ function saveDirEdit(ai,si,li){
   closeModal();autoSave();render();
 }
 
-function saveLineEdit(ai,si,li,isDlg){const l=S.acts[ai].scenes[si].lines[li];const v=$('el-v').value.trim();if(!v)return;pushUndo();l.value=v;if(isDlg){const cn=$('el-c').value.trim().toUpperCase();if(cn){const ch=S.characters.find(c=>c.name===cn);if(ch)l.character={name:ch.name,description:ch.description};}const da=$('el-da').value.trim();l.dialogueAction=da||undefined;}closeModal();autoSave();render();}
+function saveLineEdit(ai,si,li,isDlg){const l=S.acts[ai].scenes[si].lines[li];const v=$('el-v').value.trim();if(!v)return;pushUndo();l.value=v;if(isDlg){const cn=$('el-c').value.trim().toUpperCase();if(cn){const ch=S.characters.find(c=>c.name===cn);if(ch)l.characters=[{name:ch.name,description:ch.description}];delete l.character;}const da=$('el-da').value.trim();l.dialogueAction=da||undefined;}closeModal();autoSave();render();}
 function openEditChar(name){const ch=findCharAny(name);if(!ch)return;openModal(`<h3>Edit character</h3><div class="mf"><label>Name</label><input class="minput" id="ec-n" value="${esc(ch.name)}"/></div><div class="mf"><label>Description</label><input class="minput" id="ec-d" value="${esc(ch.description||'')}"/></div><div class="mtoggle-row"><label>Archived</label><div class="mtoggle${ch.archived?' on':''}" id="ec-archive-tog" onclick="this.classList.toggle('on')"></div></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="saveCharEdit('${escJs(name)}')">Save</button></div>`,()=>closeModal());setTimeout(()=>{const el=$('ec-n');if(el)el.focus();},50);}
-function saveCharEdit(old){const nn=$('ec-n').value.trim().toUpperCase()||old;const nd=$('ec-d').value.trim();const arch=$('ec-archive-tog').classList.contains('on');pushUndo();const ch=findCharAny(old);if(!ch)return;ch.name=nn;ch.description=nd;ch.archived=arch;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{if(l.character&&l.character.name===old){l.character.name=nn;l.character.description=nd;}if(l.cues){l.cues.enters=(l.cues.enters||[]).map(n=>n===old?nn:n);l.cues.exits=(l.cues.exits||[]).map(n=>n===old?nn:n);}})));closeModal();autoSave();render();}
+function saveCharEdit(old){const nn=$('ec-n').value.trim().toUpperCase()||old;const nd=$('ec-d').value.trim();const arch=$('ec-archive-tog').classList.contains('on');pushUndo();const ch=findCharAny(old);if(!ch)return;ch.name=nn;ch.description=nd;ch.archived=arch;S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{if(l.characters)l.characters.forEach(c=>{if(c.name===old){c.name=nn;c.description=nd;}});if(l.cues){l.cues.enters=(l.cues.enters||[]).map(n=>n===old?nn:n);l.cues.exits=(l.cues.exits||[]).map(n=>n===old?nn:n);}})));closeModal();autoSave();render();}
 function openNewCharStandalone(){openModal(`<h3>New character</h3><div class="mf"><label>Name</label><input class="minput" id="nc-n" placeholder="e.g. SARAH"/></div><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="nc-d" placeholder="Brief description..."/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmNewCharStandalone()">Add</button></div>`,null);setTimeout(()=>{const el=$('nc-n');if(el)el.focus();},50);}
 function confirmNewCharStandalone(){const n=($('nc-n').value.trim()).toUpperCase();if(!n)return;if(S.characters.some(c=>c.name===n)){alert('A character with that name already exists.');return;}const desc=$('nc-d').value.trim();pushUndo();S.characters.push({name:n,description:desc,archived:false});closeModal();autoSave();render();}
 function openNewCharModal(cn,da,v){openModal(`<h3>New character: ${esc(cn.toUpperCase())}</h3><div class="mf"><label>Description <em>(optional)</em></label><input class="minput" id="nc-d" placeholder="Brief description..."/></div><div class="mbtns"><button class="mb-c" onclick="closeModal()">Cancel</button><button class="mb-ok" onclick="confirmNewChar('${escJs(cn)}','${escJs(da)}','${escJs(v)}')">Add &amp; continue</button></div>`,null);setTimeout(()=>{const el=$('nc-d');if(el)el.focus();},50);}
-function confirmNewChar(cn,da,vRaw){const desc=$('nc-d').value.trim();pushUndo();const char=getOrCreate(cn,desc);const scene=insertAfter?insertAfter.scene:currentScene();if(scene){const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');const line={type:'dialogue',value:v,character:{name:char.name,description:char.description}};if(da)line.dialogueAction=da;if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}else scene.lines.push(line);}clearInput();closeModal();activatePillByType('dialogue');autoSave();render();setTimeout(()=>$('dlg-char-ta').focus(),50);}
+function confirmNewChar(cn,da,vRaw){const desc=$('nc-d').value.trim();pushUndo();const char=getOrCreate(cn,desc);const scene=insertAfter?insertAfter.scene:currentScene();if(scene){const v=vRaw.replace(/\s*(\([^)]+\))\s*/g,(m,p1)=>'\n'+p1.trim()+'\n').replace(/^\n+|\n+$/g,'');const line={type:'dialogue',value:v,characters:[{name:char.name,description:char.description}]};if(da)line.dialogueAction=da;if(insertAfter&&insertAfter.scene===scene&&typeof insertAfter.lineIdx==='number'){scene.lines.splice(insertAfter.lineIdx+1,0,line);insertAfter={...insertAfter,lineIdx:insertAfter.lineIdx+1};}else scene.lines.push(line);}clearInput();closeModal();activatePillByType('dialogue');autoSave();render();setTimeout(()=>$('dlg-char-ta').focus(),50);}
 
 /* ── Smart tooltip + dropdown positioning (all fixed, always on-screen) ── */
 (function(){
@@ -3664,7 +3747,9 @@ function exportPDF(){
   setTimeout(()=>win.print(),600);
 }
 
-function buildPDFHTML(){
+function buildPDFHTML(opts={}){
+  const includeCopyright = opts.includeCopyright !== false;
+  const includeProductionNotes = opts.includeProductionNotes !== false;
   const title=S.title||'Untitled';
   const esc2=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const esc2Br=s=>esc2(s).replace(/\n/g,'<br>');
@@ -3688,6 +3773,14 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 .char-entry{margin-bottom:12pt;padding-left:36pt;}
 .char-name{font-weight:bold;text-transform:uppercase;}
 .char-desc{font-weight:normal;font-style:italic;}
+/* Copyright page */
+.copyright-page{page-break-after:always;padding-top:48pt;text-align:center;}
+.copyright-page p{margin-bottom:14pt;line-height:1.6;font-size:11pt;}
+.copyright-page p:first-child{font-weight:bold;font-size:12pt;}
+/* Production notes page */
+.prod-notes-page{page-break-after:always;padding-top:48pt;}
+.prod-notes-page h2{text-align:center;font-size:14pt;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24pt;font-weight:bold;}
+.prod-notes-body{padding-left:36pt;line-height:1.6;font-size:12pt;white-space:pre-wrap;}
 /* TOC page */
 .toc-page{page-break-after:always;padding-top:48pt;}
 .toc-page h2{text-align:center;font-size:14pt;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24pt;font-weight:bold;}
@@ -3727,6 +3820,15 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}</div>`:''}
 </div>`;
 
+  /* Copyright page (after title, before characters) */
+  if(includeCopyright&&S.copyrightText){
+    html+=`<div class="copyright-page">`;
+    S.copyrightText.split('\n\n').forEach(para=>{
+      if(para.trim())html+=`<p>${esc2Br(para.trim())}</p>`;
+    });
+    html+=`</div>`;
+  }
+
   /* Characters page */
   const activeChars=S.characters.filter(c=>!c.archived);
   html+=`<div class="chars-page"><h2>Characters</h2>`;
@@ -3735,9 +3837,11 @@ ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}<
   } else {html+='<div style="padding-left:36pt;font-style:italic;">No characters listed.</div>';}
   html+='</div>';
 
-  /* TOC page estimates */
+  /* TOC page estimates — base page offset grows with each optional page added */
   let scenePageEstimates=[];
-  let currentPage=4;
+  let currentPage=4; /* title=1, characters=2, toc=3, script starts at 4 */
+  if(includeCopyright&&S.copyrightText)currentPage++;
+  if(includeProductionNotes&&S.productionNotes)currentPage++;
   S.acts.forEach((a,ai)=>{
     a.scenes.forEach((sc,si)=>{
       scenePageEstimates.push({actName:actLabel(ai),sceneName:sceneLabel(ai,si),page:currentPage,ai,si});
@@ -3760,8 +3864,15 @@ ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}<
   });
   html+='</div>';
 
+  /* Production notes page (before script body) */
+  if(includeProductionNotes&&S.productionNotes){
+    html+=`<div class="prod-notes-page"><h2>Production Notes</h2><div class="prod-notes-body">${esc2(S.productionNotes)}</div></div>`;
+  }
+
   /* Script pages */
   let pageNum=4;
+  if(includeCopyright&&S.copyrightText)pageNum++;
+  if(includeProductionNotes&&S.productionNotes)pageNum++;
   S.acts.forEach((a,ai)=>{
     html+=`<div class="script-page"><div class="page-num">${pageNum}.</div>`;
     html+=`<div class="s-act">${esc2(actLabel(ai))}</div>`;
@@ -3786,13 +3897,13 @@ ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}<
         else if(l.type==='dialogue'){
           if(dlgFormat==='inline'){
             html+=`<div class="s-dlg s-dlg-inline">`;
-            html+=`<span class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</span>`;
+            html+=`<span class="dlg-char">${esc2((l.characters||[]).map(c=>c.name).join(' & '))}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</span>`;
             if(l.dialogueAction)html+=` <span class="dlg-paren">(${esc2Br(l.dialogueAction)})</span>`;
             html+=` <span class="dlg-text">${esc2Br(l.value)}</span>`;
             html+='</div>';
           } else {
             html+=`<div class="s-dlg">`;
-            html+=`<div class="dlg-char">${esc2(l.character.name)}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</div>`;
+            html+=`<div class="dlg-char">${esc2((l.characters||[]).map(c=>c.name).join(' & '))}${cont?' <span class="dlg-cont">(CONT\'D)</span>':''}</div>`;
             if(l.dialogueAction)html+=`<div class="dlg-paren">(${esc2Br(l.dialogueAction)})</div>`;
             const parts=l.value.split('\n');
             const rendered=parts.map(p=>{
@@ -3843,21 +3954,63 @@ async function downloadMetadata(){
     await downloadFile(blob,S.title.toLowerCase().replace(/ /g,'_')+'_metadata.zip');
   }catch(e){alert('Failed to create metadata ZIP: '+e.message);}
 }
-async function exportPDFWithMeta(){
+let _exportAttachments=[];
+function exportPDFWithMeta(){
   closeFDD();
   if(!S.title){alert('Open or create a script first.');return;}
+  _exportAttachments=[];
+  const hasCopyright=!!(S.copyrightText);
+  const hasNotes=!!(S.productionNotes);
+  const slugBase=S.title.toLowerCase().replace(/ /g,'_');
+  openModal(`<h3>Export PDF + metadata</h3>
+<div style="font-size:13px;color:var(--tx2);margin-bottom:12px;">Packages a print-ready PDF, raw JSON, and optional extras into a ZIP file.</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+  <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+    <input type="checkbox" id="ep-copyright" ${hasCopyright?'':'disabled'} ${hasCopyright?'checked':''} style="width:14px;height:14px;">
+    <span>Include copyright page${hasCopyright?'':' <span style="color:var(--tx3);font-size:11px;">(add copyright text in Settings → Production first)</span>'}</span>
+  </label>
+  <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+    <input type="checkbox" id="ep-notes" ${hasNotes?'':'disabled'} ${hasNotes?'checked':''} style="width:14px;height:14px;">
+    <span>Include production notes page${hasNotes?'':' <span style="color:var(--tx3);font-size:11px;">(add notes in Settings → Production first)</span>'}</span>
+  </label>
+  <div style="margin-top:4px;">
+    <div style="font-size:13px;margin-bottom:6px;">Attach extra files <span style="font-size:11px;color:var(--tx3);">(riders, music cues, photos…)</span></div>
+    <input type="file" id="ep-files" multiple onchange="handleExportAttachments(this)" style="font-size:12px;color:var(--tx2);">
+    <div id="ep-files-list" style="font-size:11px;color:var(--tx3);margin-top:4px;"></div>
+  </div>
+</div>
+<div class="mbtns">
+  <button class="mb-c" onclick="closeModal()">Cancel</button>
+  <button class="mb-ok" onclick="doExportPDFWithMeta()">Export ZIP</button>
+</div>`,null);
+}
+function handleExportAttachments(input){
+  _exportAttachments=Array.from(input.files);
+  const list=$('ep-files-list');
+  if(list)list.textContent=_exportAttachments.length?_exportAttachments.map(f=>f.name).join(', '):'';
+}
+async function doExportPDFWithMeta(){
+  closeModal();
+  const includeCopyright=!!($('ep-copyright')&&$('ep-copyright').checked);
+  const includeProductionNotes=!!($('ep-notes')&&$('ep-notes').checked);
   try{
     await loadJSZip();
     const zip=new JSZip();
-    const folder=zip.folder(S.title.toLowerCase().replace(/ /g,'_'));
-    /* add the PDF as HTML (user prints from the window) */
-    folder.file(S.title.toLowerCase().replace(/ /g,'_')+'.html',buildPDFHTML());
-    /* add metadata */
-    const meta=zip.folder(S.title.toLowerCase().replace(/ /g,'_')+'/metadata');
-    meta.file('raw_script_'+S.title.toLowerCase().replace(/ /g,'_')+'.json',stateJSON());
+    const slugBase=S.title.toLowerCase().replace(/ /g,'_');
+    const folder=zip.folder(slugBase);
+    folder.file(slugBase+'.html',buildPDFHTML({includeCopyright,includeProductionNotes}));
+    const meta=folder.folder('metadata');
+    meta.file('raw_script_'+slugBase+'.json',stateJSON());
     meta.file('manifest.json',JSON.stringify({exportedAt:new Date().toISOString(),title:S.title,author:S.author,version:'1.0',app:'The Scriptwriter'},null,2));
+    if(_exportAttachments.length){
+      const attFolder=folder.folder('attachments');
+      for(const f of _exportAttachments){
+        const buf=await f.arrayBuffer();
+        attFolder.file(f.name,buf);
+      }
+    }
     const blob=await zip.generateAsync({type:'blob'});
-    await downloadFile(blob,S.title.toLowerCase().replace(/ /g,'_')+'_export.zip');
+    await downloadFile(blob,slugBase+'_export.zip');
   }catch(e){alert('Failed to create export ZIP: '+e.message);}
 }
 
@@ -3909,11 +4062,18 @@ function buildFountain(){
           const val=line.value.trim();
           const autoDetects=/^[A-Z\s]+TO:$/.test(val);
           out+=(autoDetects?val:'> '+val)+cueText+'\n\n';
-        }else if(line.type==='dialogue'){
-          /* Character name (uppercase) + optional parenthetical + dialogue */
-          out+=line.character.name.toUpperCase()+'\n';
+        }else if(line.type==='dialogue'&&line.characters&&line.characters.length){
+          /* Character name(s) (uppercase) + optional parenthetical + dialogue */
+          const[c1,c2]=line.characters;
+          out+=c1.name.toUpperCase()+'\n';
           if(line.dialogueAction)out+='('+line.dialogueAction+')\n';
           out+=line.value+'\n\n';
+          if(c2){
+            /* Dual dialogue — Fountain ^ notation for second character */
+            out+=c2.name.toUpperCase()+' ^\n';
+            if(line.dialogueAction)out+='('+line.dialogueAction+')\n';
+            out+=line.value+'\n\n';
+          }
         }else if(line.type==='action'){
           /* Stage Direction — use ! prefix to force if it might be misread as another element */
           const v=line.value.trim();
@@ -4050,6 +4210,7 @@ function parseFountain(text){
       const charMatch=firstLine.match(/^([A-Z][A-Z0-9\s\.\-']+?)(\s*\(.*?\))?\s*(\^)?$/);
       if(charMatch&&!firstLine.endsWith('TO:')){
         const charName=charMatch[1].trim();
+        const isDual=charMatch[3]==='^';
         /* Collect parentheticals and dialogue */
         let dAction='',dText='';
         let dl=1;
@@ -4069,10 +4230,18 @@ function parseFountain(text){
           characters.push({name:normalName,description:'',archived:false});
         }
         ensureActScene();
+        /* Dual dialogue (^ suffix): merge into the previous dialogue line's characters array */
+        if(isDual&&curScene.lines.length>0){
+          const prevDlg=[...curScene.lines].reverse().find(l=>l.type==='dialogue');
+          if(prevDlg&&prevDlg.characters&&prevDlg.characters.length<2){
+            prevDlg.characters.push({name:normalName,description:''});
+            p++;continue;
+          }
+        }
         curScene.lines.push({
           type:'dialogue',
           value:dText,
-          character:{name:normalName,description:''},
+          characters:[{name:normalName,description:''}],
           dialogueAction:dAction
         });
         p++;continue;
@@ -4136,9 +4305,9 @@ function parseFountain(text){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};S.productionNotes='';S.copyrightText='';
   revisionChanges={};
-  resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
+  migrateCharacterToCharacters();resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
 }
 
@@ -4250,26 +4419,29 @@ function parseFDX(xmlText){
     const type=p.getAttribute('Type')||'';
     const txt=paraText(p);
 
-    /* Handle DualDialogue — extract inner paragraphs */
+    /* Handle DualDialogue — merge both characters into one line with characters:[c1,c2] */
     const dualDlg=p.querySelector('DualDialogue');
     if(dualDlg){
       flushPendingChar();
       const innerParas=Array.from(dualDlg.querySelectorAll('Paragraph'));
-      let dChar=null;
+      let dualChars=[],dualText='',dualAction='',pendingDualChar=null;
       innerParas.forEach(ip=>{
         const iType=ip.getAttribute('Type')||'';
         const iTxt=paraText(ip);
-        if(iType==='Character'){dChar=iTxt;}
-        else if(iType==='Dialogue'&&dChar){
-          const name=normName(dChar);
+        if(iType==='Character'){pendingDualChar={name:normName(iTxt),action:''};}
+        else if(iType==='Parenthetical'&&pendingDualChar){let pa=iTxt;if(pa.startsWith('(')&&pa.endsWith(')'))pa=pa.slice(1,-1).trim();pendingDualChar.action=pa;}
+        else if(iType==='Dialogue'&&pendingDualChar){
+          const name=pendingDualChar.name;
           ensureChar(name);
-          ensureActScene();
-          curScene.lines.push({type:'dialogue',value:iTxt,character:{name,description:''},dialogueAction:''});
-          dChar=null;
-        }else if(iType==='Parenthetical'&&dChar){
-          /* Will be attached to next dialogue — store as pending action */
+          if(dualChars.length===0){dualText=iTxt;dualAction=pendingDualChar.action;}
+          dualChars.push({name,description:''});
+          pendingDualChar=null;
         }
       });
+      if(dualChars.length>0){
+        ensureActScene();
+        curScene.lines.push({type:'dialogue',value:dualText,characters:dualChars.slice(0,2),dialogueAction:dualAction});
+      }
       continue;
     }
 
@@ -4318,7 +4490,7 @@ function parseFDX(xmlText){
           ensureActScene();
           curScene.lines.push({
             type:'dialogue',value:txt,
-            character:{name,description:''},
+            characters:[{name,description:''}],
             dialogueAction:pendingChar.action||''
           });
           pendingChar=null;
@@ -4361,9 +4533,9 @@ function parseFDX(xmlText){
 
   /* Load into app */
   pushUndo();
-  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};
+  S.title=title;S.author=author;S.acts=acts;S.characters=characters;S.revisions=[];S.scenesLocked=false;S.colorLabels={};S.productionNotes='';S.copyrightText='';
   revisionChanges={};
-  resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
+  migrateCharacterToCharacters();resetEditorState();hasFilename=false;setFileHandle(null);lastSavedJSON='';lsSaveScript();
   showEditor(title);render();
 }
 
@@ -4403,19 +4575,37 @@ function buildFDXText(){
             xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
             xml+='    </Paragraph>\n';
             break;
-          case 'dialogue':
-            xml+='    <Paragraph Type="Character">\n';
-            xml+='      <Text>'+xmlEsc(line.character.name.toUpperCase())+'</Text>\n';
-            xml+='    </Paragraph>\n';
-            if(line.dialogueAction){
-              xml+='    <Paragraph Type="Parenthetical">\n';
-              xml+='      <Text>('+xmlEsc(line.dialogueAction)+')</Text>\n';
+          case 'dialogue':{
+            const dlgChars=line.characters||[];
+            if(dlgChars.length>=2){
+              /* Dual dialogue — FDX DualDialogue wrapper */
+              const[c1,c2]=dlgChars;
+              xml+='    <Paragraph Type="Dual Dialogue">\n';
+              xml+='      <DualDialogue>\n';
+              xml+='        <Paragraph Type="Character"><Text>'+xmlEsc(c1.name.toUpperCase())+'</Text></Paragraph>\n';
+              if(line.dialogueAction)xml+='        <Paragraph Type="Parenthetical"><Text>('+xmlEsc(line.dialogueAction)+')</Text></Paragraph>\n';
+              xml+='        <Paragraph Type="Dialogue"><Text>'+xmlEsc(line.value)+'</Text></Paragraph>\n';
+              xml+='        <Paragraph Type="Character"><Text>'+xmlEsc(c2.name.toUpperCase())+'</Text></Paragraph>\n';
+              if(line.dialogueAction)xml+='        <Paragraph Type="Parenthetical"><Text>('+xmlEsc(line.dialogueAction)+')</Text></Paragraph>\n';
+              xml+='        <Paragraph Type="Dialogue"><Text>'+xmlEsc(line.value)+'</Text></Paragraph>\n';
+              xml+='      </DualDialogue>\n';
+              xml+='    </Paragraph>\n';
+            }else if(dlgChars.length===1){
+              const c1=dlgChars[0];
+              xml+='    <Paragraph Type="Character">\n';
+              xml+='      <Text>'+xmlEsc(c1.name.toUpperCase())+'</Text>\n';
+              xml+='    </Paragraph>\n';
+              if(line.dialogueAction){
+                xml+='    <Paragraph Type="Parenthetical">\n';
+                xml+='      <Text>('+xmlEsc(line.dialogueAction)+')</Text>\n';
+                xml+='    </Paragraph>\n';
+              }
+              xml+='    <Paragraph Type="Dialogue">\n';
+              xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
               xml+='    </Paragraph>\n';
             }
-            xml+='    <Paragraph Type="Dialogue">\n';
-            xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
-            xml+='    </Paragraph>\n';
             break;
+          }
           case 'direction':
             xml+='    <Paragraph Type="Transition">\n';
             xml+='      <Text>'+xmlEsc(line.value)+'</Text>\n';
@@ -4491,8 +4681,7 @@ async function exportRehearsalSides(charName){
     act.scenes.forEach((sc,si)=>{
       /* Check if this character appears in this scene */
       const hasChar=sc.lines.some(l=>{
-        if(l.type==='dialogue'&&l.character&&l.character.name===charName)return true;
-        if(l.type==='action'&&l.character&&l.character.name===charName)return true;
+        if(l.type==='dialogue'&&l.characters&&l.characters.some(c=>c.name===charName))return true;
         if(l.type==='direction'&&l.cues){
           if((l.cues.enters||[]).includes(charName))return true;
           if((l.cues.exits||[]).includes(charName))return true;
@@ -4520,7 +4709,7 @@ async function exportRehearsalSides(charName){
             lines.push('  '+cueText);
           }
         }else if(l.type==='dialogue'){
-          if(l.character&&l.character.name===charName){
+          if(l.characters&&l.characters.some(c=>c.name===charName)){
             /* This character's line — shown in full */
             let dlgLine=charName.toUpperCase();
             if(l.dialogueAction)dlgLine+=' ('+l.dialogueAction+')';
@@ -4529,16 +4718,12 @@ async function exportRehearsalSides(charName){
             lines.push('');
           }else{
             /* Other character's line — show as cue line */
-            const otherName=l.character?l.character.name.toUpperCase():'???';
+            const otherName=l.characters&&l.characters.length?l.characters.map(c=>c.name).join(' & ').toUpperCase():'???';
             lines.push('  '+otherName+': .......');
           }
         }else if(l.type==='action'){
-          if(l.character&&l.character.name===charName){
-            lines.push('  ('+l.value+')');
-          }else{
-            /* Stage direction involving others — brief context */
-            lines.push('  ('+l.value.substring(0,60)+(l.value.length>60?'...':'')+')');
-          }
+          /* Stage direction — brief context */
+          lines.push('  ('+l.value.substring(0,60)+(l.value.length>60?'...':'')+')');
         }
       });
       lines.push('');
@@ -4554,7 +4739,7 @@ async function exportRehearsalSides(charName){
 function lineFingerprint(line){
   /* Create a content hash string for a line to detect changes */
   let fp=line.type+'|'+(line.type==='bookmark'?(line.label||''):line.value);
-  if(line.character)fp+='|'+line.character.name;
+  if(line.characters&&line.characters.length)fp+='|'+line.characters.map(c=>c.name).sort().join('&');
   if(line.dialogueAction)fp+='|'+line.dialogueAction;
   if(line.cues){
     fp+='|e:'+(line.cues.enters||[]).join(',');
@@ -4855,7 +5040,7 @@ function renderCharDlgList(name,query){
     a.scenes.forEach((sc,si)=>{
       if(scope.sceneIdx!==null&&si!==scope.sceneIdx)return;
       sc.lines.forEach((l,li)=>{
-        if(l.type==='dialogue'&&l.character&&l.character.name===name){
+        if(l.type==='dialogue'&&l.characters&&l.characters.some(c=>c.name===name)){
           if(!q||l.value.toLowerCase().includes(q)||(l.dialogueAction||'').toLowerCase().includes(q)){
             lines.push({ai,si,li,value:l.value,da:l.dialogueAction});
           }

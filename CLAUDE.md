@@ -40,12 +40,15 @@ S = {
       lines: [{
         type: 'direction' | 'dialogue' | 'action',  // internal keys; display names: Cue, Dialogue, Stage Direction (legacy 'setting' lines still rendered)
         value: string,
-        character?: { name, description },      // for dialogue & action (stage direction)
+        characters?: [{ name, description }],    // for dialogue — ARRAY, max 2. Display: "ALICE & BOB". Migrated from old singular character:{} on load.
         dialogueAction?: string,                 // for dialogue (parenthetical)
         cues?: { enters: string[], exits: string[] }  // for direction (cue)
       }]
     }]
   }]
+}
+  productionNotes: string,   // freetext for director/crew; included as a page in PDF if non-empty
+  copyrightText: string,     // editable copyright boilerplate; auto-populated from author+year on first use
 }
 ```
 
@@ -298,3 +301,8 @@ S = {
 - **Bookmarks** — New line type `{type:'bookmark', label:string, notes:[]}` rendered as minimal dashed-border markers with 🔖 flag. Inserted via input bar button. Supports notes attachment (reuses existing system), inline editing (saves to `label` field), drag-and-drop reordering, and undo/redo. Right panel "Bookmarks" section with collapsible list and jump-to navigation. Excluded from: Fountain export, FDX export, PDF export, View tab, stats counts, outline line counts. `lineFingerprint()` uses `label` for revision tracking. Functions: `insertBookmark`, `editBookmarkLabel`, `toggleRPBookmarks`, `getAllBookmarks`, `renderRPBookmarks`, `jumpToBookmark`.
 - **Bug fixes** — Fixed `buildFountainText()` → `buildFountain()` call in View tab. Re-added `resetHotkeys()` that was deleted during dead code cleanup. Removed dead hotkey capture code (`renderHotkeySettings`, `startHkCapture`, `stopHkCapture`, `hkCapturing`, `hkHandler`).
 - **TODO.md updates** — Added "Character panel act/scene filter" feature item and "Standard Test Checklist" section (10-item checklist to run after every new feature).
+
+### Session 17 — 2026-08-13
+- **iOS App Store submission** — Fixed spurious `.txt` sidecar files (removed `title:` from `navigator.share`), resolved 3 Apple rejection rounds: ITMS-91061 Firebase privacy manifest errors (removed Firebase entirely from the WKWebView wrapper project — Podfile, AppDelegate.swift, PushNotifications.swift, Settings.swift, ViewController.swift, WebView.swift), NSCameraUsageDescription placeholder strings (removed unused permission keys from Info.plist), subtitle Guideline 2.3.7 price reference ("Free stage play editor" → "Stage play writing app"). App submitted.
+- **Multi-character (unison) dialogue** — `character:{name,description}` singular field replaced with `characters:[{name,description}]` array (max 2). Migration function `migrateCharacterToCharacters()` called in all 5 load paths. Input bar gains a `+` button (hidden after 2 characters selected). Display: `ALICE & RUTH` joined with ` & `. Inline editing shows one select per character + `+` button. `removeCharUsage` keeps lines with 2 chars when one is removed. All 30+ read/write sites updated including: `applyAutoFormat`, `getAllSceneChars`, `isCont`, `getSceneCharsList`, `buildCoAppearanceData`, `getCharStats`, `charHasUsage`, `removeCharUsage`, `validateMoveLine`, `renderScene`, `saveCharEdit`, `renderView`, `buildPDFHTML`, `exportRehearsalSides`, `lineFingerprint`, `renderCharDlgList`. Fountain: 2-char lines use `CHARACTER ^` dual-dialogue notation. FDX: 2-char lines use `<DualDialogue>` wrapper. `lineFingerprint` uses `.sort().join('&')` for order-independent hashing.
+- **Export pages** — New `S.productionNotes` and `S.copyrightText` fields (both string, persisted in JSON + localStorage). Settings panel gains a "Production" section with two textareas and a "Reset to default" button for copyright (auto-populates with standard Samuel French boilerplate from author + year). `buildPDFHTML(opts={})` now adds a copyright page (between title and characters pages) and a production notes page (before script body) when data is present and not suppressed via opts. TOC page number estimator updated to account for extra pages. `exportPDFWithMeta()` refactored into a modal (checkboxes for copyright/notes + file picker for attachments) + `doExportPDFWithMeta()` async builder that adds attachments to `<title>/attachments/` in the ZIP.
