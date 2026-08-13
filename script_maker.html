@@ -394,6 +394,19 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 .rel-matrix th{padding:3px 6px;font-weight:600;white-space:nowrap;color:var(--tx2);border:1px solid var(--bd2);background:var(--bg2);}
 .rel-matrix td{padding:3px 6px;text-align:center;border:1px solid var(--bd2);min-width:28px;font-size:10px;cursor:default;}
 .rel-matrix td.rel-self{background:var(--bg2);color:var(--tx3);}
+.presence-section{margin-top:24px;border-top:1px solid var(--bd2);padding-top:16px;}
+.presence-header{font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;padding:4px 0;user-select:none;margin-bottom:10px;}
+.presence-header:hover{color:var(--tx1);}
+.presence-scroll{overflow-x:auto;}
+.presence-grid{display:grid;gap:3px 3px;align-items:center;}
+.presence-char-name{font-size:11px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;padding-right:6px;text-align:right;}
+.presence-dot{width:13px;height:13px;border-radius:3px;cursor:pointer;transition:opacity .1s,transform .08s;display:inline-block;}
+.presence-dot.present{background:var(--accent,#4A90D9);opacity:0.85;}
+.presence-dot.present:hover{opacity:1;transform:scale(1.15);}
+.presence-dot.absent{background:var(--bd2);opacity:0.35;}
+.presence-dot.absent:hover{opacity:0.6;}
+.presence-act-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.presence-corner{display:block;}
 .oc-color-none{width:10px;height:10px;border-radius:50%;cursor:pointer;border:1.5px solid var(--bd2);background:transparent;position:relative;}
 .oc-color-none:hover{border-color:var(--tx3);}
 .oc-color-none::after{content:'';position:absolute;top:3px;left:3px;width:2px;height:2px;border-radius:50%;background:var(--tx3);}
@@ -427,8 +440,8 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
 @media(max-width:768px){.outline-grid{grid-template-columns:1fr 1fr;gap:10px;}.outline-card{padding:10px;}}
 @media(max-width:480px){.outline-grid{grid-template-columns:1fr;}}
 /* ── Production Details panel (bottom of Outline tab) ── */
-.production-details-panel{margin:40px auto 32px;max-width:900px;padding:0 8px;}
-.pd-section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--bd2);}
+.production-details-panel{margin-top:32px;border-top:1px solid var(--bd2);padding-top:20px;}
+.pd-section-title{font-size:13px;font-weight:600;color:var(--tx2);cursor:default;margin-bottom:16px;}
 .pd-block{margin-bottom:8px;}
 .pd-label{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
 .pd-desc{font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.5;}
@@ -3106,6 +3119,8 @@ function renderOutline(){
   });
   /* Character relationship section */
   h+=renderRelationshipSection();
+  /* Character presence heatmap */
+  h+=renderPresenceSection();
   /* Production Details section */
   h+=renderProductionDetailsSection();
   p.innerHTML=h;
@@ -3145,6 +3160,62 @@ function editColorLabel(color,el){
 }
 function setOutlineColorFilter(color){outlineColorFilter=(outlineColorFilter===color)?null:color;renderOutline();}
 function getColorLabel(color){return (S.colorLabels||{})[color]||'';}
+
+/* ── Character Presence Heatmap ── */
+let showPresence=true;
+function togglePresence(){showPresence=!showPresence;renderOutline();}
+
+function getCharPresenceData(){
+  const activeChars=S.characters.filter(c=>!c.archived).map(c=>c.name);
+  if(!activeChars.length)return null;
+  /* Build per-scene sets of character names */
+  const sceneList=[];
+  S.acts.forEach((act,ai)=>{
+    act.scenes.forEach((sc,si)=>{
+      const present=new Set();
+      sc.lines.forEach(l=>{
+        if(l.type==='dialogue'&&l.characters)l.characters.forEach(c=>present.add(c.name));
+        if(l.type==='direction'&&l.cues){l.cues.enters.forEach(n=>present.add(n));l.cues.exits.forEach(n=>present.add(n));}
+      });
+      sceneList.push({ai,si,label:sceneLabel(ai,si),actLabel:actLabel(ai),present});
+    });
+  });
+  if(!sceneList.length)return null;
+  /* Filter to chars that appear at least once */
+  const chars=activeChars.filter(name=>sceneList.some(s=>s.present.has(name)));
+  if(!chars.length)return null;
+  /* Sort by total scene count descending */
+  chars.sort((a,b)=>sceneList.filter(s=>s.present.has(b)).length-sceneList.filter(s=>s.present.has(a)).length);
+  return{chars,scenes:sceneList};
+}
+
+function renderPresenceSection(){
+  const data=getCharPresenceData();
+  if(!data)return'';
+  const {chars,scenes}=data;
+  const toggle=`<span style="display:inline-block;width:12px;font-size:10px;">${showPresence?'▾':'▸'}</span>`;
+  let h=`<div class="presence-section"><div class="presence-header" onclick="togglePresence()">${toggle} Character Presence</div>`;
+  if(!showPresence){h+='</div>';return h;}
+  /* Build column template: 1 name col + 1 col per scene */
+  const cols=`120px repeat(${scenes.length},16px)`;
+  h+=`<div class="presence-scroll"><div class="presence-grid" style="grid-template-columns:${cols};">`;
+  /* Act label header row */
+  h+=`<div class="presence-corner"></div>`;
+  /* Group consecutive scenes by act label for header */
+  scenes.forEach(s=>{
+    h+=`<div class="presence-act-label" title="${esc(s.actLabel)}">${esc(s.actLabel.replace(/^Act\s+/i,''))}</div>`;
+  });
+  /* One row per character */
+  chars.forEach(name=>{
+    h+=`<div class="presence-char-name" title="${esc(name)}">${esc(name)}</div>`;
+    scenes.forEach(s=>{
+      const present=s.present.has(name);
+      h+=`<div class="presence-dot ${present?'present':'absent'}" title="${esc(name)} — ${esc(s.actLabel+' / '+s.label)}" onclick="outlineCardClick(${s.ai},${s.si})"></div>`;
+    });
+  });
+  h+=`</div></div></div>`;
+  return h;
+}
 
 /* ── Character Relationship Mapping ── */
 let showRelGraph=false;
