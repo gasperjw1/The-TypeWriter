@@ -1453,7 +1453,7 @@ let navMode=false;
 let insertAfter=null,undoStack=[],undoCursor=-1,dragSrc=null;
 let hasFilename=false,lastSavedJSON='';
 let fileHandle=null;
-let editingLine=null,ieBlurTimer=null;
+let editingLine=null,ieBlurTimer=null,ieAddingChar=false;
 let confirmState={},rpCollapsed=false,tocCollapsed={};
 let sceneFilterOn=false,pendingCues={enters:[],exits:[]};
 let indicatorMode='highlight',indicatorColors={barrier:'#378ADD',highlight:'rgba(128,128,128,0.13)'};
@@ -2588,7 +2588,7 @@ function renderInlineEditLine(line,ai,si,li){
       const opts=S.characters.filter(c=>!c.archived).map(c=>`<option value="${esc(c.name)}"${c.name===ch.name?' selected':''}>${esc(c.name)}</option>`).join('');
       return`<select class="ie-input ie-dlg-char" data-idx="${i}" onkeydown="ieCharKey(event)" onblur="ieBlur()" onfocus="ieFocus()" style="max-width:160px;">${opts}</select>`;
     }).join('');
-    const addCharBtn=existingChars.length<2?`<button type="button" onclick="ieAddChar(this)" style="font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;margin-left:4px;">+</button>`:'';
+    const addCharBtn=existingChars.length<2?`<button type="button" onmousedown="event.preventDefault()" onclick="ieAddChar(this)" style="font-size:10px;padding:1px 5px;border:1px solid var(--bd2);border-radius:3px;background:none;color:var(--tx2);cursor:pointer;margin-left:4px;">+</button>`:'';
     inner=`<div class="l-dialogue"><div class="dl-char-line" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">${charSelects}${addCharBtn}</div><div class="dl-paren" style="display:block;"><input class="ie-input ie-dlg-action" id="ie-da" value="${esc(line.dialogueAction||'')}" placeholder="dialogue action" onkeydown="ieMidKey(event)" onblur="ieBlur()" onfocus="ieFocus()" /></div><div class="dl-text"><textarea class="ie-ta ie-dlg-text" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div></div>`;
   }else if(line.type==='action'){
     inner=`<div class="l-action"><textarea class="ie-ta" id="ie-val" onkeydown="ieKey(event)" onblur="ieBlur()" onfocus="ieFocus()" oninput="ieAutosize(this)">${esc(line.value)}</textarea></div>`;
@@ -2611,6 +2611,8 @@ function startInlineEdit(ai,si,li){
   },50);
 }
 function ieAddChar(btn){
+  ieAddingChar=true;
+  ieFocus();
   const row=btn.closest('.dl-char-line')||btn.parentElement;
   const sel=document.createElement('select');
   sel.className='ie-input ie-dlg-char';
@@ -2627,6 +2629,8 @@ function ieAddChar(btn){
   });
   row.insertBefore(sel,btn);
   btn.remove();
+  sel.focus();
+  setTimeout(()=>{ieAddingChar=false;},300);
 }
 function saveInlineEdit(){
   if(!editingLine)return;
@@ -2660,7 +2664,7 @@ function cancelInlineEdit(){
 function ieKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveInlineEdit();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieCharKey(e){if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();const da=document.getElementById('ie-da');if(da)da.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
 function ieMidKey(e){if((e.key==='Tab'||e.key==='Enter')&&!e.shiftKey){e.preventDefault();const v=document.getElementById('ie-val');if(v)v.focus();}if(e.key==='Escape'){e.preventDefault();cancelInlineEdit();}}
-function ieBlur(){if(ieBlurTimer)clearTimeout(ieBlurTimer);ieBlurTimer=setTimeout(()=>{const a=document.activeElement;if(a&&(a.id==='ie-val'||a.classList.contains('ie-dlg-char')||a.id==='ie-da'))return;saveInlineEdit();},200);}
+function ieBlur(){if(ieBlurTimer)clearTimeout(ieBlurTimer);ieBlurTimer=setTimeout(()=>{if(ieAddingChar)return;const a=document.activeElement;if(a&&(a.id==='ie-val'||a.classList.contains('ie-dlg-char')||a.id==='ie-da'))return;saveInlineEdit();},200);}
 function ieFocus(){if(ieBlurTimer){clearTimeout(ieBlurTimer);ieBlurTimer=null;}}
 function ieAutosize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,160)+'px';}
 
