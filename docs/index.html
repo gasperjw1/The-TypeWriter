@@ -1907,12 +1907,12 @@ function migrateCharacterToCharacters(){
 }
 function loadFromData(data){
   S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};S.productionNotes=data.productionNotes||'';S.copyrightText=data.copyrightText||'';
-  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();
+  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=true;lastSavedJSON=stateJSON();lsSaveScript();showEditor(S.title);render();if(activeTab==='outline')renderOutline();
 }
 function resumeFromLS(){
   const raw=lsLoadScript();if(!raw)return;
   try{const data=JSON.parse(raw);S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};S.productionNotes=data.productionNotes||'';S.copyrightText=data.copyrightText||'';
-  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();}catch(err){alert('Could not restore script.');}
+  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();resetEditorState();computeRevisionChanges();hasFilename=false;lastSavedJSON='';showEditor(S.title);render();if(activeTab==='outline')renderOutline();}catch(err){alert('Could not restore script.');}
 }
 const SAMPLE_SCRIPT={
   title:'The Garden Party',
