@@ -120,11 +120,17 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);ove
 .setup-brand{font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--tx1);}
 .setup-tagline{font-size:15px;color:var(--tx2);text-align:center;max-width:360px;line-height:1.5;margin-bottom:20px;}
 .setup-version{margin-top:32px;font-size:11px;color:var(--tx3);text-align:center;font-family:var(--sans);}
-.setup-install-hint{margin-top:14px;display:flex;align-items:center;gap:8px;padding:8px 14px;border:1px dashed var(--bd2);border-radius:20px;background:var(--bg2);font-size:11px;color:var(--tx2);max-width:520px;}
-.setup-install-icon{font-size:13px;color:var(--tx2);}
-.setup-install-text{flex:1;}
-.setup-install-btn{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--tx1);background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;}
-.setup-install-btn:hover{opacity:.85;}
+.install-banner{margin:16px auto 0;max-width:520px;background:var(--bg2);border:1px solid var(--bd2);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.ib-icon{font-size:20px;flex-shrink:0;}
+.ib-text{flex:1;font-size:12px;color:var(--tx2);line-height:1.4;}
+.ib-text strong{display:block;color:var(--tx1);font-size:13px;margin-bottom:2px;}
+.ib-btn{font-size:12px;padding:5px 14px;border-radius:20px;border:none;background:var(--tx1);color:var(--bg1);cursor:pointer;font-family:var(--sans);font-weight:500;white-space:nowrap;flex-shrink:0;}
+.ib-btn:hover{opacity:.85;}
+.ib-dismiss{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:20px;line-height:1;padding:0 0 0 4px;flex-shrink:0;}
+.ib-dismiss:hover{color:var(--tx1);}
+.setup-stores{margin-top:24px;padding-top:16px;border-top:1px solid var(--bd2);text-align:center;width:100%;}
+.setup-stores-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;}
+.store-badges{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;}
 #setup-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
 .setup-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 24px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);cursor:pointer;transition:border-color .15s,background .15s;min-width:130px;max-width:160px;}
 .setup-card:hover{border-color:var(--bd1);background:var(--bg1);}
@@ -1149,16 +1155,23 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
              returns 4xx when crawled without JS (broke Bing's Site Scan). Per-
              element opt-out keeps the link crawlable while leaving CF's default
              obfuscation enabled elsewhere. https://developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/ -->
-        <div class="setup-version">v1.45 · August 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
-        <div class="store-badges" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;">
-          <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
-          <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
-          <a href="https://apps.apple.com/app/the-scriptwriter/id6790096605" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Download on the App Store"><img src="badges/app-store.svg" alt="Download on the App Store" width="140" height="38" style="display:block;"/></a>
+        <div class="setup-version">v1.49 · August 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="color:var(--tx3);text-decoration:underline;">Report a bug</a><!--/email_off--></div>
+        <div id="install-banner" class="install-banner" style="display:none;">
+          <span class="ib-icon">⤓</span>
+          <div class="ib-text">
+            <strong>Install for offline use</strong>
+            <span id="ib-instructions">Works without internet after the first visit.</span>
+          </div>
+          <button id="install-btn" class="ib-btn" style="display:none;" onclick="triggerInstall()">Install</button>
+          <button class="ib-dismiss" onclick="dismissInstallBanner()" title="Dismiss">×</button>
         </div>
-        <div id="install-hint" class="setup-install-hint" style="display:none;">
-          <span class="setup-install-icon">⤓</span>
-          <span class="setup-install-text">Install for offline use: <span id="install-hint-action">click the install icon in your browser's address bar</span>.</span>
-          <button id="install-btn" class="setup-install-btn" style="display:none;" onclick="triggerInstall()">Install</button>
+        <div class="setup-stores">
+          <div class="setup-stores-label">Also available on</div>
+          <div class="store-badges">
+            <a href="https://store.app/thescriptwriter" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="View on store.app"><img src="badges/store-app.svg" alt="Listed on store.app" width="140" height="38" style="display:block;"/></a>
+            <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn?hl=en-US&gl=US" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Get it from Microsoft"><img src="badges/ms-store.svg" alt="Get it from Microsoft" width="140" height="38" style="display:block;"/></a>
+            <a href="https://apps.apple.com/app/the-scriptwriter/id6790096605" target="_blank" rel="noopener" style="display:inline-block;line-height:0;transition:opacity .15s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Download on the App Store"><img src="badges/app-store.svg" alt="Download on the App Store" width="140" height="38" style="display:block;"/></a>
+          </div>
         </div>
       </div>
       <div id="script-content"></div>
@@ -5709,51 +5722,63 @@ if('launchQueue' in window&&typeof LaunchParams!=='undefined'&&'files' in Launch
   });
 }
 
-/* PWA install hint + Chrome/Edge install prompt */
+/* PWA install banner + Chrome/Edge install prompt */
 let deferredInstallPrompt=null;
 function isStandalonePWA(){
   return window.matchMedia('(display-mode: standalone)').matches
       || window.matchMedia('(display-mode: window-controls-overlay)').matches
       || window.navigator.standalone===true;
 }
-function showInstallHint(){
-  const hint=document.getElementById('install-hint');
-  if(!hint||isStandalonePWA())return;
+function isMobileDevice(){
+  return window.matchMedia('(pointer: coarse)').matches;
+}
+function isNativeApp(){
+  return document.cookie.split(';').some(c=>c.trim().startsWith('app-platform='));
+}
+function showInstallBanner(){
+  const banner=document.getElementById('install-banner');
+  if(!banner||isStandalonePWA()||isMobileDevice()||isNativeApp())return;
+  try{if(localStorage.getItem('install_banner_dismissed')==='1')return;}catch(e){}
   const ua=navigator.userAgent.toLowerCase();
-  const actionEl=document.getElementById('install-hint-action');
+  const instrEl=document.getElementById('ib-instructions');
   const btn=document.getElementById('install-btn');
   if(deferredInstallPrompt){
-    if(actionEl)actionEl.textContent='one click to install as a desktop app';
+    if(instrEl)instrEl.textContent='Works without internet — one click to install.';
     if(btn)btn.style.display='inline-block';
   }else if(/safari/.test(ua)&&!/chrome|chromium|edg/.test(ua)){
-    if(actionEl)actionEl.textContent="open the Share menu and choose 'Add to Dock' (macOS) or 'Add to Home Screen' (iOS)";
+    if(instrEl)instrEl.textContent="Open the Share menu and choose ‘Add to Dock’ to install.";
   }else if(/firefox/.test(ua)){
-    if(actionEl)actionEl.textContent='use a Chromium-based browser (Chrome, Edge, Brave, Arc) to install — Firefox does not support desktop install';
+    if(instrEl)instrEl.textContent='Use Chrome, Edge, or Brave to install as a desktop app.';
   }else{
-    if(actionEl)actionEl.textContent="click the install icon in your browser's address bar";
+    if(instrEl)instrEl.textContent="Click the install icon in your browser’s address bar.";
   }
-  hint.style.display='flex';
+  banner.style.display='flex';
+}
+function dismissInstallBanner(){
+  const banner=document.getElementById('install-banner');
+  if(banner)banner.style.display='none';
+  try{localStorage.setItem('install_banner_dismissed','1');}catch(e){}
 }
 async function triggerInstall(){
   if(!deferredInstallPrompt)return;
   deferredInstallPrompt.prompt();
   try{await deferredInstallPrompt.userChoice;}catch(e){}
   deferredInstallPrompt=null;
-  const hint=document.getElementById('install-hint');
-  if(hint)hint.style.display='none';
+  const banner=document.getElementById('install-banner');
+  if(banner)banner.style.display='none';
 }
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault();
   deferredInstallPrompt=e;
-  showInstallHint();
+  showInstallBanner();
 });
 window.addEventListener('appinstalled',()=>{
   deferredInstallPrompt=null;
-  const hint=document.getElementById('install-hint');
-  if(hint)hint.style.display='none';
+  const banner=document.getElementById('install-banner');
+  if(banner)banner.style.display='none';
 });
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',showInstallHint);
-else showInstallHint();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',showInstallBanner);
+else showInstallBanner();
 
 /* PWA shortcuts: ?action=new|open routes from the manifest's shortcut list */
 (function(){
