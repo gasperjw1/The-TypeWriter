@@ -46,6 +46,7 @@ You can start a new script, open a saved JSON file, import a Fountain or Final D
 - Notes and comments on any line, scene or act, with a resolved/unresolved workflow and a side-panel list
 - Bookmarks with labels and jump-to navigation
 - Revision tracking: named snapshots with industry-standard colored revision marks
+- Version history: view any snapshot read-only, compare it with the current draft, or revert to it (undoable)
 - Lockable scene numbers for production drafts
 - Keyboard shortcut reference panel (press `?`)
 

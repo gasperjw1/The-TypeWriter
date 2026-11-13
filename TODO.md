@@ -79,6 +79,7 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [x] **Export credit line** — Optional one-line credit at the end of PDFs and rehearsal sides, Settings → Export. *(Session 20)*
 - [x] **Stage play template + formatting guide** — docs/templates/ (.docx, .fountain) and blog post with HowTo schema; "Open in The Scriptwriter" via the protocol route. *(Session 20)*
 - [x] **Fountain cue round-trip fix** — Inline `[[Name enters]]` notes on transition lines now import as cues. *(Session 20)*
+- [x] **Version history** — Revision history modal with per-snapshot change counts and View (read-only in the View tab), Compare (diff grouped by act/scene) and Revert (snapshot-first, undoable) buttons. *(Session 22)*
 
 ### To Do — Statistics & Analysis (Priority 6)
 

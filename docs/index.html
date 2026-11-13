@@ -51,7 +51,7 @@
     "@type": "Person",
     "name": "Yash Mahtani"
   },
-  "softwareVersion": "1.54"
+  "softwareVersion": "1.55"
 }
 </script>
 <script type="application/ld+json">
@@ -212,6 +212,47 @@ body{margin:0;font-family:var(--sans);background:var(--bg1);color:var(--tx1);ove
 .line-item.rev-changed{border-left:3px solid var(--rev-color,#4A90D9);}
 .line-item.rev-changed::after{content:'✱';position:absolute;right:2px;top:2px;font-size:10px;color:var(--rev-color,#4A90D9);opacity:0.7;pointer-events:none;}
 #rev-toggle.active{background:var(--bg3);color:var(--tx1);}
+
+/* Version history (browse / compare / revert) */
+.rh-row{padding:8px 0;border-bottom:1px solid var(--bd3);}
+.rh-top{display:flex;align-items:center;gap:8px;}
+.rh-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:1px solid var(--bd2);}
+.rh-name{font-size:13px;color:var(--tx1);}
+.rh-meta{font-size:11px;color:var(--tx3);}
+.rh-tag{font-size:10px;color:var(--tx3);border:1px solid var(--bd3);border-radius:4px;padding:1px 6px;white-space:nowrap;}
+.rh-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;padding-left:20px;}
+.rh-btns .rbtn{font-size:11px;padding:3px 10px;}
+.rbtn.rev-danger{color:#D85A30;border-color:rgba(216,90,48,0.4);}
+.rbtn.rev-danger:hover{background:rgba(216,90,48,0.08);}
+.rbtn.rev-primary{background:var(--tx1);color:var(--bg1);border-color:var(--tx1);}
+.rbtn.rev-primary:hover{opacity:.85;}
+.rev-banner{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;margin-bottom:20px;border:1px solid var(--bd2);border-radius:var(--rl);background:var(--bg2);font-family:var(--sans);font-size:12px;color:var(--tx2);}
+.rev-banner .rh-dot{width:10px;height:10px;}
+.rev-banner-text{flex:1;min-width:140px;}
+.rev-banner-text strong{color:var(--tx1);}
+.rev-banner-btns{display:flex;flex-wrap:wrap;gap:6px;}
+.rev-banner .rbtn{font-size:11px;padding:4px 10px;}
+.rd-summary{font-family:var(--sans);font-size:12px;color:var(--tx2);margin-bottom:16px;line-height:1.6;}
+.rd-group{margin-bottom:18px;}
+.rd-head{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--tx1);padding:6px 0;border-bottom:1px solid var(--bd3);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.rd-status{font-weight:400;color:var(--tx3);font-size:11px;}
+.rd-counts{margin-left:auto;font-weight:400;font-size:11px;display:flex;gap:4px;}
+.rd-counts span{padding:1px 6px;border-radius:10px;}
+.rd-n-add{color:#1D9E75;background:rgba(29,158,117,0.1);}
+.rd-n-del{color:#D85A30;background:rgba(216,90,48,0.1);}
+.rd-n-chg{color:#B8860B;background:rgba(239,159,39,0.14);}
+.rd-line{display:grid;grid-template-columns:14px minmax(0,1fr);gap:8px;padding:5px 8px;margin:2px 0;border-radius:4px;font-family:var(--script-font-family);font-size:calc(var(--script-font-size)*0.92);line-height:1.45;overflow-wrap:anywhere;}
+.rd-sign{font-weight:700;font-family:var(--sans);}
+.rd-type{font-family:var(--sans);font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;margin-right:6px;}
+.rd-add{background:rgba(29,158,117,0.08);border-left:3px solid #1D9E75;}
+.rd-add .rd-sign{color:#1D9E75;}
+.rd-del{background:rgba(216,90,48,0.07);border-left:3px solid #D85A30;}
+.rd-del .rd-sign{color:#D85A30;}
+.rd-del .rd-text{text-decoration:line-through;color:var(--tx2);}
+.rd-chg{background:rgba(239,159,39,0.08);border-left:3px solid #EF9F27;}
+.rd-chg .rd-sign{color:#B8860B;}
+.rd-old{display:block;text-decoration:line-through;color:var(--tx3);}
+.rd-new{display:block;}
 
 /* Inline editing */
 .line-item.inline-editing{background:var(--bg2);border:1px solid var(--bd2);border-radius:var(--rm);padding:6px 12px;margin:4px 0;cursor:default;}
@@ -497,6 +538,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
   #top-bar,#input-bar,#right-panel-wrap,#mob-panel-backdrop,#mob-fdd-backdrop,.outline-toolbar,#save-nudge{display:none !important;}
   #main-area{display:block !important;}
   #view-panel{display:block !important;padding:0 !important;max-width:100% !important;overflow:visible !important;color:#000 !important;}
+  .rev-banner{display:none !important;}
   #view-panel *{color:#000 !important;}
   #view-panel .v-title{font-size:18pt !important;}
   #view-panel .v-author{font-size:12pt !important;color:#333 !important;}
@@ -1201,7 +1243,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
             <span>·</span>
             <a href="support.html">Support</a>
           </div>
-          <div class="setup-footer-meta">v1.54 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
+          <div class="setup-footer-meta">v1.55 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
         </div>
       </div>
       <div id="script-content"></div>
@@ -1394,7 +1436,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.54 · November 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.55 · November 2026</div>
       </div>
     </div>
 
@@ -1551,6 +1593,7 @@ let afOptions={charCaps:true,trimSpace:true,parenWrap:true,sentenceCap:true};
 let noteIdCounter=1; /* incrementing ID for new notes */
 let charPanelExpanded={};
 let showRevMarks=true;
+let viewingRevision=null; /* {idx,mode:'view'|'compare'} while the View tab shows a past revision instead of the draft */
 const REV_COLORS=[
   {name:'White',color:'#FFFFFF',bg:'rgba(255,255,255,0.08)'},
   {name:'Blue',color:'#4A90D9',bg:'rgba(74,144,217,0.12)'},
@@ -1783,8 +1826,10 @@ function updateUndoRedoBtns(){
 function currentAct(){return S.acts.length?S.acts[S.acts.length-1]:null;}
 function currentScene(){const a=currentAct();return a&&a.scenes.length?a.scenes[a.scenes.length-1]:null;}
 function numWord(n){const w=['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty'];return n>=1&&n<=20?w[n-1]:String(n);}
-function actLabel(ai){const a=S.acts[ai];if(!a)return'';const num='Act '+numWord(ai+1);return a.name?num+' — '+a.name:num;}
-function sceneLabel(ai,si){const sc=S.acts[ai]?.scenes[si];if(!sc)return'';const num=sc.lockedNum?'Scene '+sc.lockedNum:'Scene '+numWord(si+1);return sc.name?num+' — '+sc.name:num;}
+function actLabelOf(a,ai){if(!a)return'';const num='Act '+numWord(ai+1);return a.name?num+' — '+a.name:num;}
+function sceneLabelOf(sc,si){if(!sc)return'';const num=sc.lockedNum?'Scene '+sc.lockedNum:'Scene '+numWord(si+1);return sc.name?num+' — '+sc.name:num;}
+function actLabel(ai){return actLabelOf(S.acts[ai],ai);}
+function sceneLabel(ai,si){return sceneLabelOf(S.acts[ai]?.scenes[si],si);}
 function findChar(n){return S.characters.find(c=>c.name===n.toUpperCase()&&!c.archived)||null;}
 function findCharAny(n){return S.characters.find(c=>c.name===n.toUpperCase())||null;}
 function getOrCreate(name,desc=''){let c=findChar(name);if(!c){c={name:name.toUpperCase(),description:desc,archived:false};S.characters.push(c);}return c;}
@@ -1869,6 +1914,7 @@ function scrollToSelected(){const scrl=$('script-scroll'),sel=scrl.querySelector
 
 function switchTab(t){
   activeTab=t;
+  if(t!=='view')viewingRevision=null;
   document.querySelectorAll('.tab').forEach(el=>{el.classList.remove('active');const tx=el.textContent.toLowerCase();if((t==='edit'&&tx.includes('edit'))||(t==='view'&&tx.startsWith('view'))||(t==='outline'&&tx.includes('outl'))||(t==='settings'&&tx.includes('sett')))el.classList.add('active');});
   $('script-scroll').style.display=t==='edit'?'flex':'none';
   $('script-scroll').style.flexDirection='column';
@@ -1908,7 +1954,7 @@ function closeFDD(){
   const wrap=$('file-menu-wrap');
   if(wrap&&dd.parentElement!==wrap)wrap.appendChild(dd);
 }
-function resetEditorState(){undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};$('undo-btn').disabled=true;$('redo-btn').disabled=true;}
+function resetEditorState(){undoStack=[];undoCursor=-1;editingLine=null;insertAfter=null;confirmState={};viewingRevision=null;$('undo-btn').disabled=true;$('redo-btn').disabled=true;}
 function showEditor(title){$('setup-screen').style.display='none';$('new-title-wrap').style.display='none';$('script-content').style.display='block';$('input-bar').style.display='block';$('right-panel-wrap').style.display='flex';$('script-title-text').textContent=title;updateSaveIndicator();applyInputMode();renderStats();}
 document.addEventListener('click',e=>{
   const wrap=$('file-menu-wrap'),dd=$('file-dd');
@@ -2997,7 +3043,9 @@ function renderFDXFormatted(){
 }
 
 function renderView(){
-  const p=$('view-panel');if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
+  const p=$('view-panel');
+  if(viewingRevision){renderRevisionView(p);return;}
+  if(!S.acts.length){p.innerHTML=`<div style="text-align:center;color:var(--tx3);padding-top:60px;font-size:13px;">Nothing to view yet.</div>`;return;}
   const tb=(f,label)=>`<button class="vf-btn${viewFormat===f?' vf-active':''}" onclick="setViewFormat('${f}')">${label}</button>`;
   let h=`<div class="vf-bar">${tb('stageplay','Stage Play')}${tb('fountain','Fountain')}${tb('fdx','FDX')}<button class="view-print-btn" onclick="window.print()" style="margin-left:auto;">Print</button></div>`;
   if(viewFormat==='fountain'){
@@ -3014,10 +3062,15 @@ function renderView(){
     else{h+=renderFDXFormatted();}
     p.innerHTML=h;return;
   }
-  h+=`<div class="v-title">${esc(S.title)}</div>`;
-  if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
-  S.acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabel(ai))}</div>`;a.scenes.forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabel(ai,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;sc.lines.forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){const charName=(l.characters||[]).map(c=>c.name).join(' & ');if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
+  h+=renderStagePlayBody(S.acts);
   p.innerHTML=h;
+}
+function renderStagePlayBody(acts){
+  /* Stage-play formatted body for the View tab. `acts` is S.acts for the draft, or a revision snapshot's acts (read-only). */
+  let h=`<div class="v-title">${esc(S.title)}</div>`;
+  if(S.author)h+=`<div class="v-author">by ${esc(S.author)}</div>`;
+  acts.forEach((a,ai)=>{h+=`<div class="v-act">${esc(actLabelOf(a,ai))}</div>`;(a.scenes||[]).forEach((sc,si)=>{h+=`<div class="v-scene">${esc(sceneLabelOf(sc,si))}</div>`;if(sc.setting)h+=`<div class="v-setting">${escBr(sc.setting)}</div>`;(sc.lines||[]).forEach((l,li)=>{const cont=isCont(sc,li);if(l.type==='setting')h+=`<div class="v-setting">${escBr(l.value)}</div>`;else if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';h+=`<div class="v-direction">(${escBr(l.value)})${cues?` <span class="v-cue-note">[${esc(cues)}]</span>`:''}</div>`;}else if(l.type==='dialogue'){const charName=(l.characters||[]).map(c=>c.name).join(' & ');if(dlgFormat==='inline')h+=`<div class="v-dlg v-dlg-inline"><span class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</span>${l.dialogueAction?` <span class="vda">(${escBr(l.dialogueAction)})</span>`:''} <span class="vt">${escBr(l.value)}</span></div>`;else h+=`<div class="v-dlg"><div class="vc">${esc(charName)}${cont?` <span class="vcont">(cont.)</span>`:''}</div>${l.dialogueAction?`<div class="vda">(${escBr(l.dialogueAction)})</div>`:''}<div class="vt">${escBr(l.value)}</div></div>`;}else if(l.type==='action')h+=`<div class="v-action">(${escBr(l.value)})</div>`;if(showNotes&&l.notes&&l.notes.length)l.notes.forEach(n=>{if(!n.resolved)h+=`<div style="font-size:10px;color:var(--tx3);padding-left:40px;font-style:italic;font-family:var(--sans);">Note: ${esc(n.text)}</div>`;});});});});
+  return h;
 }
 
 /* ── Outline / Scene Cards ── */
@@ -5117,20 +5170,32 @@ function updateRevisionUI(){
 }
 
 function openRevisionHistory(){
-  if(!S.revisions||!S.revisions.length){alert('No revisions yet. Use File options → New Revision to create one.');return;}
-  let h='<div style="font-size:15px;font-weight:600;margin-bottom:12px;">Revision History</div>';
-  h+='<div style="max-height:300px;overflow-y:auto;">';
-  S.revisions.forEach((rev,i)=>{
+  if(!S.revisions||!S.revisions.length){alert('No revisions yet. Use File options → New revision to create one.');return;}
+  const isMob=window.innerWidth<=768;
+  let h='<div style="font-size:15px;font-weight:600;margin-bottom:4px;">Revision history</div>';
+  h+='<div style="font-size:11px;color:var(--tx3);margin-bottom:10px;">View a revision read-only, compare it with the current draft, or revert to it. Reverting takes a snapshot of the draft first and can be undone.</div>';
+  h+='<div style="max-height:50vh;overflow-y:auto;">';
+  S.revisions.slice().reverse().forEach((rev,ri)=>{
+    const i=S.revisions.length-1-ri;
     const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
-    const date=new Date(rev.timestamp).toLocaleString();
-    const isCurrent=i===S.revisions.length-1;
-    h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd3);${isCurrent?'font-weight:500':''}">
-      <span style="width:12px;height:12px;border-radius:50%;background:${rc.color};flex-shrink:0;border:1px solid var(--bd2);"></span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;color:var(--tx1);">${esc(rev.name)}</div>
-        <div style="font-size:11px;color:var(--tx3);">${date}</div>
+    const isLatest=i===S.revisions.length-1;
+    const d=computeRevisionDiff(rev.snapshot);
+    const n=d.counts.added+d.counts.removed+d.counts.changed;
+    const delta=n===0?'identical to draft':n+' line'+(n===1?'':'s')+' differ from draft';
+    h+=`<div class="rh-row">
+      <div class="rh-top">
+        <span class="rh-dot" style="background:${rc.color};"></span>
+        <div style="flex:1;min-width:0;">
+          <div class="rh-name"${isLatest?' style="font-weight:500;"':''}>${esc(rev.name)}</div>
+          <div class="rh-meta">${esc(revDate(rev))} · ${delta}</div>
+        </div>
+        ${isLatest?'<span class="rh-tag">latest</span>':''}
       </div>
-      ${isCurrent?'<span style="font-size:10px;color:var(--tx3);border:1px solid var(--bd3);border-radius:4px;padding:1px 6px;">current</span>':''}
+      <div class="rh-btns">
+        <button class="rbtn" onclick="viewRevision(${i},'view')">View</button>
+        <button class="rbtn" onclick="viewRevision(${i},'compare')"${n===0?' disabled style="opacity:.5;cursor:default;"':''}>Compare</button>
+        <button class="rbtn rev-danger" onclick="revertToRevision(${i})"${n===0?' disabled style="opacity:.5;cursor:default;"':''}>Revert</button>
+      </div>
     </div>`;
   });
   h+='</div>';
@@ -5139,6 +5204,177 @@ function openRevisionHistory(){
   h+='<button class="rbtn" style="background:var(--bg3);" onclick="closeGenericModal()">Close</button>';
   h+='</div>';
   openGenericModal(h);
+  const gm=document.getElementById('generic-modal');
+  if(gm)gm.style.maxWidth=isMob?'95vw':'480px';
+}
+
+/* ── Version history: browse / compare / revert ── */
+function revDate(rev){return new Date(rev.timestamp).toLocaleString();}
+
+function revLineText(l){
+  /* One-line plain-text rendering of a line for the compare view */
+  if(!l)return'';
+  if(l.type==='dialogue'){const n=(l.characters||[]).map(c=>c.name).join(' & ');return(n?n.toUpperCase()+': ':'')+(l.dialogueAction?'('+l.dialogueAction+') ':'')+(l.value||'');}
+  if(l.type==='direction'){const cues=l.cues?[(l.cues.enters||[]).map(n=>n+' enters').join(', '),(l.cues.exits||[]).map(n=>n+' exits').join(', ')].filter(Boolean).join('; '):'';return(l.value||'')+(cues?' ['+cues+']':'');}
+  if(l.type==='bookmark')return'🔖 '+(l.label||'');
+  return l.value||'';
+}
+function revLineType(l){return l.type==='bookmark'?'Bookmark':typeLabel(l.type);}
+
+function computeRevisionDiff(snapshot){
+  /* Diff a revision snapshot against the current draft, grouped by act/scene.
+     Lines are paired by lineFingerprint(); leftover removed/added lines of the same
+     type (same speakers preferred for dialogue) are paired as "changed".
+     Returns {groups:[{ai,si,actLabel,sceneLabel,status,entries:[{kind:'add'|'del'|'chg',...}]}],
+              chars:{added:[],removed:[]},counts:{added,removed,changed}} */
+  const snapActs=(snapshot&&snapshot.acts)||[];
+  const curActs=S.acts;
+  const groups=[];const counts={added:0,removed:0,changed:0};
+  const sameChars=(a,b)=>(a.characters||[]).map(c=>c.name).sort().join('&')===(b.characters||[]).map(c=>c.name).sort().join('&');
+  const nActs=Math.max(snapActs.length,curActs.length);
+  for(let ai=0;ai<nActs;ai++){
+    const sa=snapActs[ai],ca=curActs[ai];
+    const snapScenes=sa?(sa.scenes||[]):[];const curScenes=ca?(ca.scenes||[]):[];
+    const nSc=Math.max(snapScenes.length,curScenes.length);
+    for(let si=0;si<nSc;si++){
+      const ss=snapScenes[si],cs=curScenes[si];
+      const g={ai,si,actLabel:actLabelOf(ca||sa,ai),sceneLabel:sceneLabelOf(cs||ss,si),status:'same',entries:[]};
+      if(!ss){g.status='added';(cs.lines||[]).forEach(l=>g.entries.push({kind:'add',line:l}));}
+      else if(!cs){g.status='removed';(ss.lines||[]).forEach(l=>g.entries.push({kind:'del',line:l}));}
+      else{
+        const sLines=(ss.lines||[]),cLines=(cs.lines||[]);
+        const sFP=sLines.map(lineFingerprint),cFP=cLines.map(lineFingerprint);
+        /* exact matches by fingerprint (multiset) */
+        const pool={};sFP.forEach((fp,i)=>{(pool[fp]=pool[fp]||[]).push(i);});
+        const snapToCur={};const freeCur=[];
+        cFP.forEach((fp,ci)=>{const arr=pool[fp];if(arr&&arr.length)snapToCur[arr.shift()]=ci;else freeCur.push(ci);});
+        const freeSnap=sFP.map((_,i)=>i).filter(i=>!(i in snapToCur));
+        /* Current-draft index of the nearest matched line before / after a snapshot line.
+           A removed line only pairs with an added line that sits between the same neighbours,
+           so an edit in place reads as "changed" while a deletion plus an append reads as two entries. */
+        const prevMatched=si2=>{for(let k=si2-1;k>=0;k--)if(k in snapToCur)return snapToCur[k];return-1;};
+        const nextMatched=si2=>{for(let k=si2+1;k<sLines.length;k++)if(k in snapToCur)return snapToCur[k];return cLines.length;};
+        const entries=[];
+        freeSnap.forEach(si2=>{
+          const sl=sLines[si2];const lo=prevMatched(si2),hi=nextMatched(si2);let best=-1;
+          for(let k=0;k<freeCur.length;k++){const ci=freeCur[k];if(ci<=lo||ci>=hi)continue;const cl=cLines[ci];if(cl.type!==sl.type)continue;if(sl.type==='dialogue'){if(sameChars(sl,cl)){best=k;break;}if(best<0)best=k;}else{best=k;break;}}
+          if(best>=0){const ci=freeCur.splice(best,1)[0];entries.push({kind:'chg',old:sl,line:cLines[ci],pos:ci});}
+          else entries.push({kind:'del',line:sl,pos:lo+0.5});
+        });
+        freeCur.forEach(ci=>entries.push({kind:'add',line:cLines[ci],pos:ci}));
+        if((ss.setting||'')!==(cs.setting||''))entries.push({kind:'chg',label:'Setting',oldText:ss.setting||'',newText:cs.setting||'',pos:-1});
+        entries.sort((a,b)=>a.pos-b.pos);
+        g.entries=entries;
+        if(entries.length)g.status='changed';
+      }
+      g.entries.forEach(e=>{if(e.kind==='add')counts.added++;else if(e.kind==='del')counts.removed++;else counts.changed++;});
+      groups.push(g);
+    }
+  }
+  const snapNames=((snapshot&&snapshot.characters)||[]).map(c=>c.name),curNames=S.characters.map(c=>c.name);
+  const chars={added:curNames.filter(n=>!snapNames.includes(n)),removed:snapNames.filter(n=>!curNames.includes(n))};
+  return{groups,chars,counts};
+}
+
+function viewRevision(i,mode){
+  if(!S.revisions||!S.revisions[i])return;
+  viewingRevision={idx:i,mode:mode||'view'};
+  closeGenericModal();
+  switchTab('view');
+  $('view-panel').scrollTop=0;
+}
+function backToCurrentDraft(){viewingRevision=null;renderView();}
+
+function renderRevisionView(p){
+  const rev=S.revisions&&S.revisions[viewingRevision.idx];
+  if(!rev){viewingRevision=null;renderView();return;}
+  const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+  const mode=viewingRevision.mode;
+  const i=viewingRevision.idx;
+  let h=`<div class="rev-banner"><span class="rh-dot" style="background:${rc.color};"></span>`;
+  h+=`<div class="rev-banner-text">${mode==='compare'?'Comparing':'Viewing'} <strong>${esc(rev.name)}</strong> (${esc(revDate(rev))})${mode==='compare'?' with the current draft':' — read-only'}</div>`;
+  h+=`<div class="rev-banner-btns">`;
+  if(mode==='compare')h+=`<button class="rbtn" onclick="viewRevision(${i},'view')">View revision</button>`;
+  else h+=`<button class="rbtn" onclick="viewRevision(${i},'compare')">Compare with draft</button>`;
+  h+=`<button class="rbtn rev-danger" onclick="revertToRevision(${i})">Revert to this</button>`;
+  h+=`<button class="rbtn rev-primary" onclick="backToCurrentDraft()">Back to current draft</button>`;
+  h+=`</div></div>`;
+  if(mode==='compare')h+=renderRevisionCompare(rev);
+  else h+=renderStagePlayBody((rev.snapshot&&rev.snapshot.acts)||[]);
+  p.innerHTML=h;
+}
+
+function renderRevisionCompare(rev){
+  const d=computeRevisionDiff(rev.snapshot);
+  const total=d.counts.added+d.counts.removed+d.counts.changed;
+  let h='';
+  const parts=[];
+  if(d.counts.added)parts.push(`<span class="rd-n-add" style="padding:1px 6px;border-radius:10px;">+${d.counts.added} added</span>`);
+  if(d.counts.removed)parts.push(`<span class="rd-n-del" style="padding:1px 6px;border-radius:10px;">−${d.counts.removed} removed</span>`);
+  if(d.counts.changed)parts.push(`<span class="rd-n-chg" style="padding:1px 6px;border-radius:10px;">~${d.counts.changed} changed</span>`);
+  h+=`<div class="rd-summary">`;
+  h+=total?`Since <strong>${esc(rev.name)}</strong>: ${parts.join(' ')}`:`The current draft is identical to <strong>${esc(rev.name)}</strong>.`;
+  if(d.chars.added.length||d.chars.removed.length){
+    h+=`<br>Characters: `;
+    const cp=[];
+    if(d.chars.added.length)cp.push(`<span class="rd-n-add" style="padding:1px 6px;border-radius:10px;">+ ${esc(d.chars.added.join(', '))}</span>`);
+    if(d.chars.removed.length)cp.push(`<span class="rd-n-del" style="padding:1px 6px;border-radius:10px;">− ${esc(d.chars.removed.join(', '))}</span>`);
+    h+=cp.join(' ');
+  }
+  h+=`</div>`;
+  const entryHtml=e=>{
+    if(e.label){return`<div class="rd-line rd-chg"><span class="rd-sign">~</span><span><span class="rd-type">${esc(e.label)}</span><span class="rd-old">${escBr(e.oldText)||'<em>(none)</em>'}</span><span class="rd-new">${escBr(e.newText)||'<em>(none)</em>'}</span></span></div>`;}
+    if(e.kind==='add')return`<div class="rd-line rd-add"><span class="rd-sign">+</span><span><span class="rd-type">${esc(revLineType(e.line))}</span><span class="rd-text">${escBr(revLineText(e.line))}</span></span></div>`;
+    if(e.kind==='del')return`<div class="rd-line rd-del"><span class="rd-sign">−</span><span><span class="rd-type">${esc(revLineType(e.line))}</span><span class="rd-text">${escBr(revLineText(e.line))}</span></span></div>`;
+    return`<div class="rd-line rd-chg"><span class="rd-sign">~</span><span><span class="rd-type">${esc(revLineType(e.line))}</span><span class="rd-old">${escBr(revLineText(e.old))}</span><span class="rd-new">${escBr(revLineText(e.line))}</span></span></div>`;
+  };
+  d.groups.forEach(g=>{
+    if(!g.entries.length)return;
+    const a=g.entries.filter(e=>e.kind==='add').length,r=g.entries.filter(e=>e.kind==='del').length,c=g.entries.filter(e=>e.kind==='chg').length;
+    h+=`<div class="rd-group"><div class="rd-head">${esc(g.actLabel)} · ${esc(g.sceneLabel)}`;
+    if(g.status==='added')h+=`<span class="rd-status">scene not in this revision</span>`;
+    if(g.status==='removed')h+=`<span class="rd-status">scene no longer in the draft</span>`;
+    h+=`<span class="rd-counts">${a?`<span class="rd-n-add">+${a}</span>`:''}${r?`<span class="rd-n-del">−${r}</span>`:''}${c?`<span class="rd-n-chg">~${c}</span>`:''}</span></div>`;
+    g.entries.forEach(e=>{h+=entryHtml(e);});
+    h+=`</div>`;
+  });
+  return h;
+}
+
+function revertToRevision(i){
+  const rev=S.revisions&&S.revisions[i];if(!rev)return;
+  let h=`<div style="font-size:15px;font-weight:600;margin-bottom:10px;">Revert to ${esc(rev.name)}?</div>`;
+  h+=`<div style="font-size:12px;color:var(--tx2);line-height:1.6;">The acts, scenes, lines and characters of the current draft will be replaced with the snapshot from <strong>${esc(rev.name)}</strong> (${esc(revDate(rev))}).`;
+  h+=`<br><br>A new snapshot of the current draft is taken first, so nothing is lost. You can also undo the revert with Ctrl+Z. Title, author, production notes and copyright are kept.</div>`;
+  h+=`<div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">`;
+  h+=`<button class="rbtn" onclick="closeGenericModal()">Cancel</button>`;
+  h+=`<button class="rbtn rev-primary" onclick="doRevertToRevision(${i})">Revert</button>`;
+  h+=`</div>`;
+  openGenericModal(h);
+  const gm=document.getElementById('generic-modal');
+  if(gm)gm.style.maxWidth=window.innerWidth<=768?'95vw':'420px';
+}
+
+function doRevertToRevision(i){
+  const rev=S.revisions&&S.revisions[i];if(!rev||!rev.snapshot)return;
+  if(editingLine)editingLine=null;
+  pushUndo();
+  /* Snapshot the draft as it is now, so the revert never loses work */
+  const colorIdx=S.revisions.length%REV_COLORS.length;
+  const before=JSON.parse(JSON.stringify({acts:S.acts,characters:S.characters}));
+  S.revisions.push({name:REV_COLORS[colorIdx].name+' Revision (before revert)',colorIdx,timestamp:Date.now(),snapshot:before});
+  /* Restore the snapshot — deep copy so later edits never touch the stored revision */
+  S.acts=JSON.parse(JSON.stringify(rev.snapshot.acts||[]));
+  S.characters=JSON.parse(JSON.stringify(rev.snapshot.characters||[])).map(c=>({...c,archived:c.archived||false}));
+  migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();
+  if(S.scenesLocked)S.acts.forEach(a=>a.scenes.forEach((sc,si)=>{if(!sc.lockedNum)sc.lockedNum=numWord(si+1);}));
+  else S.acts.forEach(a=>a.scenes.forEach(sc=>{delete sc.lockedNum;}));
+  insertAfter=null;confirmState={};viewingRevision=null;
+  closeGenericModal();
+  computeRevisionChanges();
+  autoSave();render();
+  updateRevisionUI();
+  switchTab('edit');
 }
 
 function openGenericModal(innerHtml){

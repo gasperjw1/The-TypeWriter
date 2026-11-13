@@ -722,6 +722,22 @@ pushUndo() → autoSave() → render()</code></pre>
 </ul>
 
 <p>When adding a new line type: add its distinguishing fields to <code>lineFingerprint()</code> so changes register correctly.</p>
+
+<h3>Version history: view / compare / revert (Session 22)</h3>
+<div class="chain">
+  <span class="cs">openRevisionHistory()</span><span class="ca">→</span>
+  <span class="cs">computeRevisionDiff(snapshot) per row (change count)</span><span class="ca">→</span>
+  <span class="cs">viewRevision(i, 'view'|'compare')</span><span class="ca">→</span>
+  <span class="cs">viewingRevision = {idx, mode}</span><span class="ca">→</span>
+  <span class="cs">switchTab('view') → renderView() → renderRevisionView()</span>
+</div>
+<ul>
+  <li><strong>State:</strong> <code>viewingRevision</code> (not persisted). Cleared by <code>switchTab()</code> for any tab other than View, by <code>backToCurrentDraft()</code>, by <code>resetEditorState()</code> (every load path) and by <code>doRevertToRevision()</code>.</li>
+  <li><strong>View mode</strong> renders <code>renderStagePlayBody(snapshot.acts)</code> under a <code>.rev-banner</code>. <code>renderStagePlayBody(acts)</code> is the stage-play body extracted from <code>renderView()</code>; the draft passes <code>S.acts</code>. It uses <code>actLabelOf(a,ai)</code> / <code>sceneLabelOf(sc,si)</code>, which take objects; <code>actLabel(ai)</code> / <code>sceneLabel(ai,si)</code> now wrap them. Fountain/FDX view formats are not offered for a snapshot.</li>
+  <li><strong>Compare mode</strong>: <code>computeRevisionDiff(snapshot)</code> walks acts/scenes by index. Within a scene, lines are matched by <code>lineFingerprint()</code> as a multiset; a leftover snapshot line pairs with a leftover draft line of the same type (same speakers preferred) only when both sit between the same matched neighbours, giving a <code>chg</code> entry with old + new; otherwise <code>del</code> / <code>add</code>. Scene <code>setting</code> changes are a <code>chg</code> entry with <code>label:'Setting'</code>. Whole scenes missing on either side are reported as added/removed groups. Character names added/removed are listed separately. Rendered by <code>renderRevisionCompare()</code> with <code>.rd-*</code> classes; <code>revLineText()</code> gives the one-line text per line type (add a case when adding a line type).</li>
+  <li><strong>Revert</strong>: <code>revertToRevision(i)</code> opens a confirm in the generic modal; <code>doRevertToRevision(i)</code> does <code>pushUndo()</code>, pushes a <code>'&lt;Color&gt; Revision (before revert)'</code> snapshot of the draft, deep-copies <code>snapshot.acts</code> / <code>snapshot.characters</code> into <code>S</code>, then runs <code>migrateSettingLines()</code>, <code>migrateCharacterToCharacters()</code>, <code>recalcNoteIdCounter()</code>, reconciles <code>lockedNum</code> with <code>S.scenesLocked</code>, and calls <code>computeRevisionChanges()</code>, <code>autoSave()</code>, <code>render()</code>, <code>switchTab('edit')</code>. Title, author, <code>productionNotes</code>, <code>copyrightText</code>, <code>colorLabels</code>, <code>scenesLocked</code> are untouched. Undo restores both the acts and <code>S.revisions</code> (so the before-revert snapshot disappears on Ctrl+Z).</li>
+  <li><strong>Print:</strong> <code>.rev-banner</code> is hidden in <code>@media print</code>, so a viewed snapshot prints clean.</li>
+</ul>
 </section>
 
 <section>
@@ -861,7 +877,7 @@ pushUndo() → autoSave() → render()</code></pre>
 </section>
 
 <hr>
-<p class="meta">Last updated: Session 20 &middot; v1.54 &middot; thescriptwriter.app</p>
+<p class="meta">Last updated: Session 22 &middot; v1.55 &middot; thescriptwriter.app</p>
 
 </main>
 </div>
