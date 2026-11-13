@@ -1188,7 +1188,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
             <span>·</span>
             <a href="support.html">Support</a>
           </div>
-          <div class="setup-footer-meta">v1.52 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
+          <div class="setup-footer-meta">v1.53 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
         </div>
       </div>
       <div id="script-content"></div>
@@ -1345,6 +1345,15 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
           </div>
         </div>
       </div>
+      <div class="psec-title" style="margin-top:28px;">Export</div>
+      <div class="setting-row">
+        <div class="setting-label">Credit line</div>
+        <div class="setting-desc">Adds a single small line at the very end of exported PDFs and rehearsal sides: <em>Formatted with The Scriptwriter &middot; thescriptwriter.app</em>. Helps other writers find the app. Never appears in Fountain or Final Draft exports.</div>
+        <div class="setting-toggle-row">
+          <div><div class="setting-toggle-label">Credit line on exports</div><div class="setting-toggle-desc" id="export-credit-desc">On — one line at the end of PDFs and sides</div></div>
+          <button class="stoggle on" id="export-credit-toggle" onclick="toggleExportCredit()"></button>
+        </div>
+      </div>
       <div class="psec-title" style="margin-top:28px;">Help</div>
       <div class="setting-row desktop-only">
         <div class="setting-label">Keyboard shortcuts</div>
@@ -1372,7 +1381,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.52 · November 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.53 · November 2026</div>
       </div>
     </div>
 
@@ -1512,6 +1521,7 @@ let indicatorMode='highlight',indicatorColors={barrier:'#378ADD',highlight:'rgba
 let ghostMatch='',cddHideTimer=null;
 let modalCues={enters:[],exits:[]};
 let autosaveEnabled=true;
+let exportCredit=true; /* one-line 'Formatted with The Scriptwriter' credit on PDF + rehearsal sides; toggle in Settings → Export */
 let themeMode='system';
 function typeLabel(t){return{setting:'Setting',direction:'Cue',action:'Stage Direction',dialogue:'Dialogue'}[t]||t;}
 let ltColors={direction:'#EF9F27',action:'#D85A30',dialogue:'#378ADD'};
@@ -1546,7 +1556,7 @@ function lsLoadScript(){try{return localStorage.getItem(LS_SCRIPT_KEY);}catch(e)
 function lsSaveSettings(){try{
   const wrap=document.getElementById('right-panel-wrap');
   const rpWidth=wrap&&!rpCollapsed?parseInt(wrap.style.width)||wrap.offsetWidth||320:undefined;
-  localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,rpWidth,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes,viewSubMode,showPacing,autoFormat,afOptions}));
+  localStorage.setItem(LS_SETTINGS_KEY,JSON.stringify({autosaveEnabled,indicatorMode,indicatorColors,fontSize:document.documentElement.style.getPropertyValue('--script-font-size')||'13px',fontFamily:document.documentElement.style.getPropertyValue('--script-font-family')||"'Courier New',monospace",lineSpacing:document.documentElement.style.getPropertyValue('--script-line-height')||'1.6',editorWidth:document.documentElement.style.getPropertyValue('--script-max-width')||'100%',rpCollapsed,rpWidth,themeMode,ltColors,ltEnabled,pillHotkeys,inputMode,lineAlign,dlgFormat,showNotes,viewSubMode,showPacing,autoFormat,afOptions,exportCredit}));
 }catch(e){}}
 function lsLoadSettings(){try{const s=localStorage.getItem(LS_SETTINGS_KEY);return s?JSON.parse(s):null;}catch(e){return null;}}
 
@@ -1667,6 +1677,7 @@ function resetCopyrightText(){
 }
 
 function toggleAutosave(){autosaveEnabled=!autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');btn.classList.toggle('on',autosaveEnabled);desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';lsSaveSettings();}
+function toggleExportCredit(){exportCredit=!exportCredit;const btn=$('export-credit-toggle'),desc=$('export-credit-desc');if(btn)btn.classList.toggle('on',exportCredit);if(desc)desc.textContent=exportCredit?'On — one line at the end of PDFs and sides':'Off — exports carry no credit line';lsSaveSettings();}
 function toggleAutoFormat(){
   autoFormat=!autoFormat;
   const btn=$('autoformat-toggle'),desc=$('autoformat-desc'),opts=$('autoformat-options');
@@ -3982,6 +3993,8 @@ body{font-family:'Courier New',Courier,monospace;font-size:12pt;color:#000;backg
 .char-entry{margin-bottom:12pt;padding-left:36pt;}
 .char-name{font-weight:bold;text-transform:uppercase;}
 .char-desc{font-weight:normal;font-style:italic;}
+/* Credit line (Settings → Export) */
+.credit-line{margin-top:36pt;text-align:center;font-size:9pt;color:#666;font-style:italic;}
 /* Copyright page */
 .copyright-page{page-break-after:always;padding-top:48pt;text-align:center;}
 .copyright-page p{margin-bottom:14pt;line-height:1.6;font-size:11pt;}
@@ -4132,6 +4145,7 @@ ${S.author?`<div class="tp-by">by</div><div class="tp-author">${esc2(S.author)}<
     });
     html+='</div>';
   });
+  if(exportCredit&&opts.includeCredit!==false)html+=`<div class="credit-line">Formatted with The Scriptwriter &middot; thescriptwriter.app &middot; free stage play editor</div>`;
   html+=`</body></html>`;
   return html;
 }
@@ -4468,8 +4482,30 @@ function parseFountain(text){
       const isForcedTransition=/^>\s*/.test(tl);
       if(isAutoTransition||isForcedTransition){
         ensureActScene();
-        const val=isForcedTransition?tl.replace(/^>\s*/,'').trim():tl;
-        curScene.lines.push({type:'direction',value:val});
+        let val=isForcedTransition?tl.replace(/^>\s*/,'').trim():tl;
+        /* buildFountain appends enter/exit cues inline as a trailing
+           [[Name enters; Name exits]] note on the same line. Parse it here,
+           otherwise the note survives as literal text and the cues are lost. */
+        const dirLine={type:'direction',value:val};
+        const inlineNote=val.match(/^(.*?)\s*\[\[(.*?)\]\]\s*$/s);
+        if(inlineNote){
+          const enters=[],exits=[];
+          inlineNote[2].split(/[;,]/).forEach(part=>{
+            const em=part.trim().match(/^(.+?)\s+enters$/i);
+            const xm=part.trim().match(/^(.+?)\s+exits$/i);
+            if(em)enters.push(em[1].trim());
+            if(xm)exits.push(xm[1].trim());
+          });
+          if(enters.length||exits.length){
+            dirLine.value=inlineNote[1].trim();
+            dirLine.cues={enters,exits};
+            [...enters,...exits].forEach(n=>{
+              const norm=n.split(/\s+/).map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+              if(!charSet.has(norm)){charSet.add(norm);characters.push({name:norm,description:'',archived:false});}
+            });
+          }
+        }
+        curScene.lines.push(dirLine);
         p++;continue;
       }
     }
@@ -4941,6 +4977,7 @@ async function exportRehearsalSides(charName){
     });
   });
 
+  if(exportCredit){lines.push('');lines.push('Formatted with The Scriptwriter · thescriptwriter.app · free stage play editor');}
   const text=lines.join('\n');
   const blob=new Blob([text],{type:'text/plain'});
   await downloadFile(blob,'sides_'+charName.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+(S.title||'script').replace(/[^a-zA-Z0-9_\- ]/g,'_')+'.txt');
@@ -5491,6 +5528,7 @@ updateInputMode();switchTab('edit');updateSaveIndicator();
   const sets=lsLoadSettings();
   if(sets){
     if(typeof sets.autosaveEnabled==='boolean'){autosaveEnabled=sets.autosaveEnabled;const btn=$('autosave-toggle'),desc=$('autosave-desc');if(btn)btn.classList.toggle('on',autosaveEnabled);if(desc)desc.textContent=autosaveEnabled?'On — changes save automatically':'Off — use File options → Save manually';}
+    if(typeof sets.exportCredit==='boolean'){exportCredit=sets.exportCredit;const cb=$('export-credit-toggle'),cd=$('export-credit-desc');if(cb)cb.classList.toggle('on',exportCredit);if(cd)cd.textContent=exportCredit?'On — one line at the end of PDFs and sides':'Off — exports carry no credit line';}
     if(sets.indicatorMode){indicatorMode=sets.indicatorMode;document.querySelectorAll('.setting-option').forEach(el=>el.classList.remove('selected'));const opt=$('opt-'+indicatorMode);if(opt){opt.classList.add('selected');opt.querySelector('input[type=radio]').checked=true;}}
     if(sets.indicatorColors)indicatorColors=sets.indicatorColors;
     if(sets.fontSize){document.documentElement.style.setProperty('--script-font-size',sets.fontSize);const sel=$('font-size-sel');if(sel)sel.value=parseInt(sets.fontSize);const prev=$('font-preview');if(prev)prev.style.fontSize=sets.fontSize;}

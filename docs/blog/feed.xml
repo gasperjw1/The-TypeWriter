@@ -8,7 +8,7 @@
     <description>Articles on the craft of stage play writing — formatting, structure, tools, and the small decisions that make a script work.</description>
     <language>en-us</language>
     <copyright>The Scriptwriter — open source. Content is freely shareable with attribution.</copyright>
-    <lastBuildDate>Sun, 24 May 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 12 Nov 2026 12:00:00 GMT</lastBuildDate>
     <generator>Hand-maintained — see docs/blog/_template.html for the workflow</generator>
     <atom:link href="https://thescriptwriter.app/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
@@ -16,6 +16,15 @@
       <title>The Scriptwriter Blog</title>
       <link>https://thescriptwriter.app/blog/</link>
     </image>
+
+    <item>
+      <title>How to format a stage play: free template</title>
+      <link>https://thescriptwriter.app/blog/how-to-format-a-stage-play.html</link>
+      <guid isPermaLink="true">https://thescriptwriter.app/blog/how-to-format-a-stage-play.html</guid>
+      <description>Stage play format explained element by element: title page, character list, act and scene headings, dialogue, stage directions and cues. Free template included.</description>
+      <pubDate>Thu, 12 Nov 2026 12:00:00 GMT</pubDate>
+      <category>Formatting</category>
+    </item>
 
     <item>
       <title>Free alternatives to Final Draft (2026)</title>
