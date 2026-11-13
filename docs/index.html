@@ -1987,24 +1987,31 @@ function loadFile(e){
   reader.onload=ev=>{try{loadFromData(JSON.parse(ev.target.result));}catch(err){alert('Could not parse file.');}};
   reader.readAsText(file);e.target.value='';
 }
+function allActsSets(){
+  /* S.acts plus every revision snapshot's acts, so migrations keep snapshots in the current data shape */
+  const sets=[S.acts];
+  (S.revisions||[]).forEach(r=>{if(r&&r.snapshot&&Array.isArray(r.snapshot.acts))sets.push(r.snapshot.acts);});
+  return sets;
+}
 function migrateSettingLines(){
   /* Migrate old setting lines into scene.setting for scripts saved before this change */
-  S.acts.forEach(a=>a.scenes.forEach(sc=>{
+  allActsSets().forEach(acts=>acts.forEach(a=>(a.scenes||[]).forEach(sc=>{
+    if(!Array.isArray(sc.lines))sc.lines=[];
     if(typeof sc.setting==='undefined')sc.setting='';
     if(!sc.setting&&sc.lines.length&&sc.lines[0].type==='setting'){
       sc.setting=sc.lines[0].value;sc.lines.shift();
     }
-  }));
+  })));
 }
 function migrateCharacterToCharacters(){
   /* Migrate old singular character:{} to characters:[{}] array for unison/group dialogue */
-  S.acts.forEach(a=>a.scenes.forEach(sc=>sc.lines.forEach(l=>{
+  allActsSets().forEach(acts=>acts.forEach(a=>(a.scenes||[]).forEach(sc=>(sc.lines||[]).forEach(l=>{
     if(l.type==='dialogue'&&l.character&&!l.characters){
       l.characters=[l.character];
       delete l.character;
     }
     if(l.characters)l.characters=l.characters.slice(0,2);
-  })));
+  }))));
 }
 function loadFromData(data){
   S.title=data.title||'Untitled';S.author=data.author||'';S.acts=data.acts||[];S.characters=(data.characters||[]).map(c=>({...c,archived:c.archived||false}));S.revisions=data.revisions||[];S.scenesLocked=data.scenesLocked||false;S.colorLabels=data.colorLabels||{};S.productionNotes=data.productionNotes||'';S.copyrightText=data.copyrightText||'';
@@ -2845,7 +2852,7 @@ function validateMoveLine(fai,fsi,fli,tai,tsi,tli){if(fai!==tai||fsi!==tsi)retur
 
 function render(){
   const c=$('script-content');
-  if(!S.acts.length){c.innerHTML=`<div style="padding:60px 0;text-align:center;font-size:13px;color:var(--tx3);">No acts yet — use + Act in the right panel</div>`;updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();return;}
+  if(!S.acts.length){c.innerHTML=`<div style="padding:60px 0;text-align:center;font-size:13px;color:var(--tx3);">No acts yet — use + Act in the right panel</div>`;updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();if(activeTab==='view')renderView();return;}
   c.innerHTML=S.acts.map((act,ai)=>{
     const ek='ae'+ai,dk='ad'+ai;
     const el=confirmState[ek]==='e'?'Confirm edit?':'Edit',dl=confirmState[dk]==='d'?'Confirm delete?':'Delete';
@@ -2856,6 +2863,7 @@ ${isNotePanelOpen('act',ai,null,null)?renderNotesPanel('act',ai,null,null):''}
 <div class="scenes-wrap">${act.scenes.map((sc,si)=>renderScene(act,ai,sc,si)).join('')}</div></div>`;
   }).join('');
   updateCtx();renderTOC();renderCharList();renderCFDropdowns();if(cType==='direction')updateDirCues();checkScrollBack();updateRevisionUI();updateSceneLockUI();renderRPNotes();renderRPBookmarks();
+  if(activeTab==='view')renderView();
 }
 
 function renderScene(act,ai,sc,si){
@@ -5064,7 +5072,10 @@ function lineFingerprint(line){
 
 function computeRevisionChanges(){
   /* Compare current state against the latest revision snapshot.
-     Populates revisionChanges map: key 'ai-si-li' → {color, bg} */
+     Populates revisionChanges map: key 'ai-si-li' → {color, bg} for lines that are
+     new or changed since the snapshot. Uses the same fingerprint-based diff as the
+     Compare view (computeRevisionDiff), so inserting one line marks one line, not
+     every line that shifted below it. */
   revisionChanges={};
   if(!S.revisions||!S.revisions.length)return;
   const rev=S.revisions[S.revisions.length-1];
@@ -5072,29 +5083,11 @@ function computeRevisionChanges(){
   if(!snap||!snap.acts)return;
   const colorIdx=rev.colorIdx||0;
   const rc=REV_COLORS[colorIdx%REV_COLORS.length];
-
-  /* Build fingerprint maps for snapshot and current */
-  const snapFPs={};
-  snap.acts.forEach((act,ai)=>{
-    (act.scenes||[]).forEach((sc,si)=>{
-      (sc.lines||[]).forEach((line,li)=>{
-        snapFPs[ai+'-'+si+'-'+li]=lineFingerprint(line);
-      });
-    });
-  });
-
-  /* Check current lines against snapshot */
-  S.acts.forEach((act,ai)=>{
-    act.scenes.forEach((sc,si)=>{
-      sc.lines.forEach((line,li)=>{
-        const key=ai+'-'+si+'-'+li;
-        const curFP=lineFingerprint(line);
-        const snapFP=snapFPs[key];
-        /* Mark as changed if: line is new (no snapshot match) or content differs */
-        if(!snapFP||snapFP!==curFP){
-          revisionChanges[key]={color:rc.color,bg:rc.bg};
-        }
-      });
+  computeRevisionDiff(snap).groups.forEach(g=>{
+    if(g.status==='removed')return;
+    g.entries.forEach(e=>{
+      if(e.label||e.kind==='del')return; /* setting changes and removed lines have no current line to mark */
+      revisionChanges[g.ai+'-'+g.si+'-'+e.pos]={color:rc.color,bg:rc.bg};
     });
   });
 }
@@ -5160,7 +5153,7 @@ function updateRevisionUI(){
     return;
   }
   const rev=S.revisions[S.revisions.length-1];
-  const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+  const rc=REV_COLORS[(rev.colorIdx||0)%REV_COLORS.length];
   chip.style.display='inline-flex';
   chip.querySelector('.rev-chip-dot').style.background=rc.color;
   chip.querySelector('.rev-chip-label').textContent=rev.name;
@@ -5177,11 +5170,12 @@ function openRevisionHistory(){
   h+='<div style="max-height:50vh;overflow-y:auto;">';
   S.revisions.slice().reverse().forEach((rev,ri)=>{
     const i=S.revisions.length-1-ri;
-    const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+    const rc=REV_COLORS[(rev.colorIdx||0)%REV_COLORS.length];
     const isLatest=i===S.revisions.length-1;
-    const d=computeRevisionDiff(rev.snapshot);
-    const n=d.counts.added+d.counts.removed+d.counts.changed;
-    const delta=n===0?'identical to draft':n+' line'+(n===1?'':'s')+' differ from draft';
+    const same=snapshotIsIdentical(rev.snapshot);
+    const d=same?null:computeRevisionDiff(rev.snapshot);
+    const n=same?0:d.counts.added+d.counts.removed+d.counts.changed;
+    const delta=same?'identical to draft':n?n+' line'+(n===1?'':'s')+' differ from draft':'differs from draft (order, names, notes or labels)';
     h+=`<div class="rh-row">
       <div class="rh-top">
         <span class="rh-dot" style="background:${rc.color};"></span>
@@ -5193,8 +5187,8 @@ function openRevisionHistory(){
       </div>
       <div class="rh-btns">
         <button class="rbtn" onclick="viewRevision(${i},'view')">View</button>
-        <button class="rbtn" onclick="viewRevision(${i},'compare')"${n===0?' disabled style="opacity:.5;cursor:default;"':''}>Compare</button>
-        <button class="rbtn rev-danger" onclick="revertToRevision(${i})"${n===0?' disabled style="opacity:.5;cursor:default;"':''}>Revert</button>
+        <button class="rbtn" onclick="viewRevision(${i},'compare')"${same?' disabled style="opacity:.5;cursor:default;"':''}>Compare</button>
+        <button class="rbtn rev-danger" onclick="revertToRevision(${i})"${same?' disabled style="opacity:.5;cursor:default;"':''}>Revert</button>
       </div>
     </div>`;
   });
@@ -5221,59 +5215,122 @@ function revLineText(l){
 }
 function revLineType(l){return l.type==='bookmark'?'Bookmark':typeLabel(l.type);}
 
+function stableJSON(v){
+  if(Array.isArray(v))return'['+v.map(stableJSON).join(',')+']';
+  if(v&&typeof v==='object')return'{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stableJSON(v[k])).join(',')+'}';
+  return JSON.stringify(v);
+}
+function snapshotIsIdentical(snapshot){
+  /* True when the draft's acts and characters equal the snapshot exactly (key order ignored) */
+  return stableJSON({acts:(snapshot&&snapshot.acts)||[],characters:(snapshot&&snapshot.characters)||[]})===stableJSON({acts:S.acts,characters:S.characters});
+}
+
+function pairByContent(snapItems,curItems,fpsOf,nameOf){
+  /* Pair acts or scenes from a snapshot with those in the draft by shared line fingerprints
+     (name equality as a tie-breaker), so an inserted or deleted act/scene does not shift every
+     later comparison. Leftovers are paired in order; true leftovers come back with s or c null.
+     Returns [{s,c}] in draft order, with unmatched snapshot items placed where they used to sit. */
+  const sFPs=snapItems.map(fpsOf),cFPs=curItems.map(fpsOf);
+  const sim=(i,j)=>{
+    const a=sFPs[i],b=cFPs[j];
+    const sameName=nameOf(snapItems[i])!==''&&nameOf(snapItems[i])===nameOf(curItems[j]);
+    if(!a.length&&!b.length)return sameName?1:0.5;
+    const pool={};a.forEach(f=>pool[f]=(pool[f]||0)+1);let shared=0;b.forEach(f=>{if(pool[f]){pool[f]--;shared++;}});
+    let v=shared/Math.max(a.length,b.length);
+    if(sameName)v=Math.max(v,0.6);
+    return v;
+  };
+  const cands=[];
+  for(let i=0;i<snapItems.length;i++)for(let j=0;j<curItems.length;j++){const v=sim(i,j);if(v>=0.3)cands.push({i,j,v});}
+  cands.sort((x,y)=>y.v-x.v||Math.abs(x.i-x.j)-Math.abs(y.i-y.j));
+  const sUsed=new Set(),cUsed=new Set();const snapAt=curItems.map(()=>null);
+  cands.forEach(c=>{if(sUsed.has(c.i)||cUsed.has(c.j))return;sUsed.add(c.i);cUsed.add(c.j);snapAt[c.j]=c.i;});
+  /* Fallback: remaining items pair up in order (a fully rewritten scene still compares against its replacement) */
+  const freeS=snapItems.map((_,i)=>i).filter(i=>!sUsed.has(i)),freeC=curItems.map((_,j)=>j).filter(j=>!cUsed.has(j));
+  while(freeS.length&&freeC.length){const i=freeS.shift(),j=freeC.shift();sUsed.add(i);snapAt[j]=i;}
+  const out=[];const emitted=new Set();
+  const emitUnmatchedBefore=lim=>{for(let i=0;i<lim;i++)if(!sUsed.has(i)&&!emitted.has(i)){emitted.add(i);out.push({s:i,c:null});}};
+  curItems.forEach((_,j)=>{
+    if(snapAt[j]!==null){emitUnmatchedBefore(snapAt[j]);out.push({s:snapAt[j],c:j});}
+    else out.push({s:null,c:j});
+  });
+  emitUnmatchedBefore(snapItems.length);
+  return out;
+}
+
 function computeRevisionDiff(snapshot){
   /* Diff a revision snapshot against the current draft, grouped by act/scene.
-     Lines are paired by lineFingerprint(); leftover removed/added lines of the same
-     type (same speakers preferred for dialogue) are paired as "changed".
-     Returns {groups:[{ai,si,actLabel,sceneLabel,status,entries:[{kind:'add'|'del'|'chg',...}]}],
-              chars:{added:[],removed:[]},counts:{added,removed,changed}} */
+     Acts and scenes are paired by content (pairByContent); within a scene, lines are matched by
+     lineFingerprint() as a multiset (nearest-in-order copy first), and a leftover snapshot line pairs
+     with a leftover draft line of the same type that sits between the same matched neighbours as a
+     "changed" entry (dialogue only with the same speakers or the same text). Scene setting, scene name
+     and act name changes are "chg" entries with a label. Reordered-only scenes are flagged, not counted.
+     Returns {groups:[{ai,si,actLabel,sceneLabel,status:'same'|'added'|'removed'|'changed',reordered,entries}],
+              chars:{added:[],removed:[]},counts:{added,removed,changed},reorderedScenes} —
+     ai/si are draft indices (null when the act/scene exists only in the snapshot). */
   const snapActs=(snapshot&&snapshot.acts)||[];
   const curActs=S.acts;
-  const groups=[];const counts={added:0,removed:0,changed:0};
+  const groups=[];const counts={added:0,removed:0,changed:0};let reorderedScenes=0;
   const sameChars=(a,b)=>(a.characters||[]).map(c=>c.name).sort().join('&')===(b.characters||[]).map(c=>c.name).sort().join('&');
-  const nActs=Math.max(snapActs.length,curActs.length);
-  for(let ai=0;ai<nActs;ai++){
-    const sa=snapActs[ai],ca=curActs[ai];
-    const snapScenes=sa?(sa.scenes||[]):[];const curScenes=ca?(ca.scenes||[]):[];
-    const nSc=Math.max(snapScenes.length,curScenes.length);
-    for(let si=0;si<nSc;si++){
-      const ss=snapScenes[si],cs=curScenes[si];
-      const g={ai,si,actLabel:actLabelOf(ca||sa,ai),sceneLabel:sceneLabelOf(cs||ss,si),status:'same',entries:[]};
-      if(!ss){g.status='added';(cs.lines||[]).forEach(l=>g.entries.push({kind:'add',line:l}));}
-      else if(!cs){g.status='removed';(ss.lines||[]).forEach(l=>g.entries.push({kind:'del',line:l}));}
+  const sceneFPs=sc=>((sc&&sc.lines)||[]).map(lineFingerprint);
+  const actFPs=a=>((a&&a.scenes)||[]).reduce((acc,sc)=>acc.concat(sceneFPs(sc)),[]);
+  const actPairs=pairByContent(snapActs,curActs,actFPs,a=>(a&&a.name)||'');
+  actPairs.forEach(ap=>{
+    const sa=ap.s===null?null:snapActs[ap.s],ca=ap.c===null?null:curActs[ap.c];
+    const aLabel=actLabelOf(ca||sa,ap.c!==null?ap.c:ap.s);
+    if(sa&&ca&&(sa.name||'')!==(ca.name||'')){
+      const g={ai:ap.c,si:null,actLabel:aLabel,sceneLabel:'',status:'changed',reordered:false,entries:[{kind:'chg',label:'Act name',oldText:sa.name||'',newText:ca.name||'',pos:-1}]};
+      counts.changed++;groups.push(g);
+    }
+    const snapScenes=sa?(sa.scenes||[]):[],curScenes=ca?(ca.scenes||[]):[];
+    const scPairs=pairByContent(snapScenes,curScenes,sceneFPs,sc=>((sc&&sc.name)||'')+'|'+((sc&&sc.setting)||''));
+    scPairs.forEach(sp=>{
+      const ss=sp.s===null?null:snapScenes[sp.s],cs=sp.c===null?null:curScenes[sp.c];
+      const g={ai:ap.c,si:sp.c,actLabel:aLabel,sceneLabel:sceneLabelOf(cs||ss,sp.c!==null?sp.c:sp.s),status:'same',reordered:false,entries:[]};
+      if(!ss){g.status='added';(cs.lines||[]).forEach((l,li)=>g.entries.push({kind:'add',line:l,pos:li}));}
+      else if(!cs){g.status='removed';(ss.lines||[]).forEach((l,li)=>g.entries.push({kind:'del',line:l,pos:li}));}
       else{
         const sLines=(ss.lines||[]),cLines=(cs.lines||[]);
         const sFP=sLines.map(lineFingerprint),cFP=cLines.map(lineFingerprint);
-        /* exact matches by fingerprint (multiset) */
+        /* exact matches by fingerprint (multiset); prefer the next copy in order so duplicates stay monotonic */
         const pool={};sFP.forEach((fp,i)=>{(pool[fp]=pool[fp]||[]).push(i);});
-        const snapToCur={};const freeCur=[];
-        cFP.forEach((fp,ci)=>{const arr=pool[fp];if(arr&&arr.length)snapToCur[arr.shift()]=ci;else freeCur.push(ci);});
+        const snapToCur={};const freeCur=[];let last=-1;
+        cFP.forEach((fp,ci)=>{const arr=pool[fp];if(arr&&arr.length){let k=arr.findIndex(i=>i>last);if(k<0)k=0;const si2=arr.splice(k,1)[0];snapToCur[si2]=ci;if(si2>last)last=si2;}else freeCur.push(ci);});
         const freeSnap=sFP.map((_,i)=>i).filter(i=>!(i in snapToCur));
-        /* Current-draft index of the nearest matched line before / after a snapshot line.
-           A removed line only pairs with an added line that sits between the same neighbours,
-           so an edit in place reads as "changed" while a deletion plus an append reads as two entries. */
+        /* reordered: matched snapshot indices are not increasing in draft order */
+        const matchedInCurOrder=Object.keys(snapToCur).map(Number).sort((a,b)=>snapToCur[a]-snapToCur[b]);
+        g.reordered=matchedInCurOrder.some((si2,k)=>k>0&&si2<matchedInCurOrder[k-1]);
+        /* Draft index of the nearest matched line before / after a snapshot line. A removed line only pairs
+           with an added line that sits between the same neighbours, so an edit in place reads as "changed"
+           while a deletion plus an append reads as two entries. */
         const prevMatched=si2=>{for(let k=si2-1;k>=0;k--)if(k in snapToCur)return snapToCur[k];return-1;};
         const nextMatched=si2=>{for(let k=si2+1;k<sLines.length;k++)if(k in snapToCur)return snapToCur[k];return cLines.length;};
         const entries=[];
         freeSnap.forEach(si2=>{
           const sl=sLines[si2];const lo=prevMatched(si2),hi=nextMatched(si2);let best=-1;
-          for(let k=0;k<freeCur.length;k++){const ci=freeCur[k];if(ci<=lo||ci>=hi)continue;const cl=cLines[ci];if(cl.type!==sl.type)continue;if(sl.type==='dialogue'){if(sameChars(sl,cl)){best=k;break;}if(best<0)best=k;}else{best=k;break;}}
+          if(lo<hi)for(let k=0;k<freeCur.length;k++){
+            const ci=freeCur[k];if(ci<=lo||ci>=hi)continue;const cl=cLines[ci];if(cl.type!==sl.type)continue;
+            if(sl.type==='dialogue'){if(sameChars(sl,cl)){best=k;break;}if(best<0&&(sl.value||'')===(cl.value||''))best=k;}
+            else{best=k;break;}
+          }
           if(best>=0){const ci=freeCur.splice(best,1)[0];entries.push({kind:'chg',old:sl,line:cLines[ci],pos:ci});}
           else entries.push({kind:'del',line:sl,pos:lo+0.5});
         });
         freeCur.forEach(ci=>entries.push({kind:'add',line:cLines[ci],pos:ci}));
+        if((ss.name||'')!==(cs.name||''))entries.push({kind:'chg',label:'Scene name',oldText:ss.name||'',newText:cs.name||'',pos:-2});
         if((ss.setting||'')!==(cs.setting||''))entries.push({kind:'chg',label:'Setting',oldText:ss.setting||'',newText:cs.setting||'',pos:-1});
         entries.sort((a,b)=>a.pos-b.pos);
         g.entries=entries;
         if(entries.length)g.status='changed';
+        if(g.reordered)reorderedScenes++;
       }
       g.entries.forEach(e=>{if(e.kind==='add')counts.added++;else if(e.kind==='del')counts.removed++;else counts.changed++;});
       groups.push(g);
-    }
-  }
+    });
+  });
   const snapNames=((snapshot&&snapshot.characters)||[]).map(c=>c.name),curNames=S.characters.map(c=>c.name);
   const chars={added:curNames.filter(n=>!snapNames.includes(n)),removed:snapNames.filter(n=>!curNames.includes(n))};
-  return{groups,chars,counts};
+  return{groups,chars,counts,reorderedScenes};
 }
 
 function viewRevision(i,mode){
@@ -5288,7 +5345,7 @@ function backToCurrentDraft(){viewingRevision=null;renderView();}
 function renderRevisionView(p){
   const rev=S.revisions&&S.revisions[viewingRevision.idx];
   if(!rev){viewingRevision=null;renderView();return;}
-  const rc=REV_COLORS[rev.colorIdx%REV_COLORS.length];
+  const rc=REV_COLORS[(rev.colorIdx||0)%REV_COLORS.length];
   const mode=viewingRevision.mode;
   const i=viewingRevision.idx;
   let h=`<div class="rev-banner"><span class="rh-dot" style="background:${rc.color};"></span>`;
@@ -5313,7 +5370,10 @@ function renderRevisionCompare(rev){
   if(d.counts.removed)parts.push(`<span class="rd-n-del" style="padding:1px 6px;border-radius:10px;">−${d.counts.removed} removed</span>`);
   if(d.counts.changed)parts.push(`<span class="rd-n-chg" style="padding:1px 6px;border-radius:10px;">~${d.counts.changed} changed</span>`);
   h+=`<div class="rd-summary">`;
-  h+=total?`Since <strong>${esc(rev.name)}</strong>: ${parts.join(' ')}`:`The current draft is identical to <strong>${esc(rev.name)}</strong>.`;
+  if(total)h+=`Since <strong>${esc(rev.name)}</strong>: ${parts.join(' ')}`;
+  else if(snapshotIsIdentical(rev.snapshot))h+=`The current draft is identical to <strong>${esc(rev.name)}</strong>.`;
+  else h+=`No line changes since <strong>${esc(rev.name)}</strong>. The drafts differ in line order, descriptions, notes, labels or character details.`;
+  if(d.reorderedScenes)h+=`<br>Lines reordered in ${d.reorderedScenes} scene${d.reorderedScenes===1?'':'s'}.`;
   if(d.chars.added.length||d.chars.removed.length){
     h+=`<br>Characters: `;
     const cp=[];
@@ -5329,11 +5389,12 @@ function renderRevisionCompare(rev){
     return`<div class="rd-line rd-chg"><span class="rd-sign">~</span><span><span class="rd-type">${esc(revLineType(e.line))}</span><span class="rd-old">${escBr(revLineText(e.old))}</span><span class="rd-new">${escBr(revLineText(e.line))}</span></span></div>`;
   };
   d.groups.forEach(g=>{
-    if(!g.entries.length)return;
+    if(!g.entries.length&&!g.reordered)return;
     const a=g.entries.filter(e=>e.kind==='add').length,r=g.entries.filter(e=>e.kind==='del').length,c=g.entries.filter(e=>e.kind==='chg').length;
-    h+=`<div class="rd-group"><div class="rd-head">${esc(g.actLabel)} · ${esc(g.sceneLabel)}`;
+    h+=`<div class="rd-group"><div class="rd-head">${esc(g.actLabel)}${g.sceneLabel?' · '+esc(g.sceneLabel):''}`;
     if(g.status==='added')h+=`<span class="rd-status">scene not in this revision</span>`;
     if(g.status==='removed')h+=`<span class="rd-status">scene no longer in the draft</span>`;
+    if(g.reordered)h+=`<span class="rd-status">lines reordered</span>`;
     h+=`<span class="rd-counts">${a?`<span class="rd-n-add">+${a}</span>`:''}${r?`<span class="rd-n-del">−${r}</span>`:''}${c?`<span class="rd-n-chg">~${c}</span>`:''}</span></div>`;
     g.entries.forEach(e=>{h+=entryHtml(e);});
     h+=`</div>`;
@@ -5343,6 +5404,11 @@ function renderRevisionCompare(rev){
 
 function revertToRevision(i){
   const rev=S.revisions&&S.revisions[i];if(!rev)return;
+  if(snapshotIsIdentical(rev.snapshot)){
+    openGenericModal(`<div style="font-size:14px;font-weight:600;margin-bottom:8px;">Nothing to revert</div><div style="font-size:12px;color:var(--tx2);">The current draft is already identical to <strong>${esc(rev.name)}</strong>.</div><div style="margin-top:14px;text-align:right;"><button class="rbtn" onclick="closeGenericModal()">Close</button></div>`);
+    const gm0=document.getElementById('generic-modal');if(gm0)gm0.style.maxWidth=window.innerWidth<=768?'95vw':'420px';
+    return;
+  }
   let h=`<div style="font-size:15px;font-weight:600;margin-bottom:10px;">Revert to ${esc(rev.name)}?</div>`;
   h+=`<div style="font-size:12px;color:var(--tx2);line-height:1.6;">The acts, scenes, lines and characters of the current draft will be replaced with the snapshot from <strong>${esc(rev.name)}</strong> (${esc(revDate(rev))}).`;
   h+=`<br><br>A new snapshot of the current draft is taken first, so nothing is lost. You can also undo the revert with Ctrl+Z. Title, author, production notes and copyright are kept.</div>`;
@@ -5364,8 +5430,9 @@ function doRevertToRevision(i){
   const before=JSON.parse(JSON.stringify({acts:S.acts,characters:S.characters}));
   S.revisions.push({name:REV_COLORS[colorIdx].name+' Revision (before revert)',colorIdx,timestamp:Date.now(),snapshot:before});
   /* Restore the snapshot — deep copy so later edits never touch the stored revision */
-  S.acts=JSON.parse(JSON.stringify(rev.snapshot.acts||[]));
-  S.characters=JSON.parse(JSON.stringify(rev.snapshot.characters||[])).map(c=>({...c,archived:c.archived||false}));
+  S.acts=JSON.parse(JSON.stringify(Array.isArray(rev.snapshot.acts)?rev.snapshot.acts:[]));
+  S.acts.forEach(a=>{if(!Array.isArray(a.scenes))a.scenes=[];});
+  S.characters=JSON.parse(JSON.stringify(Array.isArray(rev.snapshot.characters)?rev.snapshot.characters:[])).map(c=>({...c,archived:c.archived||false}));
   migrateSettingLines();migrateCharacterToCharacters();recalcNoteIdCounter();
   if(S.scenesLocked)S.acts.forEach(a=>a.scenes.forEach((sc,si)=>{if(!sc.lockedNum)sc.lockedNum=numWord(si+1);}));
   else S.acts.forEach(a=>a.scenes.forEach(sc=>{delete sc.lockedNum;}));
@@ -5375,6 +5442,7 @@ function doRevertToRevision(i){
   autoSave();render();
   updateRevisionUI();
   switchTab('edit');
+  if($('find-bar').classList.contains('open'))doFind();
 }
 
 function openGenericModal(innerHtml){
