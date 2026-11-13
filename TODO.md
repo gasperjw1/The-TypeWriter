@@ -35,6 +35,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **Auto-formatting mode** — Automatic detection of screenplay elements as you type: lines starting with INT./EXT. become scene headings, all-caps lines become character names, etc. Toggle between explicit pill mode and auto-detect mode.
 - [x] **Scene cards / outline view** — Visual outlining mode where scenes appear as movable cards on a corkboard. Beat calls this "Powerful outlining" with scene cards. Also on Arc Studio and WriterSolo. *(Session 10)*
 - [x] **Revision tracking** — Track script revisions with industry-standard colored revision marks (white, blue, pink, yellow, green, goldenrod). Highlight changes between revisions. Beat and Final Draft both support this. *(Session 9)*
+- [ ] **Version history (browse / compare / revert)** — Extend revision tracking into a full draft history: list past snapshots, open any one read-only, side-by-side or inline diff against the current draft, and one-click revert to a snapshot. Revision marks already capture the snapshots; this is the UI on top. Seen free in Fountainhead (fountainhead.site, Nov 2026) — look into later.
 - [x] **Lockable scene numbers** — Lock scene numbers for production drafts so they don't change when scenes are reordered. Allow inline editing of locked numbers. Beat and Final Draft support this. *(Session 10)*
 
 ### To Do — Scene Card Upgrades (Priority 2b)
@@ -44,7 +45,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **Color labels** — Custom label names for colors (e.g., "A-Plot", "B-Plot", "Flashback"). Let users name what each color means and filter/sort by label. Turns color dots into a real structural analysis tool. *(Session 17)*
 - [x] **Status markers** — Per-scene status badge (Outline / Draft / Revised / Final) for tracking progress at a glance. Inspired by Scrivener's status labels. *(Session 15)*
 - [x] **Card size toggle** — Compact (title + color only) vs expanded (synopsis + stats + characters) view for the outline grid. *(Session 15)*
-- [ ] **Beat board mode** — Free-form cards not tied to scenes, for brainstorming story beats before committing to script structure. Larger feature inspired by Final Draft and Arc Studio.
+- [ ] **Beat board mode** — Free-form cards not tied to scenes, for brainstorming story beats before committing to script structure. Larger feature inspired by Final Draft and Arc Studio. Fountainhead (fountainhead.site) also ships a free beatboard with character profiles linked to scenes — worth a look for UX reference (Nov 2026).
 
 ### To Do — High-Impact Writing Experience (Priority 3)
 
