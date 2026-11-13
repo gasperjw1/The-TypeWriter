@@ -15,7 +15,7 @@
   ]
 }
 </script>
-<meta name="description" content="A guide to the non-obvious features of The Scriptwriter, a free browser-based stage play editor."/>
+<meta name="description" content="Every feature of The Scriptwriter explained: input modes, cues, inline editing, saving to disk, exports, outline tools, offline install and settings."/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -193,7 +193,7 @@ a:hover{text-decoration:underline;}
       <li><span class="key">`</span> then <span class="key">4</span> → New Scene</li>
       <li><span class="key">`</span> then <span class="key">5</span> → New Act</li>
     </ul>
-    <p style="margin-top:8px;">The 1/2/3 keys are customizable — go to <strong>Settings &rarr; Keyboard shortcuts</strong> to remap them. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
+    <p style="margin-top:8px;">The 1/2/3 keys are customizable — click the <strong>?</strong> button in the top bar (or <strong>Settings &rarr; Help &rarr; View shortcuts</strong>), open the <strong>Keyboard Shortcuts</strong> tab, and click the key badge next to a pill to assign a new key. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
   </div>
 
   <div class="feature keyboard-only">
@@ -212,7 +212,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Smart auto-advance</h3>
-    <p>In manual pills mode, after you submit a line, the pill automatically advances to the next likely type. Cue advances to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
+    <p>In manual pills mode, after you submit a line, the pill automatically advances to the next likely type. After a Cue or a Stage Direction the pill switches to Dialogue, and Dialogue stays on Dialogue so you can write continuous exchanges.</p>
   </div>
 
   <div class="feature">
@@ -247,7 +247,7 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
-    <h3>Multi-character (unison) dialogue <span class="badge">New</span></h3>
+    <h3>Multi-character (unison) dialogue</h3>
     <p>Up to two characters can share a single dialogue line — for unison speech, call-and-response, or lines delivered together. The <strong>+</strong> button sits immediately to the right of the first character's name. Click it to reveal a second character dropdown.</p>
     <p style="margin-top:6px;">Once a second character is added, a <strong>−</strong> button appears next to their name. Click it to remove the second speaker and return to a single-character line. This works both in the input bar (when composing a new line) and in inline editing (when editing an existing line).</p>
     <p style="margin-top:6px;">The line displays as <strong>ALICE &amp; BOB</strong> above the shared text. In Fountain export, the second character gets the <code>CHARACTER ^</code> dual-dialogue marker. In Final Draft (FDX) export, the line is wrapped in a <code>&lt;DualDialogue&gt;</code> block — both formats round-trip correctly on import.</p>
@@ -255,7 +255,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Auto-formatting</h3>
-    <p>Enable in <strong>Settings → Auto-formatting</strong>. When toggled on, formatting conventions are applied automatically as you submit lines. Four options can be individually toggled:</p>
+    <p>Enable in <strong>Settings → Input → Auto-formatting</strong>. When toggled on, formatting conventions are applied automatically as you submit lines. Four options can be individually toggled:</p>
     <ul>
       <li><strong>Capitalize character names</strong> — ensures names are always uppercase (e.g., "helen" becomes "HELEN").</li>
       <li><strong>Clean up whitespace</strong> — removes extra spaces and trims leading/trailing blanks.</li>
@@ -303,14 +303,14 @@ a:hover{text-decoration:underline;}
   <h2>Notes &amp; bookmarks</h2>
 
   <div class="feature">
-    <h3>Notes &amp; comments <span class="badge">New</span></h3>
-    <p>Attach notes to any line, scene, or act using the <strong>📝 note icon</strong> that appears next to each element. Click it to expand the note panel inline, where you can add, resolve, or delete notes. Notes have a resolved/unresolved workflow — resolved notes are dimmed but kept for reference.</p>
+    <h3>Notes &amp; comments</h3>
+    <p>Attach notes to any line, scene, or act using the <strong>🗒 note icon</strong> that appears next to each element. Click it to expand the note panel inline, where you can add, resolve, or delete notes. Notes have a resolved/unresolved workflow — resolved notes are dimmed but kept for reference.</p>
     <p style="margin-top:6px;">The right-side panel has a <strong>Notes</strong> section listing all notes across the script, filterable by status (all, open, resolved). Click any note in the list to jump to its location in the editor. Toggle note visibility globally with the 📝 button in the top bar.</p>
     <p style="margin-top:6px;">Unresolved notes are exported in Fountain format (as <code>[[note:]]</code> annotations) and displayed in the View tab and PDF.</p>
   </div>
 
   <div class="feature">
-    <h3>Bookmarks <span class="badge">New</span></h3>
+    <h3>Bookmarks</h3>
     <p>Click the <strong>🔖 button</strong> in the input bar to insert a bookmark at the current cursor position. Bookmarks are placeholders — they don't contain script content but they can carry notes and a label. Use them to mark points in the script you want to return to later.</p>
     <ul>
       <li>Click the bookmark label to rename it (or use inline editing with double-click)</li>
@@ -363,14 +363,24 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
+    <h3>Scene card extras</h3>
+    <p>Each card has a <strong>status</strong> badge that cycles Outline → Draft → Revised → Final when clicked (hover an unmarked card to reveal it), and a synopsis area you can click to edit in place (<span class="key">Esc</span> to finish). The <strong>Compact / Expanded</strong> button in the Outline toolbar switches between dense and detailed cards.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Character presence heatmap</h3>
+    <p>Below the Character Relationships section, <strong>Character Presence</strong> shows one row per character and one dot per scene: filled when the character speaks or enters, dimmed when absent. It is the fastest way to spot a character who vanishes for an act. Click any dot to jump to that scene.</p>
+  </div>
+
+  <div class="feature">
     <h3>Lockable scene numbers</h3>
-    <p>Scene numbers normally adjust automatically when you reorder scenes. For production drafts where scene numbers must stay fixed, use <strong>File &rarr; Lock scene numbers</strong>. This snapshots the current numbers so they persist even if you rearrange scenes. You can edit individual locked numbers in the scene edit modal. Use <strong>File &rarr; Unlock scene numbers</strong> to return to auto-numbering.</p>
+    <p>Scene numbers normally adjust automatically when you reorder scenes. For production drafts where scene numbers must stay fixed, use <strong>File options &rarr; Lock scene numbers</strong>. This snapshots the current numbers so they persist even if you rearrange scenes. You can edit individual locked numbers in the scene edit modal. Use <strong>File options &rarr; Unlock scene numbers</strong> to return to auto-numbering.</p>
   </div>
 
   <div class="feature">
     <h3>Revision tracking <span class="badge">Production</span></h3>
-    <p>Use <strong>File &rarr; New Revision</strong> to create a named snapshot of your script. After creating a revision, any lines you change will be marked with a colored left border and a ✱ margin indicator. The app cycles through industry-standard revision colors: white, blue, pink, yellow, green, goldenrod.</p>
-    <p style="margin-top:6px;">Toggle revision marks on/off with the color chip in the top bar. View revision history and clear old revisions from <strong>File &rarr; Revision History</strong>.</p>
+    <p>Use <strong>File options &rarr; New revision</strong> to create a named snapshot of your script. After creating a revision, any lines you change will be marked with a colored left border and a ✱ margin indicator. The app cycles through industry-standard revision colors: white, blue, pink, yellow, green, goldenrod.</p>
+    <p style="margin-top:6px;">Toggle revision marks on/off with the color chip in the top bar. View revision history and clear old revisions from <strong>File options &rarr; Revision history</strong>.</p>
   </div>
 
   <div class="feature">
@@ -387,7 +397,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Rehearsal sides export</h3>
-    <p>Under <strong>File → Export rehearsal sides</strong>, pick any character to generate a plain-text (.txt) file containing all their lines, cues, and surrounding context. Other characters' lines appear as abbreviated cue lines ("HELEN: .......") so the actor knows when to speak. Useful for table reads and line memorization.</p>
+    <p>Under <strong>File options → Export rehearsal sides</strong>, pick any character to generate a plain-text (.txt) file containing all their lines, cues, and surrounding context. Other characters' lines appear as abbreviated cue lines ("HELEN: .......") so the actor knows when to speak. Useful for table reads and line memorization.</p>
   </div>
 
   <div class="feature">
@@ -402,10 +412,10 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Production Notes &amp; Copyright</h3>
-    <p>At the bottom of the Outline tab, below the scene cards and character relationship section, is a <strong>Production Details</strong> panel with two fields:</p>
+    <p>At the bottom of the Outline tab, below the Character Relationships and Character Presence sections, is a <strong>Production Details</strong> panel with two fields:</p>
     <ul>
       <li><strong>Production Notes</strong> — a split-pane editor: type on the left, see a live formatted preview on the right. Supports markdown: <code># Heading</code>, <code>- bullet</code>, <code>**bold**</code>, <code>*italic*</code>. Use this for director's notes, staging intentions, design guidance, or casting notes.</li>
-      <li><strong>Copyright Page Text</strong> — plain text that auto-grows as you type. Click <strong>"Reset to default"</strong> to auto-fill standard copyright boilerplate from your author name (set in the top bar). Edit freely for your jurisdiction or licensing arrangement.</li>
+      <li><strong>Copyright Page Text</strong> — plain text that auto-grows as you type. Click <strong>"Reset to default"</strong> to auto-fill standard copyright boilerplate from your author name (set when creating the script, or edited in the right panel's Stats section). Edit freely for your jurisdiction or licensing arrangement.</li>
     </ul>
     <p style="margin-top:6px;">Both fields are included as dedicated pages in PDF exports when non-empty — the copyright page between the title and cast list, and the production notes page before the script body.</p>
   </div>
@@ -420,15 +430,15 @@ a:hover{text-decoration:underline;}
     <p>Your script is automatically saved to your browser's local storage on every change. The colored dot next to the script title tells you the current state:</p>
     <ul>
       <li><span class="dot" style="background:#888780;"></span> <strong>Gray</strong> — no file opened yet</li>
-      <li><span class="dot" style="background:#378ADD;"></span> <strong>Blue</strong> — saved in browser only (use File → Save to link a disk file)</li>
+      <li><span class="dot" style="background:#378ADD;"></span> <strong>Blue</strong> — saved in browser only (use File options → Save to link a disk file)</li>
       <li><span class="dot" style="background:#4CAF50;"></span> <strong>Green</strong> — linked to a file on disk; auto-saves there too</li>
     </ul>
-    <p style="margin-top:6px;">Hover over the dot to see a tooltip with more detail. The first time you use <strong>File → Save</strong>, you'll pick a location on disk. After that, every save overwrites that same file — no repeated downloads.</p>
+    <p style="margin-top:6px;">Hover over the dot to see a tooltip with more detail. The first time you use <strong>File options → Save</strong>, you'll pick a location on disk. After that, every save overwrites that same file — no repeated downloads.</p>
   </div>
 
   <div class="feature">
     <h3>Metadata ZIP</h3>
-    <p><strong>File → Download metadata (.zip)</strong> exports a ZIP containing the raw JSON script file and a manifest with export metadata. This is the file you'd keep if you want to come back and edit the script later — it has everything needed to restore your work.</p>
+    <p><strong>File options → Download metadata (.zip)</strong> exports a ZIP containing the raw JSON script file and a manifest with export metadata. This is the file you'd keep if you want to come back and edit the script later — it has everything needed to restore your work.</p>
   </div>
 
   <div class="feature">
@@ -438,12 +448,12 @@ a:hover{text-decoration:underline;}
       <li><strong>Copyright page</strong> — appears between the title page and the cast list. Set the text in <strong>Outline → Production Details → Copyright Page Text</strong>. Click "Reset to default" to auto-fill standard boilerplate from your author name.</li>
       <li><strong>Production notes page</strong> — appears before the script body. Set the notes in <strong>Outline → Production Details → Production Notes</strong>. Markdown formatting (headings, bullets, bold, italic) is preserved in the PDF.</li>
     </ul>
-    <p style="margin-top:6px;">Both pages are included in the plain <strong>File → Export PDF</strong> as well as the <strong>File → Export PDF + metadata</strong> ZIP. In the ZIP modal you can toggle each page off if you want a version without them.</p>
+    <p style="margin-top:6px;">Both pages are included in the plain <strong>File options → Export to PDF</strong> as well as the <strong>File options → Export PDF + metadata</strong> ZIP. In the ZIP modal you can toggle each page off if you want a version without them. The credit line at the end of the PDF is controlled separately, in <strong>Settings → Export</strong>.</p>
   </div>
 
   <div class="feature">
     <h3>PDF + metadata export</h3>
-    <p><strong>File → Export PDF + metadata</strong> opens a modal where you choose what to include, then downloads a ZIP with the print-ready script and the raw JSON metadata. Options in the modal:</p>
+    <p><strong>File options → Export PDF + metadata</strong> opens a modal where you choose what to include, then downloads a ZIP with the print-ready script and the raw JSON metadata. Options in the modal:</p>
     <ul>
       <li><strong>Copyright page</strong> — toggle off to omit even if text is set in Outline → Production Details</li>
       <li><strong>Production notes</strong> — toggle off to omit even if notes are set</li>
@@ -457,13 +467,18 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
+    <h3>Save as, download a copy, and Ctrl+S</h3>
+    <p><strong>File options → Save as new file</strong> links the script to a different file on disk. <strong>Download a copy (.json)</strong> gives you a plain download, which is also what Safari and Firefox use because they do not support linking to a file. <span class="key">Ctrl</span>+<span class="key">S</span> saves at any time. A linked file is remembered across reloads: close the tab, come back, and the green indicator returns after a one-click permission prompt.</p>
+  </div>
+
+  <div class="feature">
     <h3>Fountain export &amp; import</h3>
-    <p><a href="https://fountain.io" target="_blank">Fountain</a> is an open plain-text format used by Highland, Beat, and other writing apps. Use <strong>File &rarr; Export to Fountain</strong> to save your script as a <code>.fountain</code> file, or <strong>File &rarr; Import from Fountain</strong> to open one. Round-trip fidelity is preserved — export and re-import produces the same script.</p>
+    <p><a href="https://fountain.io" target="_blank">Fountain</a> is an open plain-text format used by Highland, Beat, and other writing apps. Use <strong>File options &rarr; Export to Fountain</strong> to save your script as a <code>.fountain</code> file, or <strong>File options &rarr; Import Fountain file</strong> to open one. Round-trip fidelity is preserved — export and re-import produces the same script.</p>
   </div>
 
   <div class="feature">
     <h3>Final Draft (FDX) export &amp; import</h3>
-    <p>FDX is the industry-standard XML format used by Final Draft. Use <strong>File &rarr; Export to Final Draft</strong> or <strong>File &rarr; Import from Final Draft</strong>. Both stage play and screenplay FDX files are supported on import.</p>
+    <p>FDX is the industry-standard XML format used by Final Draft. Use <strong>File options &rarr; Export to Final Draft</strong> or <strong>File options &rarr; Import Final Draft (.fdx)</strong>. Both stage play and screenplay FDX files are supported on import.</p>
   </div>
 
   <div class="feature">
@@ -473,7 +488,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Save nudge</h3>
-    <p>The first time you create a new script, a toast appears in the corner offering to save your script to a file on your computer. This is the recommended approach — your script will be a real file you can find in Finder or Explorer. If you dismiss the toast, you can always save later from <strong>File &rarr; Save</strong>.</p>
+    <p>The first time you create a new script, a toast appears in the corner offering to save your script to a file on your computer. This is the recommended approach — your script will be a real file you can find in Finder or Explorer. If you dismiss the toast, you can always save later from <strong>File options &rarr; Save</strong>.</p>
   </div>
 </div>
 
@@ -486,14 +501,20 @@ a:hover{text-decoration:underline;}
     <p>The Scriptwriter is a Progressive Web App (PWA). After installing, it runs in its own standalone window — no tabs, no address bar, no browser distractions — and works fully offline.</p>
     <ul>
       <li><strong>Chrome / Edge / Brave / Arc</strong> (macOS, Windows, Linux) — click the install icon in the address bar, or use the browser menu &rarr; <strong>Install The Scriptwriter</strong>. A one-click <strong>Install</strong> button also appears on the start screen.</li>
-      <li><strong>Safari</strong> (macOS 14+) — <strong>File &rarr; Add to Dock</strong>. On iPhone/iPad, use the Share menu &rarr; <strong>Add to Home Screen</strong>.</li>
+      <li><strong>Safari</strong> (macOS 14+) — <strong>File menu &rarr; Add to Dock</strong> (or Share &rarr; Add to Dock). On iPhone/iPad, use the Share menu &rarr; <strong>Add to Home Screen</strong>.</li>
       <li><strong>Firefox</strong> — desktop install is not supported. Use a Chromium-based browser.</li>
+      <li><strong>Prefer a store app?</strong> The same editor is on the <a href="https://apps.apple.com/app/the-scriptwriter/id6790096605" target="_blank" rel="noopener">App Store</a> for iPhone and iPad and the <a href="https://apps.microsoft.com/detail/9nzhcs8sfpzn" target="_blank" rel="noopener">Microsoft Store</a> for Windows.</li>
     </ul>
   </div>
 
   <div class="feature">
+    <h3>Share sheet, shortcuts and open-by-URL</h3>
+    <p>Once installed, the app also appears in the mobile <strong>Share</strong> sheet for <code>.json</code>, <code>.fountain</code> and <code>.fdx</code> files, and adds <strong>New Script</strong>, <strong>Open File</strong> and <strong>Try the Sample</strong> shortcuts to its icon's right-click or long-press menu. Links of the form <code>web+scriptwriter:open?url=…</code> open a script straight from a web address, which is how the <a href="blog/how-to-format-a-stage-play.html">free stage play template</a> opens in the editor with one click.</p>
+  </div>
+
+  <div class="feature">
     <h3>Open files by double-click <span class="badge">Installed only</span></h3>
-    <p>Once installed, The Scriptwriter registers itself as a handler for <code>.json</code>, <code>.fountain</code>, and <code>.fdx</code> files. Double-click any of those in Finder or Explorer and they'll open directly in the app — no need to use <strong>File &rarr; Open</strong> first.</p>
+    <p>Once installed, The Scriptwriter registers itself as a handler for <code>.json</code>, <code>.fountain</code>, and <code>.fdx</code> files. Double-click any of those in Finder or Explorer and they'll open directly in the app — no need to use <strong>File options &rarr; Open</strong> first.</p>
     <p style="margin-top:6px;"><em style="color:var(--tx3);">On macOS, you may need to right-click &rarr; Open With &rarr; The Scriptwriter the first time to register the association.</em></p>
   </div>
 
@@ -521,7 +542,7 @@ a:hover{text-decoration:underline;}
 
   <div class="feature">
     <h3>Pill hotkey customization</h3>
-    <p>Under <strong>Settings &rarr; Keyboard shortcuts</strong>, you can remap the key for each line-type pill. Click the input field next to a pill type, then press any key to assign it. If two pills would end up with the same key, they automatically swap. Click <strong>Reset to defaults</strong> to go back to 1/2/3. <em style="color:var(--tx3);">Hotkeys require a physical keyboard and are not available on touchscreen keyboards.</em></p>
+    <p>Click the <strong>?</strong> button in the top bar (or <strong>Settings &rarr; Help &rarr; View shortcuts</strong>) and open the <strong>Keyboard Shortcuts</strong> tab. Click the key badge next to Dialogue, Stage Direction or Cue, then press any key to assign it. If two pills would end up with the same key, they automatically swap. <strong>Reset to defaults</strong> returns them to 1/2/3.</p>
   </div>
 
   <div class="feature">
@@ -535,22 +556,32 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="feature">
-    <h3>Theme override</h3>
-    <p>By default the app follows your system's light/dark preference. You can force light or dark mode in <strong>Settings → Theme</strong>. Your choice persists across sessions.</p>
+    <h3>Credit line on exports</h3>
+    <p><strong>Settings → Export</strong> has a single toggle, <strong>Credit line on exports</strong>, on by default. When it is on, exported PDFs and rehearsal sides end with one small line: <em>Formatted with The Scriptwriter · thescriptwriter.app</em>. Turn it off and nothing is added. It never appears in Fountain or Final Draft exports.</p>
   </div>
 
   <div class="feature">
-    <h3>Line alignment <span class="badge">New</span></h3>
+    <h3>Fonts, spacing and editor width</h3>
+    <p><strong>Settings → Formatting</strong> also controls the script font (Courier New, Courier Prime, Times New Roman, Georgia or your system sans), the font size, the line spacing (compact to double) and the editor column width (narrow to full). The <strong>Autosave enabled</strong> toggle in the same section switches automatic saving off if you prefer to save by hand with <span class="key">Ctrl</span>+<span class="key">S</span>.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Theme override</h3>
+    <p>By default the app follows your system's light/dark preference. You can force light or dark mode in <strong>Settings → Appearance → Theme</strong>. Your choice persists across sessions.</p>
+  </div>
+
+  <div class="feature">
+    <h3>Line alignment</h3>
     <p>Under <strong>Settings &rarr; Formatting</strong>, you can set text alignment independently for each line type: character names, dialogue text, stage directions, and cues. Options are left, center, or right. Changes apply in both the editor and the View tab.</p>
   </div>
 
   <div class="feature">
-    <h3>Inline dialogue format <span class="badge">New</span></h3>
-    <p>Choose between <strong>stacked</strong> (character name on its own line above dialogue) and <strong>inline</strong> (character name and dialogue on the same line, separated by a space) in <strong>Settings &rarr; Formatting</strong>. Affects the editor, View tab, and PDF export.</p>
+    <h3>Inline dialogue format</h3>
+    <p>Choose between <strong>stacked</strong> (character name on its own line above dialogue) and <strong>inline</strong> (character name and dialogue on the same line; the dropdown labels it "Inline (NAME: text)") in <strong>Settings &rarr; Formatting</strong>. Affects the editor, View tab, and PDF export.</p>
   </div>
 
   <div class="feature">
-    <h3>View tab format toggle <span class="badge">New</span></h3>
+    <h3>View tab format toggle</h3>
     <p>The View tab now has three format buttons at the top: <strong>Stage Play</strong> (formatted output), <strong>Fountain</strong> (plain-text Fountain markup), and <strong>FDX</strong> (Final Draft XML). Switch between them to preview how your script will look in each export format.</p>
   </div>
 
@@ -559,22 +590,14 @@ a:hover{text-decoration:underline;}
     <p>The View tab includes a <strong>Print</strong> button (also works with <span class="key">Ctrl</span>+<span class="key">P</span>). All editor chrome is hidden — you get a clean black-on-white formatted script ready for paper.</p>
   </div>
 
-  <div class="feature">
-    <h3>Production notes &amp; copyright <span class="badge">New</span></h3>
-    <p>Under <strong>Settings → Production</strong>, two text areas let you write content for optional PDF pages:</p>
-    <ul>
-      <li><strong>Production notes</strong> — freetext for the director and crew. Appears as a page just before the script body.</li>
-      <li><strong>Copyright text</strong> — your rights statement. Appears between the title page and the character list. Click <strong>Reset to default</strong> to auto-fill standard boilerplate using your author name and the current year — then edit it to match your situation.</li>
-    </ul>
-    <p style="margin-top:6px;">Both pages are included in PDF export automatically when the fields are non-empty, and can be toggled individually in the <strong>Export PDF + metadata</strong> modal.</p>
-  </div>
 </div>
 
   </div><!-- /.content -->
 </div><!-- /.doc-grid -->
 
 <div class="footer">
-  The Scriptwriter — a free stage play editor. · <a href="compare.html">Compare editors</a> · <a href="blog/">Blog</a> · <a href="privacy.html">Privacy</a>
+  The Scriptwriter — a free stage play editor. Guide last updated for v1.54 · November 2026.<br>
+  <a href="compare.html">Compare editors</a> · <a href="blog/">Blog</a> · <a href="blog/how-to-format-a-stage-play.html">Formatting guide &amp; template</a> · <a href="support.html">Support</a> · <a href="privacy.html">Privacy</a>
 </div>
 
 </div>

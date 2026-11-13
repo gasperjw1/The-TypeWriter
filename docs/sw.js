@@ -1,5 +1,5 @@
 // Service Worker for The Scriptwriter PWA
-const CACHE_NAME = 'scriptwriter-v1.53';
+const CACHE_NAME = 'scriptwriter-v1.54';
 const SHARED_FILES_CACHE = 'scriptwriter-shared-files';
 const ASSETS = [
   './',
@@ -10,7 +10,11 @@ const ASSETS = [
   './icon-maskable-192.png',
   './icon-maskable-512.png',
   './icon-maskable-1024.png',
-  './vendor/jszip.min.js'
+  './vendor/jszip.min.js',
+  './manifest.json',
+  './badges/store-app.svg',
+  './badges/ms-store.svg',
+  './badges/app-store.svg'
 ];
 
 // Install: cache core assets

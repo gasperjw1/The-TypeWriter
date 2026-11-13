@@ -2,7 +2,7 @@
   "id": "/",
   "name": "The Scriptwriter",
   "short_name": "TheScriptwriter",
-  "description": "A free, open-source stage play editor. No accounts, no installs — just open and start writing.",
+  "description": "A free stage play editor. No accounts, no installs — just open and start writing.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -105,6 +105,12 @@
       "short_name": "Open",
       "description": "Open an existing script from your computer",
       "url": "./?action=open"
+    },
+    {
+      "name": "Try the Sample",
+      "short_name": "Sample",
+      "description": "Explore the editor with a demo script",
+      "url": "./?action=sample"
     }
   ],
   "screenshots": [
@@ -125,14 +131,8 @@
   ],
   "prefer_related_applications": false,
   "related_applications": [
-    {
-      "platform": "webapp",
-      "url": "https://yashmahtani.github.io/The-TypeWriter/manifest.json"
-    }
-  ],
-  "iarc_rating_id": "00000000-0000-0000-0000-000000000000",
-  "scope_extensions": [
-    { "origin": "https://yashmahtani.github.io" }
+    { "platform": "itunes", "url": "https://apps.apple.com/app/the-scriptwriter/id6790096605", "id": "6790096605" },
+    { "platform": "windows", "url": "https://apps.microsoft.com/detail/9nzhcs8sfpzn", "id": "9nzhcs8sfpzn" }
   ],
   "protocol_handlers": [
     {

@@ -819,11 +819,12 @@ pushUndo() → autoSave() → render()</code></pre>
 <p>After any change to <code>script_maker.html</code>, before pushing to GitHub:</p>
 
 <ul class="cl">
-  <li><span class="cm">1.</span>Run <code>./sync.sh</code> — regenerates <code>docs/index.html</code> with docs/ paths rewritten to site-relative</li>
-  <li><span class="cm">2.</span>Bump <code>CACHE_NAME</code> in <code>docs/sw.js</code> to <code>scriptwriter-v1.XX</code> — forces PWA cache invalidation</li>
-  <li><span class="cm">3.</span>Bump version string in HTML (setup-version div + Settings panel description)</li>
-  <li><span class="cm">4.</span>Commit and push → GitHub Pages auto-deploys from <code>docs/</code></li>
+  <li><span class="cm">1.</span>Bump the version string in HTML — <code>.setup-footer-meta</code> on the start screen and the <code>.setting-desc</code> line in the Settings panel — and <code>"softwareVersion"</code> in the JSON-LD <code>&lt;head&gt;</code> block</li>
+  <li><span class="cm">2.</span>Bump <code>CACHE_NAME</code> in <code>docs/sw.js</code> to <code>scriptwriter-v1.XX</code> — forces PWA cache invalidation (also required for blog-only changes, since navigations under <code>/blog/</code> are served cache-first)</li>
+  <li><span class="cm">3.</span>Run <code>./sync.sh</code> — regenerates <code>docs/index.html</code> with docs/ paths rewritten to site-relative</li>
+  <li><span class="cm">4.</span>Update <code>lastmod</code> in <code>docs/sitemap.xml</code> for every changed page</li>
   <li><span class="cm">5.</span>Update <code>LINEAGE.html</code> if any data model, load path, or fanout relationships changed</li>
+  <li><span class="cm">6.</span>Commit and push → GitHub Pages auto-deploys from <code>docs/</code>; then <code>./bin/indexnow.sh &lt;changed URLs&gt;</code></li>
 </ul>
 
 <div class="note"><strong>Never edit <code>docs/index.html</code> directly.</strong> It is overwritten by <code>sync.sh</code> on the next run.</div>
@@ -834,10 +835,14 @@ pushUndo() → autoSave() → render()</code></pre>
   <tbody>
     <tr><td><code>href="docs/guide.html"</code></td><td><code>href="guide.html"</code></td></tr>
     <tr><td><code>href="docs/compare.html"</code></td><td><code>href="compare.html"</code></td></tr>
-    <tr><td><code>src="docs/vendor/jszip.min.js"</code></td><td><code>src="vendor/jszip.min.js"</code></td></tr>
+    <tr><td><code>href="docs/blog/"</code></td><td><code>href="blog/"</code></td></tr>
+    <tr><td><code>href="docs/privacy.html"</code></td><td><code>href="privacy.html"</code></td></tr>
+    <tr><td><code>href="docs/support.html"</code></td><td><code>href="support.html"</code> (added Session 20; the footer Support link 404'd before)</td></tr>
+    <tr><td><code>docs/vendor/</code> (global, HTML attributes and JS strings such as <code>loadJSZip</code>)</td><td><code>vendor/</code></td></tr>
     <tr><td><code>href="docs/manifest.json"</code></td><td><code>href="manifest.json"</code></td></tr>
-    <tr><td><code>href="docs/icon-*.png"</code></td><td><code>href="icon-*.png"</code></td></tr>
-    <tr><td>SW registration path</td><td>Rewritten to site-relative</td></tr>
+    <tr><td><code>href="docs/icon-192.png"</code> (the only icon the HTML references)</td><td><code>href="icon-192.png"</code></td></tr>
+    <tr><td><code>src="docs/badges/</code></td><td><code>src="badges/</code></td></tr>
+    <tr><td><code>register('docs/sw.js'</code></td><td><code>register('sw.js'</code></td></tr>
   </tbody>
 </table></div>
 
@@ -856,7 +861,7 @@ pushUndo() → autoSave() → render()</code></pre>
 </section>
 
 <hr>
-<p class="meta">Last updated: Session 18 &middot; v1.46 &middot; thescriptwriter.app</p>
+<p class="meta">Last updated: Session 20 &middot; v1.54 &middot; thescriptwriter.app</p>
 
 </main>
 </div>

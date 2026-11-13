@@ -7,12 +7,20 @@
   1. Copy this file:  cp docs/blog/_template.html docs/blog/<your-slug>.html
   2. Search for every TEMPLATE_… token and replace.
   3. Replace H2 sections + TOC entries to match.
-  4. Add a card to docs/blog/index.html (under "Published") and move
-     the corresponding "Coming soon" card up to the top with the new link.
-  5. Add a <url> entry for the new post to docs/sitemap.xml with
+  4. Delete the <meta name="robots" content="noindex,nofollow"> line below.
+  5. Add a card to docs/blog/index.html (under "Published"); if a matching
+     "Coming soon" card exists, delete it.
+  6. Add a "Read next" link to the new post from at least one older post.
+  7. Add an <item> to docs/blog/feed.xml and bump <lastBuildDate>.
+  8. Add a <url> entry for the new post to docs/sitemap.xml with
      today's lastmod and bump the lastmod on /blog/.
-  6. Optional but recommended: bump SW cache in docs/sw.js so
-     installed users get the new post on next launch.
+  9. REQUIRED: bump CACHE_NAME in docs/sw.js (and the app version
+     string). The service worker serves /blog/ cache-first, so returning
+     visitors keep the old index until the cache name changes.
+  10. Optional: add a changelog entry on docs/compare.html if the post
+      ships with a feature.
+  11. After the push: ./bin/indexnow.sh <post URL>, then request
+      indexing in Google Search Console. Full list: TODO.md.
 
   SEO LIMITS (verified against Google + Bing rubrics)
   ====================================================
@@ -232,7 +240,7 @@ a:hover{text-decoration:underline;}
   </div>
 
   <div class="footer">
-    The Scriptwriter &mdash; a free, open-source stage play editor.<br>
+    The Scriptwriter &mdash; a free stage play editor.<br>
     <a href="../index.html">Open the editor</a> &middot;
     <a href="index.html">All blog posts</a> &middot;
     <a href="../guide.html">Feature guide</a> &middot;

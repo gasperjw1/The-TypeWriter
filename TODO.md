@@ -19,7 +19,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **PDF export** — Generates formatted screenplay PDF with title page, character list, table of contents, and script pages. *(Pre-existing in setup_fix)*
 - [x] **Auto-numbered acts and scenes** — "Act One", "Scene Three" with optional user names after an em dash. *(Session 3)*
 - [x] **Standalone character creation** — "+ New character" button in side panel, no dialogue line required. *(Session 3)*
-- [x] **Find & replace** — Search across the entire script with line-type filter chips (Setting, Direction, Dialogue, Action). Replace individually or in bulk. Ctrl+F to open, Escape to close. *(Session 4)*
+- [x] **Find & replace** — Search across the entire script with line-type filter chips (Cue, Dialogue, Stage Direction). Replace individually or in bulk. Ctrl+F to open, Escape to close. *(Session 4)*
 - [x] **Persistent save system** — localStorage auto-persistence + File System Access API for linking to a disk file that gets overwritten on each save. No more repeated downloads. *(Session 4)*
 - [x] **Mobile responsive** — Full editing on mobile with touch drag-and-drop, hamburger menu, slide-over panel, bottom-sheet file menu, and virtual keyboard handling. *(Session 7)*
 
@@ -32,7 +32,6 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 ### To Do — Writing Experience (Priority 2)
 
-- [x] **Auto-formatting mode** — Automatic detection of screenplay elements as you type: lines starting with INT./EXT. become scene headings, all-caps lines become character names, etc. Toggle between explicit pill mode and auto-detect mode.
 - [x] **Scene cards / outline view** — Visual outlining mode where scenes appear as movable cards on a corkboard. Beat calls this "Powerful outlining" with scene cards. Also on Arc Studio and WriterSolo. *(Session 10)*
 - [x] **Revision tracking** — Track script revisions with industry-standard colored revision marks (white, blue, pink, yellow, green, goldenrod). Highlight changes between revisions. Beat and Final Draft both support this. *(Session 9)*
 - [ ] **Version history (browse / compare / revert)** — Extend revision tracking into a full draft history: list past snapshots, open any one read-only, side-by-side or inline diff against the current draft, and one-click revert to a snapshot. Revision marks already capture the snapshots; this is the UI on top. Seen free in Fountainhead (fountainhead.site, Nov 2026) — look into later.
@@ -52,7 +51,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 - [x] **Multi-line input (Shift+Enter)** — Allow Shift+Enter for soft newlines in the input bar. *(Session 15)*
 - [x] **Notes and comments** — Attach notes or comments to specific lines, scenes, or acts for collaborative feedback or personal reminders. Inline expansion + right panel list with resolved/unresolved workflow. *(Session 16)*
 - [x] **Color labels for scene cards** — Extend color dots with user-defined label names and filtering. Makes the outline a structural analysis tool, not just decoration. *(Session 17)*
-- [x] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively.
+- [x] **Auto-formatting mode** — True auto-format where typing `INT.` auto-converts to a scene heading, all-caps auto-converts to a character name, etc. How Highland and Beat work natively. *(Session 14 — Smart input mode; Session 15 — auto-format options)*
 
 ### To Do — Unique Differentiators (Priority 4)
 
@@ -70,6 +69,17 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [ ] **Real-time collaboration** — Multiple users editing the same script simultaneously with cursor presence and conflict resolution. Core feature of WriterDuet. (Deprioritized — massive backend effort, not our differentiator. Note: Drive/Dropbox sync is async last-writer-wins — wrong primitive for collab, would need a CRDT layer.)
 - [ ] **Cloud sync / account-based storage** — Save scripts to a server with user accounts so work persists across devices. (Deprioritized — our value is "your files, your machine, no accounts." The Dropbox/Drive integrations above cover most of the use case without an account system.)
 
+### Shipped since Session 15 (not previously recorded here)
+
+- [x] **Bookmarks** — Dashed-border markers with labels and notes, right-panel list, jump-to. *(Session 16)*
+- [x] **Customization options** — Per-line-type alignment, stacked/inline dialogue, View tab in stage play / Fountain / FDX form. *(Session 16)*
+- [x] **Home navigation** — Click the title in the top bar to return to the start screen. *(Session 6)*
+- [x] **PWA** — Installable, offline, file handlers for .json/.fountain/.fdx, share target, app shortcuts, `web+scriptwriter:` protocol handler. *(Session 14 onward)*
+- [x] **Character presence heatmap** — Outline section, one dot per character per scene, click to jump. *(Session 19)*
+- [x] **Export credit line** — Optional one-line credit at the end of PDFs and rehearsal sides, Settings → Export. *(Session 20)*
+- [x] **Stage play template + formatting guide** — docs/templates/ (.docx, .fountain) and blog post with HowTo schema; "Open in The Scriptwriter" via the protocol route. *(Session 20)*
+- [x] **Fountain cue round-trip fix** — Inline `[[Name enters]]` notes on transition lines now import as cues. *(Session 20)*
+
 ### To Do — Statistics & Analysis (Priority 6)
 
 - [ ] **Screenplay analytics** — Detailed statistics: average scene length, longest scene, locations, times of day, INT vs EXT breakdown, dialogue-to-action ratio. Beat offers these natively.
@@ -77,7 +87,6 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 ## Other Improvements (identified during development)
 
 - [x] **Keyboard shortcuts reference** — An in-app help panel listing all keyboard shortcuts (pill selection, undo/redo, submit, etc.) *(Session 15)*
-- [ ] **Multi-line setting support** — *(Promoted to Priority 3 as "Multi-line input")*
 - [ ] **Scene reordering across acts** — Drag-and-drop currently only works within the same act for scenes. Cross-act scene moves would be useful.
 - [ ] **Line moving across scenes** — Same limitation as above for individual lines.
 - [x] **Print-friendly View tab** — Add print CSS or a dedicated print button to the View tab for quick paper output without PDF export. *(Session 15)*
@@ -86,7 +95,19 @@ No lightweight stage play editor does these. Building them would set The Scriptw
 - [ ] **Refactor internal type values** — Rename internal type keys from `'direction'`→`'cue'` and `'action'`→`'stage_direction'` to match display names. Requires migration logic for saved scripts in localStorage and JSON files, plus updates to Fountain/FDX export/import mappings, CSS class names, and all JS references.
 - [x] **Character panel act/scene filter** — Dialogue list respects act/scene dropdowns, line/word count badges, first/last appearance, sort by name/lines/appearance. *(Session 16)*
 - [x] **Multi-character (unison) dialogue** — Two characters can speak the same line simultaneously. `characters:[{name,description}]` array replaces singular `character:{}`. Cap at 2. Displays as `ALICE & RUTH`. Fountain uses `^` dual-dialogue notation; FDX uses `<DualDialogue>`. Includes migration for existing scripts. *(Session 17)*
-- [x] **Export pages** — Copyright page (with editable boilerplate, auto-populated from author + year) and production notes page added to PDF exports. Both controlled by a new "Production" section in Settings. Export PDF + metadata modal now supports file attachments (added to ZIP under `attachments/`). *(Session 17)*
+- [x] **Export pages** — Copyright page (with editable boilerplate, auto-populated from author + year) and production notes page added to PDF exports. Both edited in the Outline tab's "Production Details" panel (moved from Settings in Session 18). Export PDF + metadata modal now supports file attachments (added to ZIP under `attachments/`). *(Session 17)*
+
+## Release Checklist (every push that changes the app)
+
+1. All changes in `script_maker.html` only; never edit `docs/index.html`.
+2. Bump the version string `v1.XX · Month YYYY` in both places (setup footer `.setup-footer-meta` and Settings panel `.setting-desc`).
+3. Bump `"softwareVersion"` in the JSON-LD block in the `<head>` to the same number.
+4. Bump `CACHE_NAME` in `docs/sw.js` to `scriptwriter-v1.XX`.
+5. Run `./sync.sh` and confirm `docs/index.html` has no leftover `docs/` paths.
+6. Update `lastmod` in `docs/sitemap.xml` for every page that changed.
+7. Run the Standard Test Checklist below in the preview.
+8. Update `LINEAGE.html` and the CLAUDE.md session notes.
+9. Commit, push, wait for Pages, then `./bin/indexnow.sh <changed URLs>`.
 
 ## Standard Test Checklist (run after every new feature)
 
