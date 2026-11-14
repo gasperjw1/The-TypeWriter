@@ -34,7 +34,7 @@ Based on comparison with WriterDuet, Arc Studio Pro, WriterSolo (Session 1), and
 
 - [x] **Scene cards / outline view** — Visual outlining mode where scenes appear as movable cards on a corkboard. Beat calls this "Powerful outlining" with scene cards. Also on Arc Studio and WriterSolo. *(Session 10)*
 - [x] **Revision tracking** — Track script revisions with industry-standard colored revision marks (white, blue, pink, yellow, green, goldenrod). Highlight changes between revisions. Beat and Final Draft both support this. *(Session 9)*
-- [ ] **Version history (browse / compare / revert)** — Extend revision tracking into a full draft history: list past snapshots, open any one read-only, side-by-side or inline diff against the current draft, and one-click revert to a snapshot. Revision marks already capture the snapshots; this is the UI on top. Seen free in Fountainhead (fountainhead.site, Nov 2026) — look into later.
+- [x] **Version history (browse / compare / revert)** — *(Session 22)*  Extend revision tracking into a full draft history: list past snapshots, open any one read-only, side-by-side or inline diff against the current draft, and one-click revert to a snapshot. Revision marks already capture the snapshots; this is the UI on top. Seen free in Fountainhead (fountainhead.site, Nov 2026) — look into later.
 - [x] **Lockable scene numbers** — Lock scene numbers for production drafts so they don't change when scenes are reordered. Allow inline editing of locked numbers. Beat and Final Draft support this. *(Session 10)*
 
 ### To Do — Scene Card Upgrades (Priority 2b)

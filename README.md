@@ -123,7 +123,6 @@ See the release checklist in [TODO.md](TODO.md). In short: edit `script_maker.ht
 
 See [TODO.md](TODO.md). Up next:
 
-- Version history: browse, compare and revert to earlier drafts
 - Beat board mode: free-form story cards not tied to scenes
 - Cross-act scene reordering and cross-scene line moves
 - One-click Dropbox and Google Drive open/save, if analytics show enough users on browsers without the File System Access API

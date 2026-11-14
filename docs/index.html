@@ -41,7 +41,7 @@
     "https://apps.microsoft.com/detail/9nzhcs8sfpzn",
     "https://store.app/thescriptwriter"
   ],
-  "featureList": "Stage play formatting, entrance and exit cue tracking, scene cards and outline, revision marks, notes and bookmarks, PDF export, Fountain and Final Draft import and export, rehearsal sides, offline use",
+  "featureList": "Stage play formatting, entrance and exit cue tracking, scene cards and outline, revision marks and version history, notes and bookmarks, PDF export, Fountain and Final Draft import and export, rehearsal sides, offline use",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -51,7 +51,7 @@
     "@type": "Person",
     "name": "Yash Mahtani"
   },
-  "softwareVersion": "1.55"
+  "softwareVersion": "1.56"
 }
 </script>
 <script type="application/ld+json">
@@ -1243,7 +1243,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
             <span>·</span>
             <a href="support.html">Support</a>
           </div>
-          <div class="setup-footer-meta">v1.55 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
+          <div class="setup-footer-meta">v1.56 · November 2026 · <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com">Report a bug</a><!--/email_off--> · &copy; 2026 Yash Mahtani</div>
         </div>
       </div>
       <div id="script-content"></div>
@@ -1436,7 +1436,7 @@ select.ie-dlg-char{cursor:pointer;padding:4px 8px;background:var(--bg2);border:1
         <!--email_off--><a href="mailto:thescriptwriterapp@gmail.com" style="display:inline-block;margin-top:8px;font-size:12px;color:var(--accent,#378ADD);text-decoration:none;font-family:var(--sans);">thescriptwriterapp@gmail.com</a><!--/email_off-->
       </div>
       <div class="setting-row" style="margin-top:12px;">
-        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.55 · November 2026</div>
+        <div class="setting-desc" style="font-size:11px;color:var(--tx3);">The Scriptwriter v1.56 · November 2026</div>
       </div>
     </div>
 
@@ -5511,6 +5511,8 @@ function openKBRef(){
   h+=brow('↩ &nbsp;Undo','Reverse the last change');
   h+=brow('↪ &nbsp;Redo','Re-apply a reversed change');
   h+=brow('📝 &nbsp;Notes','Show or hide notes attached to lines');
+  h+=brow('● &nbsp;Revision chip','Open revision history: view, compare or revert a snapshot <em>(appears after your first revision)</em>');
+  h+=brow('✱ &nbsp;Marks','Show or hide colored revision marks on changed lines');
   h+=brow('? &nbsp;Help','Open this panel');
 
   h+=sec('Writing');
